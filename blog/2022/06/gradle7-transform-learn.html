@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编译技术,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Transform API 是 AGP1.5 就引入的特性，主要用于在 Android 构建过程中，在 Class转Dex的过程中修改 Class 字节码。利用 Transform API，我们可以拿到所有参与构建的 Class 文件，然后可以借助ASM 等字节码编辑工具进行修改，插入自定义逻辑。     国内很多团队都或多或少的用 AGP 的 Transform API 来搞点儿黑科技，比如">
+<meta name="keywords" content="编译技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transform 被废弃，ASM 如何适配?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/06/gradle7-transform-learn.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Transform API 是 AGP1.5 就引入的特性，主要用于在 Android 构建过程中，在 Class转Dex的过程中修改 Class 字节码。利用 Transform API，我们可以拿到所有参与构建的 Class 文件，然后可以借助ASM 等字节码编辑工具进行修改，插入自定义逻辑。     国内很多团队都或多或少的用 AGP 的 Transform API 来搞点儿黑科技，比如">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/44e2f3d80f7847c1803c90f66a8c2bb5~tplv-k3u1fbpfcp-zoom-in-crop-mark:1304:0:0:0.awebp?">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.248Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Transform 被废弃，ASM 如何适配?">
+<meta name="twitter:description" content="前言Transform API 是 AGP1.5 就引入的特性，主要用于在 Android 构建过程中，在 Class转Dex的过程中修改 Class 字节码。利用 Transform API，我们可以拿到所有参与构建的 Class 文件，然后可以借助ASM 等字节码编辑工具进行修改，插入自定义逻辑。     国内很多团队都或多或少的用 AGP 的 Transform API 来搞点儿黑科技，比如">
+<meta name="twitter:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/44e2f3d80f7847c1803c90f66a8c2bb5~tplv-k3u1fbpfcp-zoom-in-crop-mark:1304:0:0:0.awebp?">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/06/gradle7-transform-learn.html">
+
+
+
+
+
+  <title>Transform 被废弃，ASM 如何适配? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/06/gradle7-transform-learn.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Transform 被废弃，ASM 如何适配?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-05T20:26:56+08:00">
+                2022-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Transform API</code> 是 <code>AGP1.5</code> 就引入的特性，主要用于在 <code>Android</code> 构建过程中，在 <code>Class</code>转<code>Dex</code>的过程中修改 <code>Class</code> 字节码。利用 <code>Transform API</code>，我们可以拿到所有参与构建的 <code>Class</code> 文件，然后可以借助<code>ASM</code> 等字节码编辑工具进行修改，插入自定义逻辑。    </p>
+<p>国内很多团队都或多或少的用 <code>AGP</code> 的 <code>Transform API</code> 来搞点儿黑科技，比如无痕埋点，耗时统计，方法替换等。但是在<code>AGP7.0</code>中<code>Transform</code>已经被标记为废弃了，并且将在<code>AGP8.0</code>中移除。而<code>AGP8.0</code>应该会在今年内发布，可以说是已经近在眼前了。所以现在应该是时候了解一下，在<code>Transform</code>被废弃之后，该怎么适配了。</p>
+<h2 id="Transform-Action介绍"><a href="#Transform-Action介绍" class="headerlink" title="Transform Action介绍"></a><code>Transform Action</code>介绍</h2><p><code>Transform API</code>是由<code>AGP</code>提供的，而<code>Transform Action</code>则是由<code>Gradle</code>提供。不光是 <code>AGP</code> 需要 <code>Transform</code>，<code>Java</code> 也需要，所以由 <code>Gradle</code> 来提供统一的 <code>Transform API</code> 也合情合理。<br>这应该也是<code>Transform API</code>被废弃的原因，既然<code>Gradle</code>已经统一提供了<code>API</code>，<code>AGP</code>也就没必要自定义一套了。   </p>
+<p>关于 <code>TransformAction</code> 如何使用，<code>Gradle</code> 官方已经提供了很详细的文档–<a href="https://docs.gradle.org/current/userguide/artifact_transforms.html" target="_blank" rel="noopener">Transforming dependency artifacts on resolution</a>，具体使用可以直接参考文档</p>
+<h2 id="AsmClassVisitorFactory介绍"><a href="#AsmClassVisitorFactory介绍" class="headerlink" title="AsmClassVisitorFactory介绍"></a><code>AsmClassVisitorFactory</code>介绍</h2><p>直接使用<code>Transform Action</code>的话还是有些麻烦，跟<code>Transform API</code>一样，需要手动处理增量编译的逻辑。<code>AGP</code>很贴心的为我们又做了一层封装，提供了<code>AsmClassVisitorFactory</code>来方便我们使用<code>Transform Action</code>进行<code>ASM</code>操作。<br>根据官方的说法，<code>AsmClassVisitoFactory</code>会带来约18%的性能提升，同时可以减少约5倍代码       </p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/44e2f3d80f7847c1803c90f66a8c2bb5~tplv-k3u1fbpfcp-zoom-in-crop-mark:1304:0:0:0.awebp?" alt>     </p>
+<h2 id="代码实战"><a href="#代码实战" class="headerlink" title="代码实战"></a>代码实战</h2><p>接下来我们利用<code>AGP</code> 的<code>AsmClassVisitorFactory API</code>,来实现方法执行耗时的插桩。     </p>
+<h3 id="实现AsmClassVisitorFactory"><a href="#实现AsmClassVisitorFactory" class="headerlink" title="实现AsmClassVisitorFactory"></a>实现<code>AsmClassVisitorFactory</code></h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeCostTransform</span>: <span class="type">AsmClassVisitorFactory</span>&lt;<span class="type">InstrumentationParameters.None</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">createClassVisitor</span><span class="params">(classContext: <span class="type">ClassContext</span>, nextClassVisitor: <span class="type">ClassVisitor</span>)</span></span>: ClassVisitor &#123;</span><br><span class="line">        <span class="keyword">return</span> TimeCostClassVisitor(nextClassVisitor)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">isInstrumentable</span><span class="params">(classData: <span class="type">ClassData</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><code>AsmClassVisitorFactory</code>即创建<code>ClassVisitor</code>对象的工厂。此接口的实现必须是一个抽象类，</li>
+<li><code>createClassVisitor</code>返回我们自定义的<code>ClassVisitor</code>，在自定义<code>Visitor</code>处理完成后，需要传内容传递给下一个<code>Visitor</code>，因此我们将其放在构造函数中传入      </li>
+<li><code>isInstrumentable</code>用于控制我们的自定义<code>Visitor</code>是否需要处理这个类，通过这个方法可以过滤我们不需要的类，加快编译速度</li>
+</ol>
+<h3 id="自定义ClassVisitor"><a href="#自定义ClassVisitor" class="headerlink" title="自定义ClassVisitor"></a>自定义<code>ClassVisitor</code></h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeCostClassVisitor</span></span>(nextVisitor: ClassVisitor) : ClassVisitor(Opcodes.ASM5, nextVisitor) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">visitMethod</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        access: <span class="type">Int</span>, name: <span class="type">String</span>?, descriptor: <span class="type">String</span>?, signature: <span class="type">String</span>?, exceptions: <span class="type">Array</span>&lt;<span class="type">out</span> <span class="type">String</span>&gt;?</span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span>: MethodVisitor &#123;</span><br><span class="line">        <span class="keyword">val</span> methodVisitor = <span class="keyword">super</span>.visitMethod(access, name, descriptor, signature, exceptions)</span><br><span class="line">        <span class="keyword">val</span> newMethodVisitor =</span><br><span class="line">            <span class="keyword">object</span> : AdviceAdapter(Opcodes.ASM5, methodVisitor, access, name, descriptor) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onMethodEnter</span><span class="params">()</span></span> &#123;</span><br><span class="line">                    <span class="comment">// 方法开始</span></span><br><span class="line">                    <span class="keyword">if</span> (isNeedVisiMethod(name)) &#123;</span><br><span class="line">                        mv.visitLdcInsn(name);</span><br><span class="line">                        mv.visitMethodInsn(</span><br><span class="line">                            INVOKESTATIC, <span class="string">"com/zj/android_asm/TimeCache"</span>, <span class="string">"putStartTime"</span>,<span class="string">"(Ljava/lang/String;)V"</span>, <span class="literal">false</span></span><br><span class="line">                        );</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">super</span>.onMethodEnter();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onMethodExit</span><span class="params">(opcode: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">                    <span class="comment">// 方法结束</span></span><br><span class="line">                    <span class="keyword">if</span> (isNeedVisiMethod(name)) &#123;</span><br><span class="line">                        mv.visitLdcInsn(name);</span><br><span class="line">                        mv.visitMethodInsn(</span><br><span class="line">                            INVOKESTATIC, <span class="string">"com/zj/android_asm/TimeCache"</span>, <span class="string">"putEndTime"</span>,<span class="string">"(Ljava/lang/String;)V"</span>, <span class="literal">false</span></span><br><span class="line">                        );</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">super</span>.onMethodExit(opcode);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        <span class="keyword">return</span> newMethodVisitor</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">isNeedVisiMethod</span><span class="params">(name: <span class="type">String</span>?)</span></span>:<span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> name != <span class="string">"putStartTime"</span> &amp;&amp; name != <span class="string">"putEndTime"</span> &amp;&amp; name != <span class="string">"&lt;clinit&gt;"</span> &amp;&amp; name != <span class="string">"printlnTime"</span> &amp;&amp; name != <span class="string">"&lt;init&gt;"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里就跟普通的<code>ASM</code>操作没什么不同了，主要是通过<code>ASM</code>字节码插桩，在方法的前后插入如下代码，通过计算两者的时间差来得出方法的耗时</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">timeMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">    TimeCache.putStartTime(<span class="string">"timeMethod"</span>) <span class="comment">//方法开始插入的代码</span></span><br><span class="line">    Thread.sleep(<span class="number">1000</span>)</span><br><span class="line">    TimeCache.putEndTime(<span class="string">"timeMethod"</span>) <span class="comment">//方法结束插入的代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="注册Transform"><a href="#注册Transform" class="headerlink" title="注册Transform"></a>注册<code>Transform</code></h3><p>老版本的<code>Transform</code>是注册在<code>AppExtension</code>中的，新版本则是注册在<code>AndroidComponentsExtension</code>中      </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeCostPlugin</span> : <span class="type">Plugin</span>&lt;<span class="type">Project</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">apply</span><span class="params">(project: <span class="type">Project</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> androidComponents = project.extensions.getByType(AndroidComponentsExtension::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        androidComponents.onVariants &#123; variant -&gt;</span><br><span class="line">            variant.instrumentation.transformClassesWith(TimeCostTransform::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>,<span class="type"></span></span></span><br><span class="line">                    InstrumentationScope.PROJECT) &#123;&#125;</span><br><span class="line">            variant.instrumentation.setAsmFramesComputationMode(</span><br><span class="line">                    FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS</span><br><span class="line">            )</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>基于<code>variant</code>可实现不同的变种不同的处理逻辑    </li>
+<li><code>transformClassesWith</code>通过<code>InstrumentationScope</code>控制是否需要扫描依赖库代码   </li>
+<li><code>setAsmFramesComputationMode</code>可设置不同的栈帧计算模式，具体可查看源码</li>
+</ol>
+<h3 id="AsmClassVisitorFactory的优势"><a href="#AsmClassVisitorFactory的优势" class="headerlink" title="AsmClassVisitorFactory的优势"></a><code>AsmClassVisitorFactory</code>的优势</h3><p>通过以上步骤，一个简单的通过插桩计算方法执行耗时的功能就完成了，这比起老版的<code>Transform API</code>其实简化了不少，老版本处理增量更新就需要处理一大堆的逻辑。<br>可以看到我们这里并没有手动处理增量逻辑，这是因为调用<code>AsmClassVisitorFactory</code>的<code>TransformClassesWithAsmTask</code>继承自<code>NewIncrementalTask</code>，已经处理了增量逻辑，不需要我们再手动处理了</p>
+<p>同时老版本的<code>Transform</code>每个<code>Transfrom</code>各自独立，如果每个<code>Transform</code>编译构建耗时<code>+10s</code>，各个<code>Transform</code>叠在一起，编译耗时就会呈线性增长<br>而新版本可以看出我们也没有手动进行<code>IO</code>操作，这是因为<code>AsmInstrumentationManager</code>中已经做了统一处理，只需要进行一次<code>IO</code>操作，然后交给<code>ClassVisitor</code>链表处理，完成后统一交给<code>ClassWriter</code>写入<br>通过这种方式，可以有效地减少<code>IO</code>操作，这也是新版本<code>API</code>性能提升的原因</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总得来说，由于<code>Transform API</code>在<code>AGP7.0</code>已标记为废弃，并且将在<code>AGP8.0</code>中移除，是时候了解一下如何迁移<code>Transform API</code>了              </p>
+<p>而<code>AsmClassVisitorFactory</code>相比<code>Transform API</code>，使用起来更加简单，不需要手动处理增量逻辑，可以专注于字节码插桩操作。同时<code>AsmClassVisitorFactory</code>通过减少<code>IO</code>的方式，可以得到约20%的性能提升，加快编译速度。 </p>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><p>本文所有源码可见：<a href="https://github.com/shenzhen2017/Android-ASM" target="_blank" rel="noopener">https://github.com/shenzhen2017/Android-ASM</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/7098752199575994405" target="_blank" rel="noopener">其实 Gradle Transform 就是个纸老虎 —— Gradle 系列(4)</a><br><a href="https://juejin.cn/post/7016147287889936397" target="_blank" rel="noopener">现在准备好告别Transform了吗？ | 拥抱AGP7.0</a>     </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编译技术/" rel="tag"># 编译技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/06/android-jank-optimize.html" rel="next" title="【从入门到实用】Android卡顿优化深入解析">
+                <i class="fa fa-chevron-left"></i> 【从入门到实用】Android卡顿优化深入解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/06/asm-method-record.html" rel="prev" title="ASM 插桩采集方法入参，出参及耗时信息">
+                ASM 插桩采集方法入参，出参及耗时信息 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transform-Action介绍"><span class="nav-number">2.</span> <span class="nav-text">Transform Action介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AsmClassVisitorFactory介绍"><span class="nav-number">3.</span> <span class="nav-text">AsmClassVisitorFactory介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实战"><span class="nav-number">4.</span> <span class="nav-text">代码实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现AsmClassVisitorFactory"><span class="nav-number">4.1.</span> <span class="nav-text">实现AsmClassVisitorFactory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义ClassVisitor"><span class="nav-number">4.2.</span> <span class="nav-text">自定义ClassVisitor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册Transform"><span class="nav-number">4.3.</span> <span class="nav-text">注册Transform</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AsmClassVisitorFactory的优势"><span class="nav-number">4.4.</span> <span class="nav-text">AsmClassVisitorFactory的优势</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例代码"><span class="nav-number">5.1.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.2.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

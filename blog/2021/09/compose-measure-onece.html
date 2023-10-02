@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="compose,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言做过布局性能优化的同学都知道，为了优化界面加载速度，要尽可能的减少布局的层级。这主要是因为布局层级的增加，可能会导致测量时间呈指数级增长。而Compose却没有这个问题，它从根本上解决了布局层级对布局性能的影响: Compose界面只允许一次测量。这意味着随着布局层级的加深，测量时间也只是线性增长的.下面我们就一起来看看Compose到底是怎么只测量一次就把活给干了的,本文主要包括以下内容：">
+<meta name="keywords" content="compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么 Compose 没有布局嵌套问题?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/09/compose-measure-onece.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言做过布局性能优化的同学都知道，为了优化界面加载速度，要尽可能的减少布局的层级。这主要是因为布局层级的增加，可能会导致测量时间呈指数级增长。而Compose却没有这个问题，它从根本上解决了布局层级对布局性能的影响: Compose界面只允许一次测量。这意味着随着布局层级的加深，测量时间也只是线性增长的.下面我们就一起来看看Compose到底是怎么只测量一次就把活给干了的,本文主要包括以下内容：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://image.rengwuxian.com/2021/05/05/8220fbcb38a10.png">
+<meta property="og:image" content="http://image.rengwuxian.com/2021/05/05/5585808964f8c.png">
+<meta property="og:image" content="http://image.rengwuxian.com/2021/05/05/58596a6ec9dc5.png">
+<meta property="og:image" content="https://developer.android.com/images/jetpack/compose/layout-text-with-divider.png?hl=zh-cn">
+<meta property="og:image" content="https://developer.android.com/images/jetpack/compose/layout-text-with-divider-too-long.png?hl=zh-cn">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p11.jpg">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p12.png">
+<meta property="og:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c991f8852bbc413aaab7f99311b36561~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f4a41cfc8c0b45bab4489c3b680811c8~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b4b74f5f51764e06a0545fb0f9a1600e~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.244Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="为什么 Compose 没有布局嵌套问题?">
+<meta name="twitter:description" content="前言做过布局性能优化的同学都知道，为了优化界面加载速度，要尽可能的减少布局的层级。这主要是因为布局层级的增加，可能会导致测量时间呈指数级增长。而Compose却没有这个问题，它从根本上解决了布局层级对布局性能的影响: Compose界面只允许一次测量。这意味着随着布局层级的加深，测量时间也只是线性增长的.下面我们就一起来看看Compose到底是怎么只测量一次就把活给干了的,本文主要包括以下内容：">
+<meta name="twitter:image" content="https://image.rengwuxian.com/2021/05/05/8220fbcb38a10.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/09/compose-measure-onece.html">
+
+
+
+
+
+  <title>为什么 Compose 没有布局嵌套问题? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/09/compose-measure-onece.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">为什么 Compose 没有布局嵌套问题?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-15T21:54:54+08:00">
+                2021-09-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>做过布局性能优化的同学都知道，为了优化界面加载速度，要尽可能的减少布局的层级。这主要是因为布局层级的增加，可能会导致测量时间呈指数级增长。<br>而<code>Compose</code>却没有这个问题，它从根本上解决了布局层级对布局性能的影响: <code>Compose</code>界面只允许一次测量。这意味着随着布局层级的加深，测量时间也只是线性增长的.<br>下面我们就一起来看看<code>Compose</code>到底是怎么只测量一次就把活给干了的,本文主要包括以下内容：      </p>
+<ol>
+<li>布局层级过深为什么影响性能?     </li>
+<li><code>Compose</code>为什么没有布局嵌套问题?         </li>
+<li><code>Compose</code>测量过程源码分析    </li>
+</ol>
+<h2 id="1-布局层级过深为什么影响性能"><a href="#1-布局层级过深为什么影响性能" class="headerlink" title="1. 布局层级过深为什么影响性能?"></a>1. 布局层级过深为什么影响性能?</h2><p>我们总说布局层级过深会影响性能，那么到底是怎么影响的呢？主要是因为在某些情况下<code>ViewGroup</code>会对子<code>View</code>进行多次测量<br>举个例子<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">LinearLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:orientation</span>=<span class="string">"vertical"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">View</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"100dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:background</span>=<span class="string">"@android:color/holo_red_dark"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">View</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"100dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"100dp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:background</span>=<span class="string">"@android:color/black"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<ol>
+<li><code>LinearLayout</code>宽度为<code>wrap_content</code>,因此它将选择子<code>View</code>的最大宽度为其最后的宽度     </li>
+<li>但是有个子<code>View</code>的宽度为<code>match_parent</code>，意思它将以<code>LinearLayout</code>的宽度为宽度，这就陷入死循环了     </li>
+<li>因此这时候， <code>LinearLayout</code> 就会先以<code>0</code>为强制宽度测量一下子<code>View</code>，并正常地测量剩下的其他子<code>View</code>，然后再用其他子<code>View</code>里最宽的那个的宽度，二次测量这个<code>match_parent</code>的子 <code>View</code>，最终得出它的尺寸，并把这个宽度作为自己最终的宽度。      </li>
+<li>这是对单个子<code>View</code>的二次测量，如果有多个子<code>View</code>写了<code>match_parent</code> ，那就需要对它们每一个都进行二次测量。       </li>
+<li>除此之外，如果在<code>LinearLayout</code>中使用了<code>weight</code>会导致测量3次甚至更多,重复测量在<code>Android</code>中是很常见的        </li>
+</ol>
+<p>上面介绍了为什么会出现重复测量，那么会有什么影响呢？不过是多测量了几次，会对性能有什么大的影响吗？<br><strong>之所以需要避免布局层级过深是因为它对性能的影响是指数级的</strong>       </p>
+<ol>
+<li>如果我们的布局有两层，其中父<code>View</code>会对每个子<code>View</code>做二次测量，那它的每个子<code>View</code>一共需要被测量 2 次        </li>
+<li>如果增加到三层，并且每个父<code>View</code>依然都做二次测量，这时候最下面的子<code>View</code>被测量的次数就直接翻倍了，变成 4 次     </li>
+<li>同理，增加到 4 层的话会再次翻倍，子 View 需要被测量 8 次<br><img src="https://image.rengwuxian.com/2021/05/05/8220fbcb38a10.png" alt>     </li>
+</ol>
+<p>也就是说，对于会做二次测量的系统，层级加深对测量时间的影响是指数级的,这就是<code>Android</code>官方文档建议我们减少布局层级的原因     </p>
+<h2 id="2-Compose为什么没有布局嵌套问题"><a href="#2-Compose为什么没有布局嵌套问题" class="headerlink" title="2. Compose为什么没有布局嵌套问题?"></a>2. <code>Compose</code>为什么没有布局嵌套问题?</h2><p>我们知道，<code>Compose</code>只允许测量一次，不允许重复测量。<br>如果每个父组件对每个子组件只测量一次，那就直接意味着界面中的每个组件只会被测量一次<br><img src="http://image.rengwuxian.com/2021/05/05/5585808964f8c.png" alt><br>这样即使布局层级加深，测量时间却没有增加，把组件加载的时间复杂度从<code>O(2ⁿ)</code> 降到了 <code>O(n)</code>。          </p>
+<p>那么问题就来了，上面我们已经知道，多次测量有时是必要的，但是为什么<code>Compose</code>不需要呢？<br><strong><code>Compose</code>中引入了固有特性测量(<code>Intrinsic Measurement</code>)</strong>         </p>
+<p>固有特性测量即<code>Compose</code>允许父组件在对子组件进行测量之前，先测量一下子组件的「固有尺寸」<br>我们上面说的，<code>ViewGroup</code>的二次测量，也是先进行这种「粗略测量」再进行最终的「正式测量」，使用固有特性测量可以产生同样的效果      </p>
+<p>而使用固有特性测量之所以有性能优势，主要是因为其不会随着层级的加深而加倍，固有特性测量也只进行一次<br><code>Compose</code>会先对整个组件树进行一次<code>Intrinsic</code>测量，然后再对整体进行正式的测量。这样开辟两个平行的测量过程，就可以避免因为层级增加而对同一个子组件反复测量所导致的测量时间的不断加倍了。<br><img src="http://image.rengwuxian.com/2021/05/05/58596a6ec9dc5.png" alt><br>总结成一句话就是，在<code>Compose</code>里疯狂嵌套地写界面，和把所有组件全都写进同一层里面，性能是一样的！所以<code>Compose</code>没有布局嵌套问题     </p>
+<h3 id="2-1-固有特性测量使用"><a href="#2-1-固有特性测量使用" class="headerlink" title="2.1 固有特性测量使用"></a>2.1 固有特性测量使用</h3><p>假设我们需要创建一个可组合项，该可组合项在屏幕上显示两个用分隔线隔开的文本，如下所示：<br><img src="https://developer.android.com/images/jetpack/compose/layout-text-with-divider.png?hl=zh-cn" alt><br>为了实现分隔线与最高的文本一样高，我们可以怎么做呢？<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">TwoTexts</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    text1: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    text2: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    modifier: <span class="type">Modifier</span> = Modifier</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">    Row(modifier = modifier.height(IntrinsicSize.Min)) &#123;</span><br><span class="line">        Text(</span><br><span class="line">            modifier = Modifier</span><br><span class="line">                .weight(<span class="number">1f</span>)</span><br><span class="line">                .padding(start = <span class="number">4</span>.dp)</span><br><span class="line">                .wrapContentWidth(Alignment.Start),</span><br><span class="line">            text = text1</span><br><span class="line">        )</span><br><span class="line">        Divider(</span><br><span class="line">            color = Color.Black,</span><br><span class="line">            modifier = Modifier</span><br><span class="line">                .fillMaxHeight()</span><br><span class="line">                .width(<span class="number">1</span>.dp)</span><br><span class="line">        )</span><br><span class="line">        Text(</span><br><span class="line">            modifier = Modifier</span><br><span class="line">                .weight(<span class="number">1f</span>)</span><br><span class="line">                .padding(end = <span class="number">4</span>.dp)</span><br><span class="line">                .wrapContentWidth(Alignment.End),</span><br><span class="line">            text = text2</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意，这里给<code>Row</code>的<code>height</code>设置为了<code>IntrinsicSize.Min</code>,<code>IntrinsicSize.Min</code>会递归查询它子项的最小高度，其中两个<code>Text</code>的最小高度即文本的宽度，而<code>Divider</code>的最小高度为0<br>因此最后<code>Row</code>的高度即为最长的文本的高度，而<code>Divider</code>的高度为<code>fillMaxHeight</code>，也就跟最高的文本一样高了<br>如果我们这里不设置高度为<code>IntrinsicSize.Min</code>的话，<code>Divider</code>的高度是占满屏幕的，如下所示<br><img src="https://developer.android.com/images/jetpack/compose/layout-text-with-divider-too-long.png?hl=zh-cn" alt>        </p>
+<h2 id="3-Compose测量过程源码分析"><a href="#3-Compose测量过程源码分析" class="headerlink" title="3. Compose测量过程源码分析"></a>3. <code>Compose</code>测量过程源码分析</h2><p>上面我们介绍了固有特性测量是什么，及固有特性测量的使用，下面我们来看看<code>Compose</code>的测量究竟是怎么实现的    </p>
+<h3 id="3-1-测量入口"><a href="#3-1-测量入口" class="headerlink" title="3.1 测量入口"></a>3.1 测量入口</h3><p>我们知道，在<code>Compose</code>中自定义<code>Layout</code>是通过<code>Layout</code>方法实现的<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span> <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="title">Layout</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    content: @<span class="type">Composable</span> () -&gt; <span class="type">Unit</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    modifier: <span class="type">Modifier</span> = Modifier,</span></span></span><br><span class="line"><span class="function"><span class="params">    measurePolicy: <span class="type">MeasurePolicy</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>主要传入3个参数     </p>
+<ol>
+<li><code>content</code>：自定义布局的子项，我们后续需要对它们测量和定位       </li>
+<li><code>modifier</code>: 对<code>Layout</code>添加的一些修饰<code>modifier</code>     </li>
+<li><code>measurePolicy</code>: 即测量规则，这个是我们主要需要处理的地方    </li>
+</ol>
+<p><code>measurePolicy</code>中主要有五个接口<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="keyword">interface</span> MeasurePolicy &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> MeasureScope.<span class="title">measure</span><span class="params">(measurables: <span class="type">List</span>&lt;<span class="type">Measurable</span>&gt;,constraints: <span class="type">Constraints</span>)</span></span>: MeasureResult</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> IntrinsicMeasureScope.<span class="title">minIntrinsicWidth</span><span class="params">(measurables: <span class="type">List</span>&lt;<span class="type">IntrinsicMeasurable</span>&gt;,height: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> IntrinsicMeasureScope.<span class="title">minIntrinsicHeight</span><span class="params">(measurables: <span class="type">List</span>&lt;<span class="type">IntrinsicMeasurable</span>&gt;,width: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> IntrinsicMeasureScope.<span class="title">maxIntrinsicWidth</span><span class="params">(measurables: <span class="type">List</span>&lt;<span class="type">IntrinsicMeasurable</span>&gt;,height: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> IntrinsicMeasureScope.<span class="title">maxIntrinsicHeight</span><span class="params">(measurables: <span class="type">List</span>&lt;<span class="type">IntrinsicMeasurable</span>&gt;,width: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出：    </p>
+<ol>
+<li>使用固有特性测量的时候，会调用对应的<code>IntrinsicMeasureScope</code>方法，如使用<code>Modifier.height(IntrinsicSize.Min)</code>，就会调用<code>minIntrinsicHeight</code>方法</li>
+<li>父项测量子项时，就是在<code>MeasureScope.measure</code>方法中调用<code>measure.meausre(constraints)</code>，但是具体是怎么实现的呢?我们来看个例子</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">MeasureTest</span><span class="params">()</span></span> &#123;</span><br><span class="line">    Row() &#123;</span><br><span class="line">        Layout(content = &#123; &#125;, measurePolicy = &#123; measurables, constraints -&gt;</span><br><span class="line">        	measurables.forEach &#123;</span><br><span class="line">            	it.measure(constraints)</span><br><span class="line">        	&#125;</span><br><span class="line">            layout(<span class="number">100</span>, <span class="number">100</span>) &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一个简单的例子，我们在<code>measure</code>方法中打个断点，如下图所示:<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p11.jpg" alt>    </p>
+<ol>
+<li>如下图所示，是由<code>Row</code>的<code>MeasurePolicy</code>中开始测量子项，<code>rowColumnMeasurePolicy</code>我们定义为<code>ParentPolicy</code>       </li>
+<li>然后调用到<code>LayoutNode</code>,<code>OuterMeasurablePlaceable</code>,<code>InnerPlaceable</code>的<code>measure</code>方法     </li>
+<li>最后再由<code>InnerPlaceable</code>中调用到子项的<code>MeasurePolicy</code>,即我们自定义<code>Layout</code>时实现的部分，我们定义它为<code>ChildPolicy</code>        </li>
+<li>子项中也可能会测量它的子项，在这种情况下它就变成了一个<code>ParentPolicy</code>,然后继续后续的测量<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p12.png" alt>    </li>
+</ol>
+<p>综上所述，父项在测量子项时，子项的测量入口就是<code>LayoutNode.measure</code>，然后经过一系列调用到子项自己的<code>MeasurePolicy</code>，也就是我们自定义<code>Layout</code>中自定义的部分     </p>
+<h3 id="3-2-LayoutNodeWrapper链构建"><a href="#3-2-LayoutNodeWrapper链构建" class="headerlink" title="3.2 LayoutNodeWrapper链构建"></a>3.2 <code>LayoutNodeWrapper</code>链构建</h3><p>上面我们说了，测量入口是<code>LayoutNode</code>,后续还要经过<code>OuterMeasurablePlaceable</code>,<code>InnerPlaceable</code>的<code>measure</code>方法,那么问题来了，这些东西是怎么来的呢?<br>首先给出结论     </p>
+<ol>
+<li>子项都是以<code>LayoutNode</code>的形式，存在于<code>Parent</code>的<code>children</code>中的     </li>
+<li>给<code>Layout</code>的设置的<code>modifier</code>会以<code>LayoutNodeWrapper</code>链的形式存储在<code>LayoutNode</code>中，然后后续做相应变换      </li>
+</ol>
+<p>由于篇幅原因，关于第一点就不在这里详述了，有兴趣的同学可以参考：<a href="https://juejin.cn/post/6981805443219718151" target="_blank" rel="noopener">Jetpack Compose 测量流程源码分析</a><br>我们这里主要看下<code>LayoutNodeWrapper</code>链是怎么构建的<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="keyword">val</span> innerLayoutNodeWrapper: LayoutNodeWrapper = InnerPlaceable(<span class="keyword">this</span>)</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> outerMeasurablePlaceable = OuterMeasurablePlaceable(<span class="keyword">this</span>, innerLayoutNodeWrapper)</span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">measure</span><span class="params">(constraints: <span class="type">Constraints</span>)</span></span> = outerMeasurablePlaceable.measure(constraints)</span><br><span class="line"><span class="keyword">override</span> <span class="keyword">var</span> modifier: Modifier = Modifier</span><br><span class="line">      <span class="keyword">set</span>(value) &#123;</span><br><span class="line">          <span class="comment">// …… code</span></span><br><span class="line">          field = value</span><br><span class="line">          <span class="comment">// …… code</span></span><br><span class="line"></span><br><span class="line">      </span><br><span class="line">          <span class="comment">// 创建新的 LayoutNodeWrappers 链</span></span><br><span class="line">          <span class="comment">// foldOut 相当于遍历 modifier</span></span><br><span class="line">          <span class="keyword">val</span> outerWrapper = modifier.foldOut(innerLayoutNodeWrapper) &#123; mod <span class="comment">/*📍 modifier*/</span> , toWrap -&gt;</span><br><span class="line">              <span class="keyword">var</span> wrapper = toWrap</span><br><span class="line">              <span class="keyword">if</span> (mod <span class="keyword">is</span> OnGloballyPositionedModifier) &#123;</span><br><span class="line">                  onPositionedCallbacks += mod</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">if</span> (mod <span class="keyword">is</span> RemeasurementModifier) &#123;</span><br><span class="line">                  mod.onRemeasurementAvailable(<span class="keyword">this</span>)</span><br><span class="line">              &#125;</span><br><span class="line"></span><br><span class="line">              <span class="keyword">val</span> delegate = reuseLayoutNodeWrapper(mod, toWrap)</span><br><span class="line">              <span class="keyword">if</span> (delegate != <span class="literal">null</span>) &#123;</span><br><span class="line">                  wrapper = delegate</span><br><span class="line">              &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// …… 省略了一些 Modifier判断 </span></span><br><span class="line">                    <span class="keyword">if</span> (mod <span class="keyword">is</span> KeyInputModifier) &#123;</span><br><span class="line">                      wrapper = ModifiedKeyInputNode(wrapper, mod).assignChained(toWrap)</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="keyword">if</span> (mod <span class="keyword">is</span> PointerInputModifier) &#123;</span><br><span class="line">                      wrapper = PointerInputDelegatingWrapper(wrapper, mod).assignChained(toWrap)</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="keyword">if</span> (mod <span class="keyword">is</span> NestedScrollModifier) &#123;</span><br><span class="line">                      wrapper = NestedScrollDelegatingWrapper(wrapper, mod).assignChained(toWrap)</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="comment">// 布局相关的 Modifier</span></span><br><span class="line">                  <span class="keyword">if</span> (mod <span class="keyword">is</span> LayoutModifier) &#123;</span><br><span class="line">                      wrapper = ModifiedLayoutNode(wrapper, mod).assignChained(toWrap)</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="keyword">if</span> (mod <span class="keyword">is</span> ParentDataModifier) &#123;</span><br><span class="line">                      wrapper = ModifiedParentDataNode(wrapper, mod).assignChained(toWrap)</span><br><span class="line">                  &#125;</span><br><span class="line">                 </span><br><span class="line">              &#125;</span><br><span class="line">              wrapper</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          outerWrapper.wrappedBy = parent?.innerLayoutNodeWrapper</span><br><span class="line">          outerMeasurablePlaceable.outerWrapper = outerWrapper</span><br><span class="line"></span><br><span class="line">          ……</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示：   </p>
+<ol>
+<li>默认的<code>LayoutNodeWrapper</code>链即由<code>LayoutNode</code>,<code>OuterMeasurablePlaceable</code>,<code>InnerPlaceable</code>组成    </li>
+<li>当添加了<code>modifier</code>时，<code>LayoutNodeWrapper</code>链会更新，<code>modifier</code>会作为一个结点插入到其中    </li>
+</ol>
+<p>举个例子，如果我们给<code>Layout</code>设置一些<code>modifier</code>:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Modifier.size(100.dp).padding(10.dp).background(Color.Blue)</span><br></pre></td></tr></table></figure></p>
+<p>那么对应的<code>LayoutNodeWrapper</code>链如下图所示<br><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c991f8852bbc413aaab7f99311b36561~tplv-k3u1fbpfcp-watermark.awebp" alt><br>这样一个接一个链式调用下一个的<code>measure</code>，直到最后一个结点<code>InnerPlaceable</code><br>那么<code>InnerPlaceable</code>又会调用到哪儿呢？<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f4a41cfc8c0b45bab4489c3b680811c8~tplv-k3u1fbpfcp-watermark.awebp" alt><br><code>InnerPlaceable</code>最终调用到了我们自定义<code>Layout</code>时写的<code>measure</code>方法    </p>
+<h3 id="3-3-固有特性测量是怎样实现的？"><a href="#3-3-固有特性测量是怎样实现的？" class="headerlink" title="3.3 固有特性测量是怎样实现的？"></a>3.3 固有特性测量是怎样实现的？</h3><p>上面我们介绍了固有特性测量的使用，也介绍了<code>LayoutNodeWrapper</code>链的构建，那么固有特性测量是怎么实现的呢？<br>其实固有特性测量就是往<code>LayoutNodeWrapper</code>链中插入了一个<code>Modifier</code><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Stable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> Modifier.<span class="title">height</span><span class="params">(intrinsicSize: <span class="type">IntrinsicSize</span>)</span></span> = <span class="keyword">when</span> (intrinsicSize) &#123;</span><br><span class="line">    IntrinsicSize.Min -&gt; <span class="keyword">this</span>.then(MinIntrinsicHeightModifier)</span><br><span class="line">    IntrinsicSize.Max -&gt; <span class="keyword">this</span>.then(MaxIntrinsicHeightModifier)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">object</span> MinIntrinsicHeightModifier : IntrinsicSizeModifier &#123;</span><br><span class="line">	<span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> MeasureScope.<span class="title">measure</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        measurable: <span class="type">Measurable</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        constraints: <span class="type">Constraints</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span>: MeasureResult &#123;</span><br><span class="line">    	<span class="comment">//正式测量前先根据固有特性测量获得一个约束</span></span><br><span class="line">        <span class="keyword">val</span> contentConstraints = calculateContentConstraints(measurable, constraints)</span><br><span class="line">        <span class="comment">//正式测量</span></span><br><span class="line">        <span class="keyword">val</span> placeable = measurable.measure(</span><br><span class="line">            <span class="keyword">if</span> (enforceIncoming) constraints.constrain(contentConstraints) <span class="keyword">else</span> contentConstraints</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">return</span> layout(placeable.width, placeable.height) &#123;</span><br><span class="line">            placeable.placeRelative(IntOffset.Zero)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> MeasureScope.<span class="title">calculateContentConstraints</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        measurable: <span class="type">Measurable</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        constraints: <span class="type">Constraints</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span>: Constraints &#123;</span><br><span class="line">        <span class="keyword">val</span> height = measurable.minIntrinsicHeight(constraints.maxWidth)</span><br><span class="line">        <span class="keyword">return</span> Constraints.fixedHeight(height)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> IntrinsicMeasureScope.<span class="title">maxIntrinsicHeight</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        measurable: <span class="type">IntrinsicMeasurable</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        width: <span class="type">Int</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span> = measurable.minIntrinsicHeight(width)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示：   </p>
+<ol>
+<li><code>IntrinsicSize.Min</code>其实也是个<code>Modifier</code>     </li>
+<li><code>MinIntrinsicHeightModifier</code>会在测量之间，先调用<code>calculateContentConstraints</code>计算约束    </li>
+<li><code>calculateContentConstraints</code>中则会递归地调用子项的<code>minIntrinsicHeight</code>,并找出最大值，这样父项的高度就确定了    </li>
+<li>固有特性测量完成后，再调用<code>measurable.measure</code>，开始真正的递归测量    </li>
+</ol>
+<h3 id="3-4-测量过程小结"><a href="#3-4-测量过程小结" class="headerlink" title="3.4 测量过程小结"></a>3.4 测量过程小结</h3><p><strong>准备阶段</strong><br>子项在声明时，会生成<code>LayoutNode</code>添加到父项的<code>chindredn</code>中，同时子项的<code>modifier</code>也将构建成<code>LayoutNodeWrapper</code>链，保存在<code>LayoutNode</code>中<br>值得注意的是，如果使用了固有特性测量，将会添加一个<code>IntrinsicSizeModifier</code>到<code>LayoutNodeWrapper</code>链中    </p>
+<p><strong>测量阶段</strong><br>父容器在其测量策略<code>MeasurePolicy</code>的<code>measure</code>函数中会执行<code>child</code>的<code>measure</code>函数。<br><code>child</code>的<code>measure</code>方法按照构建好的<code>LayoutNodeWrapper</code>链一步步的执行各个节点的<code>measure</code>函数，最终走到<code>InnerPlaceable</code>的<code>measure</code>函数，在这里又会继续它的<code>children</code>进行测量，此时它的<code>children</code> 就会和它一样进行执行上述流程，一直到所有<code>children</code>测量完成。    </p>
+<p>用下面这张图总结一下上述流程。<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b4b74f5f51764e06a0545fb0f9a1600e~tplv-k3u1fbpfcp-watermark.awebp" alt></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了以下内容    </p>
+<ol>
+<li>在<code>Android</code>中布局层级过深为什么会对性能有影响?     </li>
+<li>在<code>Compose</code>中为什么没有布局嵌套问题?    </li>
+<li>什么是固有特性测量及固有特性测量的使用    </li>
+<li><code>Compose</code>测量过程源码分析及固有特性测量到底是怎样实现的?    </li>
+</ol>
+<p>如果本文对你有所帮助，欢迎点赞收藏~     </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://rengwuxian.com/compose-intrinsic-measurement/" target="_blank" rel="noopener">View 嵌套太深会卡？来用 Jetpack Compose，随便套——Intrinsic Measurement</a><br><a href="https://juejin.cn/post/6981805443219718151" target="_blank" rel="noopener">Jetpack Compose 测量流程源码分析</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/compose/" rel="tag"># compose</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/09/compose-moon-animatin.html" rel="next" title="【中秋征文】Compose 实现月亮阴晴圆缺动画">
+                <i class="fa fa-chevron-left"></i> 【中秋征文】Compose 实现月亮阴晴圆缺动画
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/09/compose-summary-resource.html" rel="prev" title="【总结】Compose学习资源总结">
+                【总结】Compose学习资源总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-布局层级过深为什么影响性能"><span class="nav-number">2.</span> <span class="nav-text">1. 布局层级过深为什么影响性能?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Compose为什么没有布局嵌套问题"><span class="nav-number">3.</span> <span class="nav-text">2. Compose为什么没有布局嵌套问题?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-固有特性测量使用"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 固有特性测量使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Compose测量过程源码分析"><span class="nav-number">4.</span> <span class="nav-text">3. Compose测量过程源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-测量入口"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 测量入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-LayoutNodeWrapper链构建"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 LayoutNodeWrapper链构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-固有特性测量是怎样实现的？"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 固有特性测量是怎样实现的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-测量过程小结"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 测量过程小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

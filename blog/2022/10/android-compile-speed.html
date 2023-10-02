@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kotlin,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言KAE 插件早在 2020 年就已经被宣布废弃了，并且将在 Kotlin 1.8 中被正式移除：Discontinuing Kotlin synthetics for views  如上图示，移除 KAE 的代码已经被 Merge 了，因此如果我们需要升级到 Kotlin 1.8，则必须要移除 KAE 那么移除 KAE 后，我们该如何迁移呢？ 迁移方案 官方的迁移方案如上所示，官方建议我们老项">
+<meta name="keywords" content="kotlin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KAE 将被正式移除，如何无缝迁移？">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/10/android-compile-speed.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言KAE 插件早在 2020 年就已经被宣布废弃了，并且将在 Kotlin 1.8 中被正式移除：Discontinuing Kotlin synthetics for views  如上图示，移除 KAE 的代码已经被 Merge 了，因此如果我们需要升级到 Kotlin 1.8，则必须要移除 KAE 那么移除 KAE 后，我们该如何迁移呢？ 迁移方案 官方的迁移方案如上所示，官方建议我们老项">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p1.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p2.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p3.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p4.png">
+<meta property="og:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/909ba8e80597430996e4e2f2817b83a5~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6f3334def17d484aab8c009cb4608935~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/987583643eb443e79b80c9d2e5680e2d~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p5.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p6.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/873a47d931704ee1bdfce191d260b9a0~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.249Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KAE 将被正式移除，如何无缝迁移？">
+<meta name="twitter:description" content="前言KAE 插件早在 2020 年就已经被宣布废弃了，并且将在 Kotlin 1.8 中被正式移除：Discontinuing Kotlin synthetics for views  如上图示，移除 KAE 的代码已经被 Merge 了，因此如果我们需要升级到 Kotlin 1.8，则必须要移除 KAE 那么移除 KAE 后，我们该如何迁移呢？ 迁移方案 官方的迁移方案如上所示，官方建议我们老项">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/10/android-compile-speed.html">
+
+
+
+
+
+  <title>KAE 将被正式移除，如何无缝迁移？ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/10/android-compile-speed.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">KAE 将被正式移除，如何无缝迁移？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-10-07T16:09:25+08:00">
+                2022-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>KAE 插件早在 2020 年就已经被宣布废弃了，并且将在 Kotlin 1.8 中被正式移除：<a href="https://android-developers.googleblog.com/2022/02/discontinuing-kotlin-synthetics-for-views.html" target="_blank" rel="noopener">Discontinuing Kotlin synthetics for views</a></p>
+<p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p1.png" alt></p>
+<p>如上图示，移除 KAE 的代码已经被 Merge 了，因此如果我们需要升级到 Kotlin 1.8，则必须要移除 KAE</p>
+<p>那么移除 KAE 后，我们该如何迁移呢？</p>
+<h2 id="迁移方案"><a href="#迁移方案" class="headerlink" title="迁移方案"></a>迁移方案</h2><p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p2.png" alt></p>
+<p>官方的迁移方案如上所示，官方建议我们老项目迁移到 ViewBinding，老项目直接迁移到 Jetpack Compose</p>
+<p>对于新代码我们当然可以这么做，但是对于大量存量代码，我们该如何迁移？由于 KAE 简单易用的特性，它在项目中经常被大量使用，要迁移如此多的存量代码，并不是一个简单的工作</p>
+<h3 id="存量代码迁移方案"><a href="#存量代码迁移方案" class="headerlink" title="存量代码迁移方案"></a>存量代码迁移方案</h3><p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p3.png" alt></p>
+<p>KAE 存量代码主要有如图3种迁移方式</p>
+<p>最简单也最直接的当然就是直接手动修改，这种方式的问题在于要迁移的代码数量庞大，迁移成本高。同时手动迁移容易出错，也不容易回测，测试不能覆盖到所有的页面，导致引入线上 bug</p>
+<p>第二个方案，是把 KAE 直接从 Kotlin 源码中抽取出来单独维护，但是 KAE 中也大量依赖了 Kotlin 的源码，抽取成本较高。同时 KAE 中大量使用了 Kotlin 编译器插件的 API，而这部分 API 并没有稳定，当 K2 编译器正式发布的时候很可能还会有较大的改动，而这也带来较高的维护成本。</p>
+<p>第三个方案就是本篇要重点介绍的 Kace</p>
+<h2 id="Kace-是什么？"><a href="#Kace-是什么？" class="headerlink" title="Kace 是什么？"></a>Kace 是什么？</h2><p>Kace 即 kotlin-android-compatible-extensions，一个用于帮助从 kotlin-android-extensions 无缝迁移的框架</p>
+<p>目前已经开源，开源地址可见：<a href="https://github.com/kanyun-inc/Kace" target="_blank" rel="noopener">https://github.com/kanyun-inc/Kace</a></p>
+<p>相比其它方案，Kace 主要有以下优点</p>
+<ol>
+<li>接入方便，不需要手动修改旧代码，可以真正做到无缝迁移</li>
+<li>与 KAE 表现一致(都支持 viewId 缓存，并在页面销毁时清除)，不会引入预期外的 bug</li>
+<li>统一迁移，回测方便，如果存在问题时，应该是批量存在的，避免手动修改可能引入线上 bug 的问题</li>
+<li>通过生成源码的方式兼容 KAE，维护成本低</li>
+</ol>
+<h2 id="快速迁移"><a href="#快速迁移" class="headerlink" title="快速迁移"></a>快速迁移</h2><p>使用 Kace 完成迁移主要分为以下几步</p>
+<h3 id="1-添加插件到-classpath"><a href="#1-添加插件到-classpath" class="headerlink" title="1. 添加插件到 classpath"></a>1. 添加插件到 classpath</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方式 1</span></span><br><span class="line"><span class="comment">// 传统方式，在根目录的 build.gradle.kts 中添加以下代码</span></span><br><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath(<span class="string">"com.kanyun.kace:kace-gradle-plugin:1.0.0"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式 2</span></span><br><span class="line"><span class="comment">// 引用插件新方式，在 settings.gradle.kts 中添加以下代码</span></span><br><span class="line">pluginManagement &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    plugins &#123;</span><br><span class="line">        id(<span class="string">"com.kanyun.kace"</span>) version <span class="string">"1.0.0"</span> apply <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-应用插件"><a href="#2-应用插件" class="headerlink" title="2. 应用插件"></a>2. 应用插件</h3><p>移除<code>kotlin-android-extensions</code>插件，并添加以下代码</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    id(<span class="string">"com.kanyun.kace"</span>)</span><br><span class="line">    id(<span class="string">"kotlin-parcelize"</span>) <span class="comment">// 可选，当使用了`@Parcelize`注解时需要添加</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-配置插件（可选）"><a href="#3-配置插件（可选）" class="headerlink" title="3. 配置插件（可选）"></a>3. 配置插件（可选）</h3><p>默认情况下 Kace 会解析模块内的每个 layout 并生成代码，用户也可以自定义需要解析的 layout</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kace &#123;</span><br><span class="line">    whiteList = listOf() <span class="comment">// 当 whiteList 不为空时，只有 whiteList 中的 layout 才会被解析</span></span><br><span class="line">    blackList = listOf(<span class="string">"activity_main.xml"</span>) <span class="comment">// 当 blackList 不为空时，blackList 中的 layout 不会被解析</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>经过以上几步，迁移就完全啦~</p>
+<h2 id="支持的类型"><a href="#支持的类型" class="headerlink" title="支持的类型"></a>支持的类型</h2><p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p4.png" alt></p>
+<p>如上所示，Kace 目前支持了以上四种最常用的类型，其他 kotlin-android-extensions 支持的类型如 android.app.Fragment, android.app.Dialog, kotlinx.android.extensions.LayoutContainer 等，由于被废弃或者使用较少，Kace 目前没有做支持</p>
+<h2 id="版本兼容"><a href="#版本兼容" class="headerlink" title="版本兼容"></a>版本兼容</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>Kotlin</th>
+<th>AGP</th>
+<th>Gradle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最低支持版本</td>
+<td>1.7.0</td>
+<td>4.2.0</td>
+<td>6.7.1</td>
+</tr>
+</tbody>
+</table>
+<p>由于 Kace 的目标是帮助开发者更方便地迁移到 Kotlin 1.8，因此 Kotlin 最低支持版本比较高</p>
+<h2 id="原理解析：前置知识"><a href="#原理解析：前置知识" class="headerlink" title="原理解析：前置知识"></a>原理解析：前置知识</h2><h3 id="编译器插件是什么？"><a href="#编译器插件是什么？" class="headerlink" title="编译器插件是什么？"></a>编译器插件是什么？</h3><p>Kotlin 的编译过程，简单来说就是将 Kotlin 源代码编译成目标产物的过程，具体步骤如下图所示：</p>
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/909ba8e80597430996e4e2f2817b83a5~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?" alt></p>
+<p>Kotlin 编译器插件，通过利用编译过程中提供的各种Hook时机，让我们可以在编译过程中插入自己的逻辑，以达到修改编译产物的目的。比如我们可以通过 IrGenerationExtension 来修改 IR 的生成，可以通过 ClassBuilderInterceptorExtension 修改字节码生成逻辑</p>
+<p>Kotlin 编译器插件可以分为 Gradle 插件，编译器插件，IDE 插件三部分，如下图所示</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6f3334def17d484aab8c009cb4608935~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?" alt></p>
+<h3 id="kotlin-android-extensions-是怎么实现的"><a href="#kotlin-android-extensions-是怎么实现的" class="headerlink" title="kotlin-android-extensions 是怎么实现的"></a>kotlin-android-extensions 是怎么实现的</h3><p>我们知道，KAE 是一个 Kotlin 编译器插件，当然也可以分为 Gradle 插件，编译器插件，IDE 插件三部分。我们这里只分析 Gradle 插件与编译器插件的源码，它们的具体结构如下：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/987583643eb443e79b80c9d2e5680e2d~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<ol>
+<li><code>AndroidExtensionsSubpluginIndicator</code>是<code>KAE</code>插件的入口</li>
+<li><code>AndroidSubplugin</code>用于配置传递给编译器插件的参数</li>
+<li><code>AndroidCommandLineProcessor</code>用于接收编译器插件的参数</li>
+<li><code>AndroidComponentRegistrar</code>用于注册如图的各种<code>Extension</code></li>
+</ol>
+<p>关于更细节的分析可以参阅：<a href="https://juejin.cn/post/7155491115645435917" target="_blank" rel="noopener">kotlin-android-extensions 插件到底是怎么实现的？</a></p>
+<p>总的来说，其实 KAE 主要做了两件事</p>
+<ol>
+<li>KAE 会将 viewId 转化为 findViewByIdCached 方法调用</li>
+<li>KAE 会在页面关闭时清除 viewId cache</li>
+</ol>
+<p>那么我们要无缝迁移，就也要实现相同的效果</p>
+<h2 id="Kace-原理解析"><a href="#Kace-原理解析" class="headerlink" title="Kace 原理解析"></a>Kace 原理解析</h2><h3 id="第一次尝试"><a href="#第一次尝试" class="headerlink" title="第一次尝试"></a>第一次尝试</h3><p>我们首先想到的是解析 layout 自动生成扩展属性，如下图所示</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生成的代码</span></span><br><span class="line"><span class="keyword">val</span> AndroidExtensions.button1</span><br><span class="line">    <span class="keyword">get</span>() = findViewByIdCached&lt;Button&gt;(R.id.button1)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> AndroidExtensions.buttion2</span><br><span class="line">    <span class="keyword">get</span>() = findViewByIdCached(R.id.button1)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 给 Activity 添加 AndroidExtensions 接口</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> : <span class="type">AppCompatActivity</span></span>(), AndroidExtensions &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> androidExtensionImpl <span class="keyword">by</span> lazy &#123; AndroidExtensionsImpl() &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">        lifecycle.addObserver(androidExtensionImpl)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T : View?&gt;</span> <span class="title">findViewByIdCached</span><span class="params">(owner: <span class="type">AndroidExtensionsBase</span>, id: <span class="type">Int</span>)</span></span>: T &#123;</span><br><span class="line">        <span class="keyword">return</span> androidExtensionImpl.findViewByIdCached(id)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，主要做了这么几件事：</p>
+<ol>
+<li>通过 gradle 插件，自动解析 layout 生成<code>AndroidExtensions</code>接口的扩展属性</li>
+<li>给 Activity 添加 <code>AndroidExtensions</code> 接口</li>
+<li>由于需要支持缓存，因此也需要添加一个全局的变量：<code>androidExtensionImpl</code></li>
+<li>由于需要在页面关闭时清除缓存，因此也需要添加<code>lifecycle Observer</code></li>
+<li>重写<code>findViewByIdCached</code>方法，将具体工作委托给<code>AndroidExtensionsImpl</code></li>
+</ol>
+<p>通过以上步骤，其实 KAE 的功能已经实现了，我们可以在 Activity 中通过<code>button1</code>，<code>button2</code>等 viewId 获取对应的 View</p>
+<p>但是这样还是太麻烦了，修改一个页面需要添加这么多代码，还能再优化吗？</p>
+<h3 id="第二次尝试"><a href="#第二次尝试" class="headerlink" title="第二次尝试"></a>第二次尝试</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">inline</span> <span class="keyword">val</span> AndroidExtensions.button1</span><br><span class="line">    <span class="keyword">get</span>() = findViewByIdCached&lt;Button&gt;(<span class="keyword">this</span>, R.id.button1)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> AndroidExtensions.buttion2</span><br><span class="line">    <span class="keyword">get</span>() = findViewByIdCached(<span class="keyword">this</span>, R.id.button1)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> : <span class="type">AppCompatActivity</span></span>(), AndroidExtensions <span class="keyword">by</span> AndroidExtensionsImpl() &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>我们通过委托简化了代码调用，只需要添加一行<code>AndroidExtensions by AndroidExtensionsImpl()</code>就可以实现迁移</li>
+<li>我们不需要在初始化的时候手动添加<code>lifecycle observer</code>，这是因为我们在调用<code>findViewByIdCached</code>方法时会将<code>this</code>传递过去，因此可以在第一次调用时初始化，自动添加<code>lifecycle observer</code></li>
+</ol>
+<p>可以看出，现在已经比较简洁了，只需要添加一行代码就可以实现迁移，但如果项目中有几百个页面使用了 KAE 的话，改起来还是有点痛苦的，目前还不能算是真正的无缝迁移</p>
+<p>那么还能再优化吗?</p>
+<h3 id="第三次尝试"><a href="#第三次尝试" class="headerlink" title="第三次尝试"></a>第三次尝试</h3><p>第3次尝试就是 Kace 的最终方案，结构如图所示  </p>
+<p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p5.png" alt></p>
+<p>下面我们就来介绍一下</p>
+<h3 id="kace-compiler-实现"><a href="#kace-compiler-实现" class="headerlink" title="kace-compiler 实现"></a>kace-compiler 实现</h3><p>kace-compiler 是一个 Kotlin 编译器插件，它的作用是给目标类型（Activity 或者 Fragment）自动添加接口与实现</p>
+<p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p6.png" alt></p>
+<p>如上所示，kace-compiler 的作用就是通过<code>KaceSyntheticResolveExtension</code>扩展添加接口，以及<code>KaceIrGenerationExtension</code>扩展添加实现</p>
+<p>处理后的代码如下所示：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> : <span class="type">AppCompatActivity</span></span>(), AndroidExtensions &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> $$androidExtensionImpl <span class="keyword">by</span> lazy &#123; AndroidExtensionsImpl() &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T : View?&gt;</span> <span class="title">findViewByIdCached</span><span class="params">(owner: <span class="type">AndroidExtensionsBase</span>, id: <span class="type">Int</span>)</span></span>: T &#123;</span><br><span class="line">        <span class="keyword">return</span> $$androidExtensionImpl.findViewByIdCached(id)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你可能还记得，前面说过由于编译器插件 API 还没有稳定，因此将 KAE 抽取出来独立维护成本较高，那么我们这里为什么还使用了编译器插件呢？</p>
+<p>这是因为我们这里使用的编译器插件是比较少的，生成的代码也很简单，将来维护起来并不复杂，但是可以大幅的降低迁移成本，实现真正的无缝迁移</p>
+<h3 id="kace-gradle-plugin-生成代码"><a href="#kace-gradle-plugin-生成代码" class="headerlink" title="kace-gradle-plugin 生成代码"></a>kace-gradle-plugin 生成代码</h3><p>kace-gradle-plugin 的主要作用就是解析 layout 然后生成代码，生成的代码如下所示</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> kotlinx.android.synthetic.debug.activity_main</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">inline</span> <span class="keyword">val</span> AndroidExtensionsBase.button1</span><br><span class="line">    <span class="keyword">get</span>() = findViewByIdCached&lt;android.widget.Button&gt;(<span class="keyword">this</span>, R.id.button1)</span><br><span class="line"><span class="keyword">internal</span> <span class="keyword">inline</span> <span class="keyword">val</span> Activity.button1</span><br><span class="line">    <span class="keyword">get</span>() = (<span class="keyword">this</span> <span class="keyword">as</span> AndroidExtensionsBase).button1</span><br><span class="line"><span class="keyword">internal</span> <span class="keyword">inline</span> <span class="keyword">val</span> Fragment.button1</span><br><span class="line">    <span class="keyword">get</span>() = (<span class="keyword">this</span> <span class="keyword">as</span> AndroidExtensionsBase).button1</span><br></pre></td></tr></table></figure>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> kotlinx.android.synthetic.main.activity_main.view</span><br><span class="line"></span><br><span class="line"><span class="keyword">internal</span> <span class="keyword">inline</span> <span class="keyword">val</span> View.button1</span><br><span class="line">    <span class="keyword">get</span>() = findViewById&lt;android.widget.Button&gt;(R.id.button1)</span><br></pre></td></tr></table></figure>
+<ol>
+<li>给 Activity, Fragment, View 等类型添加扩展属性</li>
+<li>给 View 添加的扩展属性目前不支持缓存，而是直接通过<code>finidViewById</code>实现</li>
+<li>支持根据不同的<code>variant</code>，生成不同的<code>package</code>的代码，比如<code>debug</code></li>
+</ol>
+<h2 id="Kace-性能优化"><a href="#Kace-性能优化" class="headerlink" title="Kace 性能优化"></a>Kace 性能优化</h2><h3 id="明确输入输出"><a href="#明确输入输出" class="headerlink" title="明确输入输出"></a>明确输入输出</h3><p>前面介绍了 kace-gradle-plugin 的主要作用就是解析 layout 然后生成代码，但是对于一个比较大的模块，layout 可能有几百个，如果每次编译时都要运行这个 Task，会带来一定的性能损耗</p>
+<p>理想情况下，在输入输出没有发生变化的情况下，应该跳过这个 Task</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/873a47d931704ee1bdfce191d260b9a0~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<p>比如 Gradle 中内置的 JavaCompilerTask，在源码与 jdk 版本没有发生变化的时候，会自动跳过（标记为 up-to-date）</p>
+<p>Gradle 需要我们明确 Task 的输入与输出是什么，这样它才能决定是否可以自动跳过这个Task，如下所示： </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">KaceGenerateTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@get:Internal</span></span><br><span class="line">    <span class="keyword">val</span> layoutDirs: ConfigurableFileCollection = project.files()</span><br><span class="line"></span><br><span class="line">    <span class="meta">@get:Incremental</span></span><br><span class="line">    <span class="meta">@get:InputFiles</span></span><br><span class="line">    <span class="meta">@get:PathSensitive</span>(PathSensitivity.RELATIVE)</span><br><span class="line">    <span class="keyword">internal</span> <span class="keyword">open</span> <span class="keyword">val</span> androidLayoutResources: FileCollection = layoutDirs</span><br><span class="line">        .asFileTree</span><br><span class="line">        .matching &#123; patternFilterable -&gt;</span><br><span class="line">            patternFilterable.include(<span class="string">"**/*.xml"</span>)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@get:Input</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">val</span> layoutVariantMap: MapProperty&lt;String, String&gt;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@get:Input</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">val</span> namespace: Property&lt;String&gt;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@get:OutputDirectory</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">val</span> sourceOutputDir: DirectoryProperty    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，通过注解的方式明确了 Task 的输入输出，在输入与输出都没有发生改变的时候，该 Task 会被标记为 up-to-date ，通过编译避免的方式提高编译性能</p>
+<h3 id="并行-Task"><a href="#并行-Task" class="headerlink" title="并行 Task"></a>并行 Task</h3><p><code>KaceGenerateTask</code>的主要作用其实就是解析 layout 然后生成代码，每个 layout 都是相互独立的，在这种情况下就特别适合使用并行 Task</p>
+<p>要实现并行 Task，首先要将 Task 转化为 <code>Worker API</code></p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">KaceGenerateAction</span> : <span class="type">WorkAction</span>&lt;<span class="type">KaceGenerateAction.Parameters</span>&gt; </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">Parameters</span> : <span class="type">WorkParameters &#123;</span></span></span><br><span class="line">        <span class="keyword">val</span> destDir: DirectoryProperty</span><br><span class="line">        <span class="keyword">val</span> layoutFile: RegularFileProperty</span><br><span class="line">        <span class="keyword">val</span> variantName: Property&lt;String&gt;</span><br><span class="line">        <span class="keyword">val</span> namespace: Property&lt;String&gt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">execute</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> item = LayoutItem(</span><br><span class="line">            parameters.destDir.<span class="keyword">get</span>().asFile,</span><br><span class="line">            parameters.layoutFile.<span class="keyword">get</span>().asFile,</span><br><span class="line">            parameters.variantName.<span class="keyword">get</span>()</span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">val</span> namespace = parameters.namespace.<span class="keyword">get</span>()</span><br><span class="line">        <span class="keyword">val</span> file = item.layoutFile</span><br><span class="line">        <span class="keyword">val</span> layoutNodeItems = parseXml(saxParser, file, logger)</span><br><span class="line">        writeActivityFragmentExtension(layoutNodeItems, item, namespace)</span><br><span class="line">        writeViewExtension(layoutNodeItems, item, namespace)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>第一步：首先我们需要定义一个接口来表示每个<code>Action</code>需要的参数，即<code>KaceGenerateAction.Parameters</code></li>
+<li>第二步：您需要将自定义<code>Task</code>中为每个单独文件执行工作的部分重构为单独的类，即<code>KaceGenerateAction</code></li>
+<li>第三步：您应该重构自定义<code>Task</code>类以将工作提交给 <code>WorkerExecutor</code>，而不是自己完成工作</li>
+</ol>
+<p>接下来就是将<code>KaceGenerateAction</code>提交给<code>WorkerExector</code></p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">KaceGenerateTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line">    <span class="meta">@get:Inject</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">val</span> workerExecutor: WorkerExecutor</span><br><span class="line"></span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">action</span><span class="params">(inputChanges: <span class="type">InputChanges</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> workQueue = workerExecutor.noIsolation()</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        changedLayoutItemList.forEach &#123; item -&gt;</span><br><span class="line">            workQueue.submit(KaceGenerateAction::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>) </span>&#123; parameters -&gt;</span><br><span class="line">                parameters.destDir.<span class="keyword">set</span>(destDir)</span><br><span class="line">                parameters.layoutFile.<span class="keyword">set</span>(item.layoutFile)</span><br><span class="line">                parameters.variantName.<span class="keyword">set</span>(item.variantName)</span><br><span class="line">                parameters.namespace.<span class="keyword">set</span>(namespace)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        workQueue.await() <span class="comment">// 等待所有 Action 完成，计算耗时</span></span><br><span class="line">        <span class="keyword">val</span> duration = System.currentTimeMillis() - startTime</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line"><span class="number">1</span>. 您需要拥有`WorkerExecutor`服务才能提交`Action`。这里我们添加了一个抽象的`workerExecutor`并添加注解，`Gradle` 将在运行时注入服务</span><br><span class="line"><span class="number">2</span>. 在提交`Action`之前，我们需要通过不同的隔离模式获取`WorkQueue`，这里使用的是线程隔离模式</span><br><span class="line"><span class="number">3</span>. 提交`Action`时，指定`Action`实现，在这种情况下调用`KaceGenerateAction`并配置其参数</span><br><span class="line"></span><br><span class="line">经过测试，在一个包括 <span class="number">500</span> 个 layout 的模块中，在开启并行 Task 前全量编译耗时约 <span class="number">4</span> 秒，而开启后全量编译耗时减少到 <span class="number">2</span> 秒左右，可以有 <span class="number">100</span>% 左右的提升</span><br><span class="line"></span><br><span class="line">### 支持增量编译</span><br><span class="line">还有一种常见的场景，当我们只修改了一个 layout 时，如果模块内的所有 layout 都需要重新解析并生成代码，也是非常浪费性能的</span><br><span class="line"></span><br><span class="line">理想情况下，应该只需要重新解析与处理我们修改的 layout 就行了，Gradle 同样提供了 API 供我们实现增量编译</span><br><span class="line"></span><br><span class="line">```kotlin</span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">KaceGenerateTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line">    <span class="meta">@get:Incremental</span></span><br><span class="line">    <span class="meta">@get:InputFiles</span></span><br><span class="line">    <span class="meta">@get:PathSensitive</span>(PathSensitivity.RELATIVE)</span><br><span class="line">    <span class="keyword">internal</span> <span class="keyword">open</span> <span class="keyword">val</span> androidLayoutResources: FileCollection = layoutDirs</span><br><span class="line">        .asFileTree</span><br><span class="line">        .matching &#123; patternFilterable -&gt;</span><br><span class="line">            patternFilterable.include(<span class="string">"**/*.xml"</span>)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">action</span><span class="params">(inputChanges: <span class="type">InputChanges</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> changeFiles = getChangedFiles(inputChanges, androidLayoutResources)</span><br><span class="line">        <span class="comment">// ...        </span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getChangedFiles</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        inputChanges: <span class="type">InputChanges</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        layoutResources: <span class="type">FileCollection</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span> = <span class="keyword">if</span> (!inputChanges.isIncremental) &#123;</span><br><span class="line">        ChangedFiles.Unknown()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        inputChanges.getFileChanges(layoutResources)</span><br><span class="line">            .fold(mutableListOf&lt;File&gt;() to mutableListOf&lt;File&gt;()) &#123; (modified, removed), item -&gt;</span><br><span class="line">                <span class="keyword">when</span> (item.changeType) &#123;</span><br><span class="line">                    ChangeType.ADDED, ChangeType.MODIFIED -&gt; modified.add(item.file)</span><br><span class="line">                    ChangeType.REMOVED -&gt; removed.add(item.file)</span><br><span class="line">                    <span class="keyword">else</span> -&gt; <span class="built_in">Unit</span></span><br><span class="line">                &#125;</span><br><span class="line">                modified to removed</span><br><span class="line">            &#125;.run &#123;</span><br><span class="line">                ChangedFiles.Known(first, second)</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过以下步骤，就可以实现增量编译</p>
+<ol>
+<li><code>androidLayoutResources</code>使用<code>@Incremental</code>注解标识，表示支持增量处理的输入</li>
+<li>给<code>TaskAction</code>方法添加<code>inputChange</code>参数</li>
+<li>通过<code>inputChanges</code>方法获取输入中发生了更改的文件，如果发生了更改则重新处理，如果被删除了则同样删除目标目录中的文件，没有发生更改的文件则不处理</li>
+</ol>
+<p>通过支持增量编译，当只修改或者添加一个 layout 时，增量编译耗时可以减少到 8ms 左右，大幅减少了编译耗时</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了如何使用 Kace ，以及 Kace 到底是如何实现的，如果有任何问题，欢迎提出 Issue，如果对你有所帮助，欢迎点赞收藏 Star ~</p>
+<h3 id="开源地址"><a href="#开源地址" class="headerlink" title="开源地址"></a>开源地址</h3><p><a href="https://github.com/kanyun-inc/Kace" target="_blank" rel="noopener">https://github.com/kanyun-inc/Kace</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kotlin/" rel="tag"># kotlin</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/08/kotlin-compile-analysis.html" rel="next" title="Kotlin 增量编译是怎么实现的？">
+                <i class="fa fa-chevron-left"></i> Kotlin 增量编译是怎么实现的？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/11/now-in-android-learn.html" rel="prev" title="学习一下 nowinandroid 的构建脚本">
+                学习一下 nowinandroid 的构建脚本 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迁移方案"><span class="nav-number">2.</span> <span class="nav-text">迁移方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#存量代码迁移方案"><span class="nav-number">2.1.</span> <span class="nav-text">存量代码迁移方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kace-是什么？"><span class="nav-number">3.</span> <span class="nav-text">Kace 是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速迁移"><span class="nav-number">4.</span> <span class="nav-text">快速迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-添加插件到-classpath"><span class="nav-number">4.1.</span> <span class="nav-text">1. 添加插件到 classpath</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-应用插件"><span class="nav-number">4.2.</span> <span class="nav-text">2. 应用插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-配置插件（可选）"><span class="nav-number">4.3.</span> <span class="nav-text">3. 配置插件（可选）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#支持的类型"><span class="nav-number">5.</span> <span class="nav-text">支持的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本兼容"><span class="nav-number">6.</span> <span class="nav-text">版本兼容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理解析：前置知识"><span class="nav-number">7.</span> <span class="nav-text">原理解析：前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译器插件是什么？"><span class="nav-number">7.1.</span> <span class="nav-text">编译器插件是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kotlin-android-extensions-是怎么实现的"><span class="nav-number">7.2.</span> <span class="nav-text">kotlin-android-extensions 是怎么实现的</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kace-原理解析"><span class="nav-number">8.</span> <span class="nav-text">Kace 原理解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一次尝试"><span class="nav-number">8.1.</span> <span class="nav-text">第一次尝试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二次尝试"><span class="nav-number">8.2.</span> <span class="nav-text">第二次尝试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三次尝试"><span class="nav-number">8.3.</span> <span class="nav-text">第三次尝试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kace-compiler-实现"><span class="nav-number">8.4.</span> <span class="nav-text">kace-compiler 实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kace-gradle-plugin-生成代码"><span class="nav-number">8.5.</span> <span class="nav-text">kace-gradle-plugin 生成代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kace-性能优化"><span class="nav-number">9.</span> <span class="nav-text">Kace 性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#明确输入输出"><span class="nav-number">9.1.</span> <span class="nav-text">明确输入输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#并行-Task"><span class="nav-number">9.2.</span> <span class="nav-text">并行 Task</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">10.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开源地址"><span class="nav-number">10.1.</span> <span class="nav-text">开源地址</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

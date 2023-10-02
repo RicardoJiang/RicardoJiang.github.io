@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="性能优化,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言内存问题是一个普遍问题，但是却普遍缺少关注度，具体有以下几个原因1.内存问题相对比较隐蔽，表现并不明显2.同时android使用Jvm语言开发，垃圾回收是自动的，所以一般没有特别关注3.内存问题难以定位，出现问题的地方往往只是表现的地方，真正的原因难以收集    内存优化的内容其实非常多而复杂，我们可以尝试从以下思路去了解1.要了解内存问题，我们首先要了解为什么要做内存优化？2.同时需要了解一">
+<meta name="keywords" content="性能优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【从入门到实用】android内存优化深入解析">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/05/memory-sum-up.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言内存问题是一个普遍问题，但是却普遍缺少关注度，具体有以下几个原因1.内存问题相对比较隐蔽，表现并不明显2.同时android使用Jvm语言开发，垃圾回收是自动的，所以一般没有特别关注3.内存问题难以定位，出现问题的地方往往只是表现的地方，真正的原因难以收集    内存优化的内容其实非常多而复杂，我们可以尝试从以下思路去了解1.要了解内存问题，我们首先要了解为什么要做内存优化？2.同时需要了解一">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog11/p5.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9285ae8a857945fb95a47527c162ae68~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/26ba4f5fd59e47c0982bcd54b9be12d8~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f1e939370db5400384bf1b8fe92b748c~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/934cf04e29a24055971ebaf7ce3af279~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4d59f1b5a1424f91bbb49c8ca03189f3~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/251424c1d8a14b97ba4a40795ab4bb46~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3a851196e2f5439fa05070ac0c37eb90~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d5e9651d7bd943c4afb211591e994475~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd2f54d13770470289b9518957639f69~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8271f1c2b5ce4e3181d507ed2c4d732c~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://github.com/KwaiAppTeam/KOOM/wiki/images/android_benchmark_cn.png">
+<meta property="og:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f3fd3422bb5b4f7689c25fd554f5c88f~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/627840a253884469847989453ccb14d7~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog11/p3.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.242Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【从入门到实用】android内存优化深入解析">
+<meta name="twitter:description" content="前言内存问题是一个普遍问题，但是却普遍缺少关注度，具体有以下几个原因1.内存问题相对比较隐蔽，表现并不明显2.同时android使用Jvm语言开发，垃圾回收是自动的，所以一般没有特别关注3.内存问题难以定位，出现问题的地方往往只是表现的地方，真正的原因难以收集    内存优化的内容其实非常多而复杂，我们可以尝试从以下思路去了解1.要了解内存问题，我们首先要了解为什么要做内存优化？2.同时需要了解一">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog11/p5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/05/memory-sum-up.html">
+
+
+
+
+
+  <title>【从入门到实用】android内存优化深入解析 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/05/memory-sum-up.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【从入门到实用】android内存优化深入解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-11T07:55:31+08:00">
+                2021-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>内存问题是一个普遍问题，但是却普遍缺少关注度，具体有以下几个原因<br>1.内存问题相对比较隐蔽，表现并不明显<br>2.同时<code>android</code>使用<code>Jvm</code>语言开发，垃圾回收是自动的，所以一般没有特别关注<br>3.内存问题难以定位，出现问题的地方往往只是表现的地方，真正的原因难以收集   </p>
+<p>内存优化的内容其实非常多而复杂，我们可以尝试从以下思路去了解<br>1.要了解内存问题，我们首先要了解为什么要做内存优化？<br>2.同时需要了解一些内存优化的背景知识，如垃圾回收机制<br>3.我们需要了解一些内存优化的常用工具与手段<br>4.图片是内存优化的重点，我们需要重点了解下图片优化的知识点<br>5.内存问题的一个直接体现是<code>OOM</code>,我们还需要了解下<code>OOM</code>治理的一些手段     </p>
+<p>所以我们可以轻松得出本文的主要内容：<br>1.为什么要做内存优化?<br>2.<code>android</code>内存优化的一些背景知识<br>3.<code>android</code>内存优化的常用工具与手段<br>4.怎么做图片内存优化？<br>5.怎么做<code>OOM</code>线上监控?       </p>
+<p>本文主要内容思维导图如下：<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog11/p5.png" alt>    </p>
+<h2 id="1-为什么要做内存优化"><a href="#1-为什么要做内存优化" class="headerlink" title="1. 为什么要做内存优化?"></a>1. 为什么要做内存优化?</h2><p>要回答这个问题，我们首先应该明确需求，当我们去做内存优化时是为了什么<br>做内存优化的目的是降低<code>OOM</code>率、减少卡顿、增加应用存活时间。       </p>
+<h3 id="1-1-降低OOM率"><a href="#1-1-降低OOM率" class="headerlink" title="1.1 降低OOM率"></a>1.1 降低<code>OOM</code>率</h3><p>做内存优化的一个常见原因是为了降低<code>OOM</code>率<br>申请内存过多而没有及时释放，常常就会导致<code>OOM</code><br>引起<code>OOM</code>的原因有多种，在后面我们再细谈    </p>
+<h3 id="1-2-减少卡顿"><a href="#1-2-减少卡顿" class="headerlink" title="1.2 减少卡顿"></a>1.2 减少卡顿</h3><p><code>Android</code>中造成界面卡顿的原因有很多种，其中一种就是由内存问题引起的.<br>内存问题之所以会影响到界面流畅度，是因为垃圾回收.<br>在<code>GC</code>时，所有线程都要停止，包括主线程.当<code>GC</code>和绘制界面的操作同时触发时，绘制的执行就会被搁置，导致掉帧，也就是界面卡顿。</p>
+<h3 id="1-3-增加应用存活时间"><a href="#1-3-增加应用存活时间" class="headerlink" title="1.3 增加应用存活时间"></a>1.3 增加应用存活时间</h3><p><code>Android</code>会按照特定的机制清理进程，清理进程时优先会考虑清理后台进程，如果某个应用在后台运行并且占用的内存更多，就会被优先清理掉<br>我们通常希望<code>App</code>能尽量存活的久一点，所以内存不再使用时应该尽快释放         </p>
+<h2 id="2-android内存优化的一些背景知识"><a href="#2-android内存优化的一些背景知识" class="headerlink" title="2. android内存优化的一些背景知识"></a>2. <code>android</code>内存优化的一些背景知识</h2><h3 id="2-1-Java垃圾回收机制"><a href="#2-1-Java垃圾回收机制" class="headerlink" title="2.1 Java垃圾回收机制"></a>2.1 <code>Java</code>垃圾回收机制</h3><p><code>Java</code>内存回收主要包括以下内容<br>1.判断对象是否回收的可达性分析算法<br>2.强软弱虚4种引用类型<br>3.用于<code>GC</code>回收的垃圾回收算法<br>这些都是很常见的知识点了，这里也就不缀述了，如果想要了解更多细节的同学可参考：<a href="https://juejin.cn/post/6844903897958449166#heading-14" target="_blank" rel="noopener">Java 垃圾回收机制</a></p>
+<h3 id="2-2-什么是内存泄漏"><a href="#2-2-什么是内存泄漏" class="headerlink" title="2.2 什么是内存泄漏?"></a>2.2 什么是内存泄漏?</h3><p>内存泄漏指的是一块内存没有被使用且无法被<code>GC</code>回收，从而造成了内存的浪费，比如<code>Handler</code>匿名内部类持有<code>Activity</code>的引用，<code>Activity</code> 需要销毁时，<code>GC</code> 就无法回收它。<br>内存泄漏的表现就是可用内存逐渐减少，无法被回收的内存逐渐累积，直到应用无更多可用内存可申请时，就会导致内存溢出<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9285ae8a857945fb95a47527c162ae68~tplv-k3u1fbpfcp-zoom-1.image" alt><br>内存泄漏的直接原因是长生命周期的对象引用了短生命周期的对象，导致短生命周期对象无法回收<br>常见的引起内存泄漏的原因有：<br>1.非静态内部类持有了外部引用<br>2.静态变量持有了<code>context</code>的引用<br>3.资源没有及时释放     </p>
+<p>我们一般使用<code>LeakCanary</code>或者<code>Profile</code>检测内存泄漏，后面会详细介绍      </p>
+<h3 id="2-3-什么是内存抖动"><a href="#2-3-什么是内存抖动" class="headerlink" title="2.3 什么是内存抖动?"></a>2.3 什么是内存抖动?</h3><p>当我们在短时间内频繁创建大量临时对象时，就会引起内存抖动，比如在一个<code>for</code>循环中创建临时对象实例，下面这张图就是内存抖动时的一个内存图表现，它的形状是锯齿形的，而中间的垃圾桶代表着一次<code>GC</code>。<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/26ba4f5fd59e47c0982bcd54b9be12d8~tplv-k3u1fbpfcp-zoom-1.image" alt>        </p>
+<p>内存抖动意味着频繁的创建对象与回收，容易触发<code>GC</code>，而当<code>GC</code>时所有线程都会停止，因此可能导致卡顿<br>为了避免内存抖动，我们应该避免以下操作<br>1.尽量避免在循环体中创建对象<br>2.尽量不要在自定义<code>View</code>的<code>onDraw()</code>方法中创建对象，因为这个方法会被频繁调用<br>3.对于能够复用的对象，可以考虑使用对象池把它们缓存起来      </p>
+<h3 id="2-4-什么是内存溢出"><a href="#2-4-什么是内存溢出" class="headerlink" title="2.4 什么是内存溢出?"></a>2.4 什么是内存溢出?</h3><p>内存溢出即申请的内存超出可用的内存，即<code>OOM</code>，这会导致我们的程序异常退出,这也是我们重点关注的指标<br>引起<code>OOM</code>的原因可能有多种，主要可以分为以下几类<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f1e939370db5400384bf1b8fe92b748c~tplv-k3u1fbpfcp-watermark.image" alt><br>关于<code>OOM</code>治理及线上监控等，后面会详细介绍    </p>
+<h2 id="3-android内存优化的常用工具与手段"><a href="#3-android内存优化的常用工具与手段" class="headerlink" title="3. android内存优化的常用工具与手段"></a>3. <code>android</code>内存优化的常用工具与手段</h2><h3 id="3-1-Memory-Profiler"><a href="#3-1-Memory-Profiler" class="headerlink" title="3.1 Memory Profiler"></a>3.1 <code>Memory Profiler</code></h3><p><code>Memory Profiler</code>是<code>Profiler</code> 中的其中一个版块，<code>Profiler</code> 是 <code>Android Studio</code> 为我们提供的性能分析工具，使用 <code>Profiler</code> 能分析应用的 <code>CPU</code>、内存、网络以及电量的使用情况。<br>使用<code>Memory</code>可以检测以下功能<br>1.查看内存曲线及内存占用情况<br>2.可以定位是否存在内存抖动问题<br>3.堆转储（<code>Dump Java Heap</code>）可检测出内存泄漏的对象<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/934cf04e29a24055971ebaf7ce3af279~tplv-k3u1fbpfcp-zoom-1.image" alt><br>关于<code>Memory Profiler</code>的具体使用就不在此缀述了，想要了解的可参考：<a href="https://juejin.cn/post/6844903897958449166#heading-48" target="_blank" rel="noopener">什么是 Memory Profiler？</a></p>
+<h3 id="3-2-Memory-Analyzer-Tool"><a href="#3-2-Memory-Analyzer-Tool" class="headerlink" title="3.2 Memory Analyzer Tool"></a>3.2 <code>Memory Analyzer Tool</code></h3><p><code>MAT</code>工具可以帮助开发者定位导致内存泄漏的对象，以及发现大的内存对象，然后解决内存泄漏并通过优化内存对象，以达到减少内存消耗的目的。<br>比起<code>Memory Profiler</code>，<code>MAT</code>使用起来更加麻烦，同时现在<code>Memory Profiler</code>功能也越来越强大了，所以我现在已经很少使用<code>MAT</code>了<br>如果想要更多地了解<code>MAT</code>，也可以参考:<a href="https://juejin.cn/post/6844903897958449166#heading-52" target="_blank" rel="noopener">什么是Memory Analyzer Tool</a></p>
+<h3 id="3-3-LeakCanary检测内存泄漏"><a href="#3-3-LeakCanary检测内存泄漏" class="headerlink" title="3.3 LeakCanary检测内存泄漏"></a>3.3 <code>LeakCanary</code>检测内存泄漏</h3><p>相比<code>Memory Profiler</code>与<code>MAT</code>,<code>LeakCanary</code>在使用上更加简便<br>只需要在项目中添加依赖，即可自动地检测内存泄漏并报警，使用起来非常方便<br>当发生泄漏时，引用链如下：<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4d59f1b5a1424f91bbb49c8ca03189f3~tplv-k3u1fbpfcp-zoom-1.image" alt>         </p>
+<p><code>LeakCanary</code>有以下几个特点：<br>1.不需要手动初始化<br>2.可自动检测内存泄漏并通过通知报警<br>3.不能用于线上<br><code>LeakCanary</code>检测流程如下：<br><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/251424c1d8a14b97ba4a40795ab4bb46~tplv-k3u1fbpfcp-watermark.image" alt>          </p>
+<p>关于<code>LeakCanary</code>的原理，我之前曾经总结过一篇文章，有兴趣的同学也可以参考:<a href="https://juejin.cn/post/6968084138125590541" target="_blank" rel="noopener">【带着问题学】关于LeakCanary2.0你应该知道的知识点</a></p>
+<h3 id="3-4-内存优化的一些常规手段"><a href="#3-4-内存优化的一些常规手段" class="headerlink" title="3.4 内存优化的一些常规手段"></a>3.4 内存优化的一些常规手段</h3><p>内存优化的一些细节问题可以在开发时避免，下面介绍一些常规的内存优化手段<br>1）、使用<code>LargeHeap</code>属性增加最大可用内存<br>2）、在系统触发资源紧张回调时，主动删除缓存<br>3）、使用优化过后的集合：如<code>SparseArray</code>类等<br>4）、谨慎使用 <code>SharedPreference</code>,<code>SP</code>会在应用初始化时将所有内容加载到内存中，所以不应该存放比较大的内容<br>5）、谨慎使用外部库，引入时需要明确不会对应用性能造成大的影响<br>6）、业务架构设计要合理,抽象可以优化代码的灵活性和可维护性，但是抽象也会带来其他成本,应权衡使用    </p>
+<p>这些细节问题其实都很普通，如果平时注意到了，相信对应用的内存一定有所帮助</p>
+<h2 id="4-怎么做图片内存优化？"><a href="#4-怎么做图片内存优化？" class="headerlink" title="4. 怎么做图片内存优化？"></a>4. 怎么做图片内存优化？</h2><p>内存优化应该优先去做见效快的地方，图片内存优化是内存优化的重点，可能一张图片没有回收就会造成几M内存的浪费          </p>
+<h3 id="4-1-常规的图片内存优化方法"><a href="#4-1-常规的图片内存优化方法" class="headerlink" title="4.1 常规的图片内存优化方法"></a>4.1 常规的图片内存优化方法</h3><p>我们都知道，图片所占内存=宽<em>高</em>一像素占用内存<br>所以优化图片内存主要有以下几个思路<br>1.缩放减小宽高<br>2.减少每个像素所占用的内存<br>3.内存复用，避免重复分配内存<br>4.对于大图，可以采取局部加载的策略      </p>
+<h4 id="4-1-1-减少图片宽高"><a href="#4-1-1-减少图片宽高" class="headerlink" title="4.1.1 减少图片宽高"></a>4.1.1 减少图片宽高</h4><p>有时图片宽高为<code>200*200</code>,而<code>View</code>宽高为<code>100*100</code>,这种时候如果展示<code>200*200</code>的图片没有意义，应该对图片进行缩放<br>这种情况一般通过<code>inSampleSize</code>实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">BitampFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line"><span class="comment">// 设置为4就是宽和高都变为原来1/4大小的图片</span></span><br><span class="line">options.inSampleSize = <span class="number">4</span>;</span><br><span class="line">BitmapFactory.decodeSream(is, <span class="keyword">null</span>, options);</span><br></pre></td></tr></table></figure></p>
+<h4 id="4-1-2-减少每个像素所占用的内存"><a href="#4-1-2-减少每个像素所占用的内存" class="headerlink" title="4.1.2 减少每个像素所占用的内存"></a>4.1.2 减少每个像素所占用的内存</h4><p>在<code>API29</code>中，将<code>Bitmap</code>分为<code>ALPHA_8</code>, <code>RGB_565</code>, <code>ARGB_4444</code>, <code>ARGB_8888</code>, <code>RGBA_F16</code>, <code>HARDWARE</code>六个等级。</p>
+<ul>
+<li><code>ALPHA_8</code>：不存储颜色信息，每个像素占1个字节；</li>
+<li><code>RGB_565</code>：仅存储<code>RGB</code>通道，每个像素占2个字节，对<code>Bitmap</code>色彩没有高要求，可以使用该模式；</li>
+<li><code>ARGB_4444</code>：已弃用，用<code>ARGB_8888</code>代替；</li>
+<li><code>ARGB_8888</code>：每个像素占用4个字节，保持高质量的色彩保真度，默认使用该模式；</li>
+<li><code>RGBA_F16</code>：每个像素占用8个字节，适合宽色域和<code>HDR</code>；</li>
+<li><code>HARDWARE</code>：一种特殊的配置，减少了内存占用同时也加快了<code>Bitmap</code>的绘制。</li>
+</ul>
+<p>每个等级每个像素所占用的字节也都不一样，所存储的色彩信息也不同。同一张100像素的图片，<code>ARGB_8888</code>就占了400字节，<code>RGB_565</code>才占200字节<br>所以在某些场景中，修改图片格式可以达到减少一半内存的效果         </p>
+<h4 id="4-1-3-内存复用，避免重复分配内存"><a href="#4-1-3-内存复用，避免重复分配内存" class="headerlink" title="4.1.3 内存复用，避免重复分配内存"></a>4.1.3 内存复用，避免重复分配内存</h4><p><code>Bitmap</code>所占内存比较大，如果我们频繁创建与回收<code>Bitmap</code>，那么很容易造成内存抖动,所以我们应该尽量复用<code>Bitmap</code>内存     </p>
+<p>在 <code>Android 3.0（API 级别 11）</code>开始，系统引入了 <code>BitmapFactory.Options.inBitmap</code> 字段。如果设置了此选项，那么采用 <code>Options</code> 对象的解码方法会在生成目标 <code>Bitmap</code> 时尝试复用 <code>inBitmap</code>，这意味着 <code>inBitmap</code> 的内存得到了重复使用，从而提高了性能，同时移除了内存分配和取消分配。不过 <code>inBitmap</code> 的使用方式存在某些限制，在 <code>Android 4.4（API 级别 19）</code>之前系统仅支持复用大小相同的位图，4.4 之后只要 <code>inBitmap</code> 的大小比目标 <code>Bitmap</code> 大即可</p>
+<h4 id="4-1-4-大图局部加载策略"><a href="#4-1-4-大图局部加载策略" class="headerlink" title="4.1.4 大图局部加载策略"></a>4.1.4 大图局部加载策略</h4><p>对于图片加载还有种情况，就是单个图片非常巨大，并且还不允许压缩。比如显示：世界地图、清明上河图、微博长图等<br>首先不压缩，按照原图尺寸加载，那么屏幕肯定是不够大的，并且考虑到内存的情况，不可能一次性整图加载到内存中<br>所以这种情况的优化思路一般是局部加载，通过<code>BitmapRegionDecoder</code>来实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置显示图片的中心区域</span></span><br><span class="line">BitmapRegionDecoder bitmapRegionDecoder = BitmapRegionDecoder.newInstance(inputStream, <span class="keyword">false</span>);</span><br><span class="line">BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line">options.inPreferredConfig = Bitmap.Config.RGB_565;</span><br><span class="line">Bitmap bitmap = bitmapRegionDecoder.decodeRegion(<span class="keyword">new</span> Rect(width / <span class="number">2</span> - <span class="number">100</span>, height / <span class="number">2</span> - <span class="number">100</span>, width / <span class="number">2</span> + <span class="number">100</span>, height / <span class="number">2</span> + <span class="number">100</span>), options);</span><br><span class="line">mImageView.setImageBitmap(bitmap);</span><br></pre></td></tr></table></figure></p>
+<h4 id="4-1-5-小结"><a href="#4-1-5-小结" class="headerlink" title="4.1.5 小结"></a>4.1.5 小结</h4><p>上面所说的这些关于<code>Bitmap</code>的内存优化策略其实都比较简单，而且我们在开发中可能很少用到<br>因为我们常用的图片框架比如<code>Glide</code>已经将这些都封装在里面了，所以一般情况下我们加载图片时不需要做这些特殊操作<br>关于<code>Glide</code>对于加载图片都做了哪些优化，有兴趣的同学可以参考:<a href="https://juejin.cn/post/6970683481127043085" target="_blank" rel="noopener">【带着问题学】Glide做了哪些优化?</a>      </p>
+<h3 id="4-2-图片兜底策略"><a href="#4-2-图片兜底策略" class="headerlink" title="4.2 图片兜底策略"></a>4.2 图片兜底策略</h3><p>针对因<code>activity</code>、<code>fragment</code>泄漏导致的图片泄漏，我们可以在<code>onDetachedFromWindow</code>时机进行了监控和兜底，具体流程如下：<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3a851196e2f5439fa05070ac0c37eb90~tplv-k3u1fbpfcp-watermark.image" alt><br>通过这种方式可以方便地解决因<code>Activity</code>导致的图片泄漏问题         </p>
+<h3 id="4-3-线上大图监控方案"><a href="#4-3-线上大图监控方案" class="headerlink" title="4.3 线上大图监控方案"></a>4.3 线上大图监控方案</h3><p>当运营在线上配置了不合理大小的图片时，如果我们及时发现，也会带来内存问题<br>如果图片本身大小就不合理，我们在这个基础上谈图片优化也没有什么意义，因此大图监控这也是个比较常见的需求<br>下面介绍几种大图监控的方案：     </p>
+<h4 id="4-3-1-ArtHook-方案"><a href="#4-3-1-ArtHook-方案" class="headerlink" title="4.3.1 ArtHook 方案"></a>4.3.1 <code>ArtHook</code> 方案</h4><p>该方案采用<code>weishu</code>大佬写的<code>epic</code>库实现，通过对<code>ART</code>虚拟机的<code>hook</code>，<code>hook ImageView</code>的 <code>setImageBitmap</code> 等方法<br>解析对比方法参数中的 <code>bitmap</code> 宽高和 <code>ImageView</code> 实例的宽高，也可以获得<code>bitmap</code>的实际大小<br>如果图片宽高比<code>ImageView</code>宽高大，或者图片大小超出了阈值，就可以把相关信息上报         </p>
+<p>这种方案的优点在于：<br>1.侵入性极低，一次初始化配置即可<code>hook</code>全局的目标<code>View</code>控件<br>2.可以获取代码调用堆栈，方便开发者快速定位       </p>
+<p>而缺点则在于:<br>兼容性存在问题，使用了<code>hook</code>系统<code>API</code> ,不能用于线上      </p>
+<h4 id="4-3-2-BaseActivity-方案"><a href="#4-3-2-BaseActivity-方案" class="headerlink" title="4.3.2 BaseActivity 方案"></a>4.3.2 <code>BaseActivity</code> 方案</h4><p>大部分应用工程在业务发展的过程中都会沉淀封装自己的<code>BaseActivity</code> ，通过在<code>BaseActivity onDestroy</code>中动态地检测各个<code>View</code>控件，从而获知图片加载情况<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseActivity</span> : <span class="type">Activity</span></span>()&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onDestory</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(isOpenCheckBitmap)&#123;</span><br><span class="line">            checkBitmapFromView()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">checkBitmapFromView</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//1、遍历activity中的各个View控件</span></span><br><span class="line">        <span class="comment">//2、获取View控件加载的Bitmap</span></span><br><span class="line">        <span class="comment">//3、对比Bitmap宽高与View宽高</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种方案的优点在于：<br>1.兼容性强，无任何反射<br>2.加入简单，没有什么复杂逻辑     </p>
+<p>缺点在于：<br>1.侵入性太强，需要修改<code>BaseActivity</code><br>2.<code>BaseActivity.onDestory</code>本身可能被重写,并不安全       </p>
+<h4 id="4-3-3-ASM方案"><a href="#4-3-3-ASM方案" class="headerlink" title="4.3.3 ASM方案"></a>4.3.3 <code>ASM</code>方案</h4><p>该方案在编译流程进行插桩，通过匹配<code>setImageBitmap</code> 、 <code>setBackground</code> 等关键方法，插入<code>Bitmap</code>大小检测逻辑<br>这种方案优点在于：<br>1.编译时期插桩，对开发过程无侵入性       </p>
+<p>缺点在于：<br>1.通过插桩的方式打点，可能会增加编译期耗时<br>2.<code>ASM</code>代码维护成本较高，使用起来不是那么方便        </p>
+<h4 id="4-3-4-registerActivityLifecycleCallback方案"><a href="#4-3-4-registerActivityLifecycleCallback方案" class="headerlink" title="4.3.4 registerActivityLifecycleCallback方案"></a>4.3.4 <code>registerActivityLifecycleCallback</code>方案</h4><p>通过<code>registerActivityLifecycleCallback</code>监听<code>Activity</code>生命周期,在<code>onStop</code>时进行<code>Bitmap</code>大小检测的逻辑<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">registerActivityLifecycleCallback</span><span class="params">(application: <span class="type">Application</span>)</span></span> &#123;</span><br><span class="line">    application.registerActivityLifecycleCallbacks(<span class="keyword">object</span> :</span><br><span class="line">        Application.ActivityLifecycleCallbacks &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onActivityStopped</span><span class="params">(activity: <span class="type">Activity</span>)</span></span> &#123;</span><br><span class="line">            checkBitmapIsTooBig(childViews)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种方案对原始代码无侵入性，同时使用起来比较简单，也没有兼容性问题，应该属于比较良好的方案<br>详细实现可见：<a href="https://juejin.cn/post/6956138531789996040#heading-14" target="_blank" rel="noopener">BitmapCanary 诞生</a></p>
+<h2 id="5-怎么做OOM线上监控"><a href="#5-怎么做OOM线上监控" class="headerlink" title="5.怎么做OOM线上监控?"></a>5.怎么做<code>OOM</code>线上监控?</h2><p>上文我们介绍了，可以使用<code>LeakCanary</code>在线下监测内存泄漏，但是<code>LeakCanary</code>只能在线下使用,有以下问题<br>1.线下场景能跑到的场景有限，很难把所有用户场景穷尽.碰到线上问题难以定位<br>2.检测过程需要主动触发<code>GC</code>,<code>Dump</code>内存镜像造成<code>app</code>冻结，造成测试过程中体验不好<br>3.适用范围有限，只能定位<code>Activity</code>&amp;<code>Fragment</code>泄漏，无法定位大对象、频繁分配等问题<br>4.<code>hprof</code>文件过大，如果整体上传的话需要耗费很多资源         </p>
+<p>下面我们就介绍一下快手开源的线上<code>OOM</code>监控框架<code>KOOM</code></p>
+<h3 id="5-1-线上OOM监控框架KOOM介绍"><a href="#5-1-线上OOM监控框架KOOM介绍" class="headerlink" title="5.1 线上OOM监控框架KOOM介绍"></a>5.1 线上<code>OOM</code>监控框架<code>KOOM</code>介绍</h3><p>上面我们介绍了<code>LeakCanary</code>不能用于线上监控的原因，所以要实现线上监控功能，就需要解决以下问题          </p>
+<ul>
+<li>监控<ul>
+<li>主动触发<code>GC</code>，会造成卡顿</li>
+</ul>
+</li>
+<li>采集<ul>
+<li><code>Dump hprof</code>，会造成<code>app</code>冻结</li>
+<li><code>Hprof</code>文件过大</li>
+</ul>
+</li>
+<li>解析<ul>
+<li>解析耗时过长</li>
+<li>解析本身有<code>OOM</code>风险</li>
+</ul>
+</li>
+</ul>
+<p>其核心流程为三部分：<br>1.监控<code>OOM</code>，发生问题时触发内存镜像的采集，以便进一步分析问题<br>2.采集内存镜像，学名堆转储，将内存数据拷贝到文件中，以下简称<code>dump hprof</code><br>3.解析镜像文件，对泄漏、超大对象等我们关注的对象进行可达性分析，解析出其到<code>GC root</code>的引用链以解决问题<br><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d5e9651d7bd943c4afb211591e994475~tplv-k3u1fbpfcp-zoom-1.image" alt></p>
+<h3 id="5-2-KOOM解决GC卡顿"><a href="#5-2-KOOM解决GC卡顿" class="headerlink" title="5.2 KOOM解决GC卡顿"></a>5.2 <code>KOOM</code>解决<code>GC</code>卡顿</h3><p><code>LeakCanary</code>通过多次<code>GC</code>的方式来判断对象是否被回收，所以会造成性能损耗<br><code>koom</code>通过无性能损耗的内存阈值监控来触发镜像采集，具体策略如下：       </p>
+<ul>
+<li><code>Java</code>堆内存/线程数/文件描述符数突破阈值触发采集</li>
+<li><code>Java</code>堆上涨速度突破阈值触发采集</li>
+<li>发生<code>OOM</code>时如果策略1、2未命中 触发采集</li>
+<li>泄漏判定延迟至解析时</li>
+</ul>
+<p>我们并不需要在运行时判定对象是否泄漏，以<code>Activity</code>为例，我们并不需要在运行时判定其是否泄漏，<code>Activity</code>有一个成员变<code>mDestroyed</code>，在<code>onDestory</code>时会被置为<code>true</code>，只要解析时发现有可达且<code>mDestroyed</code>为<code>true</code>的<code>Activity</code>，即可判定为泄漏<br>通过将泄漏判断延迟至解析时，即可解决<code>GC</code>卡顿的问题<br><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd2f54d13770470289b9518957639f69~tplv-k3u1fbpfcp-zoom-1.image" alt>               </p>
+<h3 id="5-3-KOOM解决Dump-hprof冻结app"><a href="#5-3-KOOM解决Dump-hprof冻结app" class="headerlink" title="5.3 KOOM解决Dump hprof冻结app"></a>5.3 <code>KOOM</code>解决<code>Dump hprof</code>冻结<code>app</code></h3><p><code>Dump hprof</code>即采集内存镜像需要暂停虚拟机，以确保在内存数据拷贝到磁盘的过程中，引用关系不会发生变化，暂停时间通常长达10秒以上，对用户来讲是难以接受的，这也是<code>LeakCanary</code>官方不推荐线上使用的重要原因之一。<br>利用<code>Copy-on-write</code>机制，<code>fork</code>子进程<code>dump</code>内存镜像，可以完美解决这一问题，<code>fork</code>成功以后，父进程立刻恢复虚拟机运行，子进程<code>dump</code>内存镜像期间不会受到父进程数据变动的影响。<br>流程如下图所示：<br><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8271f1c2b5ce4e3181d507ed2c4d732c~tplv-k3u1fbpfcp-zoom-1.image" alt><br><code>KOOM</code>随机采集线上真实用户的内存镜像，普通<code>dump</code>和<code>fork</code>子进程<code>dump</code>阻塞用户使用的耗时如下：<br><img src="https://github.com/KwaiAppTeam/KOOM/wiki/images/android_benchmark_cn.png" alt><br>可以看出，基本可以做到无感知的采集内存镜像        </p>
+<h3 id="5-4-KOOM解决hprof文件过大"><a href="#5-4-KOOM解决hprof文件过大" class="headerlink" title="5.4 KOOM解决hprof文件过大"></a>5.4 <code>KOOM</code>解决<code>hprof</code>文件过大</h3><p><code>Hprof</code>文件通常比较大，分析<code>OOM</code>时遇到500M以上的<code>hprof</code>文件并不稀奇，文件的大小，与<code>dump</code>成功率、<code>dump</code>速度、上传成功率负相关，且大文件额外浪费用户大量的磁盘空间和流量。<br>因此需要对<code>hprof</code>进行裁剪，只保留分析<code>OOM</code>必须的数据，另外，裁剪还有数据脱敏的好处，只上传内存中类与对象的组织结构，并不上传真实的业务数据（诸如字符串、<code>byte</code>数组等含有具体数据的内容），保护用户隐私。<br>裁剪<code>hprof</code>文件涉及到对<code>hprof</code>文件格式的了解，这里就不缀述了<br>下面看一下裁剪过程的流程图：<br><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f3fd3422bb5b4f7689c25fd554f5c88f~tplv-k3u1fbpfcp-zoom-1.image" alt>          </p>
+<h3 id="5-5-KOOM解决hprof解析的耗时与OOM"><a href="#5-5-KOOM解决hprof解析的耗时与OOM" class="headerlink" title="5.5 KOOM解决hprof解析的耗时与OOM"></a>5.5 <code>KOOM</code>解决<code>hprof</code>解析的耗时与<code>OOM</code></h3><p>解析<code>hprof</code>文件，对关键对象进行可达性分析，得到引用链，是解决<code>OOM</code>最核心的一步，之前的监控和<code>dump</code>都是为解析做铺垫。<br>解析分两种，一种是上传<code>hprof</code>文件由<code>server</code>解析，另一种是在客户端解析后上传报告(通常只有几<code>KB</code>)。<br><code>KOOM</code>选择了端上解析，这样做有两个好处：        </p>
+<ul>
+<li>1.节省用户流量           </li>
+<li>2.利用用户闲时算力，降低<code>server</code>压力，这样也符合分布式计算理念。      </li>
+</ul>
+<p>这样就可以把解析过程拆解成以下两个问题       </p>
+<ul>
+<li>哪些对象需要分析，全部分析性能开销太大，很难在端上完成，并且问题没有重点也不利于解决。</li>
+<li>性能优化，作为一个<code>debug</code>组件，要在不影响用户体验的情况下完成解析，对性能有非常高的要求。</li>
+</ul>
+<h4 id="5-5-1-关键对象判定"><a href="#5-5-1-关键对象判定" class="headerlink" title="5.5.1 关键对象判定"></a>5.5.1 关键对象判定</h4><p><code>KOOM</code>只解析关键的对象，关键对象分为两类，一类是根据规则可以判断出对象已经泄露，且持有大量资源的，另外一类是对象<code>shallow / retained size</code> 超过阈值<br><code>Activity/fragment</code>泄露判定即为第一种:<br>对于强可达的<code>activity</code>对象，其<code>mDestroyed</code>值为<code>true</code>时(<code>onDestroy</code>时赋值)，判定已经泄露。<br>类似的，对于<code>fragment</code>，当<code>mCalled</code>值为<code>true</code>且<code>mFragmentManager</code>为<code>null</code>时，判定已经泄露 。       </p>
+<p><code>Bitmap/window/array/sufacetexture</code>判定为第二种<br>检查<code>bitmap/texture</code>的数量、宽高、<code>window</code>数量、<code>array</code>长度等等是否超过阈值，再结合<code>hprof</code>中的相关业务信息，比如屏幕大小，<code>view</code>大小等进行判定。            </p>
+<h4 id="5-5-2-性能优化"><a href="#5-5-2-性能优化" class="headerlink" title="5.5.2 性能优化"></a>5.5.2 性能优化</h4><p><code>KOOM</code>在<code>LeakCanary</code>解析引擎<code>shark</code>的基础上做了一些优化，将解析时间在<code>shark</code>的基础上优化了2倍以上，内存峰值控制在100M以内。 用一张图总结解析的流程：<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/627840a253884469847989453ccb14d7~tplv-k3u1fbpfcp-zoom-1.image" alt><br>详细流程就不在这里缀述了，详情可见：<a href="https://juejin.cn/post/6860014199973871624#heading-13" target="_blank" rel="noopener">KOOM解析性能优化</a>        </p>
+<h3 id="5-6-KOOM使用"><a href="#5-6-KOOM使用" class="headerlink" title="5.6 KOOM使用"></a>5.6 <code>KOOM</code>使用</h3><p><code>KOOM</code>目前已经开源，开源地址：<a href="https://github.com/KwaiAppTeam/KOOM" target="_blank" rel="noopener">https://github.com/KwaiAppTeam/KOOM</a><br>直接参照接入指南接入即可，当发现内存超过阈值或者发生<code>OOM</code>时，就会触发采集内存快照，对<code>hprof</code>文件进行裁剪并分析后得到报告<br><code>KOOM</code>的报告是<code>json</code>格式，并且大小在<code>KB</code>级别，样式如下所示：<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog11/p3.png" alt><br>大概包括以下信息<br>1.一些可能泄漏的类信息<br>2.泄漏原因,<code>gcRoot</code>,泄漏实例数量等<br>3.泄漏对象的引用链，方便定位问题         </p>
+<p>可见<code>KOOM</code>上传的数据量并不太大，但相对准确，非常便于我们分析线上数据           </p>
+<h3 id="5-7-小结"><a href="#5-7-小结" class="headerlink" title="5.7 小结"></a>5.7 小结</h3><p>本章主要介绍了线上监控<code>OOM</code>的开源框架<code>KOOM</code><br>其实线上监控<code>OOM</code>的框架各大厂都有开发，比如美团的<a href="https://tech.meituan.com/2019/11/14/crash-oom-probe-practice.html" target="_blank" rel="noopener">Probe</a>,字节的<a href="https://juejin.cn/post/6908517174667804680#heading-7" target="_blank" rel="noopener">Liko</a><br>不过大部分都没有正式开源，只是一些文章介绍原理，有兴趣的同学也可以都了解下      </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>对于优化的大方向，我们应该优先去做见效快的地方，主要有以下几个部分：<br>1.内存泄漏<br>2.内存抖动<br>3.<code>Bitmap</code>大图监控<br>4.<code>OOM</code>线上监控       </p>
+<p>我们还介绍了内存优化的多种实用工具<br>1.可以使用<code>Profile</code>,<code>MAT</code>在开发时定位内存抖动内存泄漏问题<br>2.线下开发、回归、<code>Monkey</code>、压测等环节可以自动集成<code>LeakCanary</code>检测内存泄漏；<br>3.图片加载是内存优化的重点，我们可以结合图片兜底策略与线上大图监控，优化图片内存问题<br>4.线上<code>OOM</code>时通过<code>KOOM</code>监测，内存超出阈值时主动<code>dump</code>内存快照，通过上传分析结果精准分析<code>OOM</code>问题。       </p>
+<p>内存优化是个复杂的过程，我们在做内存优化的过程中，需要结合多种工具，线上线下结合，系统化地配合来定位与解决问题    </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6844903897958449166" target="_blank" rel="noopener">探索 Android 内存优化方法</a><br><a href="https://juejin.cn/post/6872919545728729095#heading-70" target="_blank" rel="noopener">深入探索 Android 内存优化（炼狱级别-下）</a><br><a href="https://juejin.cn/post/6956138531789996040" target="_blank" rel="noopener">更优雅地检测android应用中的大图</a><br><a href="https://juejin.cn/post/6860014199973871624" target="_blank" rel="noopener">快手客户端稳定性体系建设</a><br><a href="https://tech.meituan.com/2019/11/14/crash-oom-probe-practice.html" target="_blank" rel="noopener">Probe：Android线上OOM问题定位组件</a><br><a href="https://juejin.cn/post/6908517174667804680" target="_blank" rel="noopener">抖音 Android 性能优化系列: Java 内存优化篇</a>       </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/05/no-permission-float.html" rel="next" title="【开源项目】不需要权限的悬浮窗方案了解一下~">
+                <i class="fa fa-chevron-left"></i> 【开源项目】不需要权限的悬浮窗方案了解一下~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/05/dispatch-sum-up.html" rel="prev" title="【带着问题学】 android事件分发8连问">
+                【带着问题学】 android事件分发8连问 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-为什么要做内存优化"><span class="nav-number">2.</span> <span class="nav-text">1. 为什么要做内存优化?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-降低OOM率"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 降低OOM率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-减少卡顿"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 减少卡顿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-增加应用存活时间"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 增加应用存活时间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-android内存优化的一些背景知识"><span class="nav-number">3.</span> <span class="nav-text">2. android内存优化的一些背景知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Java垃圾回收机制"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 Java垃圾回收机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-什么是内存泄漏"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 什么是内存泄漏?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-什么是内存抖动"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 什么是内存抖动?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-什么是内存溢出"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 什么是内存溢出?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-android内存优化的常用工具与手段"><span class="nav-number">4.</span> <span class="nav-text">3. android内存优化的常用工具与手段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Memory-Profiler"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 Memory Profiler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Memory-Analyzer-Tool"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 Memory Analyzer Tool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-LeakCanary检测内存泄漏"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 LeakCanary检测内存泄漏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-内存优化的一些常规手段"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 内存优化的一些常规手段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-怎么做图片内存优化？"><span class="nav-number">5.</span> <span class="nav-text">4. 怎么做图片内存优化？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-常规的图片内存优化方法"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 常规的图片内存优化方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-减少图片宽高"><span class="nav-number">5.1.1.</span> <span class="nav-text">4.1.1 减少图片宽高</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-2-减少每个像素所占用的内存"><span class="nav-number">5.1.2.</span> <span class="nav-text">4.1.2 减少每个像素所占用的内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-3-内存复用，避免重复分配内存"><span class="nav-number">5.1.3.</span> <span class="nav-text">4.1.3 内存复用，避免重复分配内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-4-大图局部加载策略"><span class="nav-number">5.1.4.</span> <span class="nav-text">4.1.4 大图局部加载策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-5-小结"><span class="nav-number">5.1.5.</span> <span class="nav-text">4.1.5 小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-图片兜底策略"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 图片兜底策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-线上大图监控方案"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 线上大图监控方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-1-ArtHook-方案"><span class="nav-number">5.3.1.</span> <span class="nav-text">4.3.1 ArtHook 方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-2-BaseActivity-方案"><span class="nav-number">5.3.2.</span> <span class="nav-text">4.3.2 BaseActivity 方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-3-ASM方案"><span class="nav-number">5.3.3.</span> <span class="nav-text">4.3.3 ASM方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-4-registerActivityLifecycleCallback方案"><span class="nav-number">5.3.4.</span> <span class="nav-text">4.3.4 registerActivityLifecycleCallback方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-怎么做OOM线上监控"><span class="nav-number">6.</span> <span class="nav-text">5.怎么做OOM线上监控?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-线上OOM监控框架KOOM介绍"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 线上OOM监控框架KOOM介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-KOOM解决GC卡顿"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 KOOM解决GC卡顿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-KOOM解决Dump-hprof冻结app"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 KOOM解决Dump hprof冻结app</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-KOOM解决hprof文件过大"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 KOOM解决hprof文件过大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-KOOM解决hprof解析的耗时与OOM"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 KOOM解决hprof解析的耗时与OOM</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-5-1-关键对象判定"><span class="nav-number">6.5.1.</span> <span class="nav-text">5.5.1 关键对象判定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-5-2-性能优化"><span class="nav-number">6.5.2.</span> <span class="nav-text">5.5.2 性能优化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-6-KOOM使用"><span class="nav-number">6.6.</span> <span class="nav-text">5.6 KOOM使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-7-小结"><span class="nav-number">6.7.</span> <span class="nav-text">5.7 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

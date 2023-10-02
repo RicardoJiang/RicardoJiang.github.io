@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="前端,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言几年前，Google 给 Chrome 浏览器加了一个有趣的彩蛋：如果你在未联网的情况下访问网页，会看到 “Unable to connect to the Internet” 或 “No internet” 的提示，旁边是一只像素恐龙。许多人可能觉得这只恐龙只是一个可爱的小图标，在断网的时候陪伴用户。但是后来有人按下空格键，小恐龙开始奔跑！这只可爱的小恐龙是设计师 Sebastien Gab">
+<meta name="keywords" content="前端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue 实现 Chrome 小恐龙游戏">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/04/vue-chrome-rex.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言几年前，Google 给 Chrome 浏览器加了一个有趣的彩蛋：如果你在未联网的情况下访问网页，会看到 “Unable to connect to the Internet” 或 “No internet” 的提示，旁边是一只像素恐龙。许多人可能觉得这只恐龙只是一个可爱的小图标，在断网的时候陪伴用户。但是后来有人按下空格键，小恐龙开始奔跑！这只可爱的小恐龙是设计师 Sebastien Gab">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p8.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p9.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p10.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p11.jpeg">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.247Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vue 实现 Chrome 小恐龙游戏">
+<meta name="twitter:description" content="前言几年前，Google 给 Chrome 浏览器加了一个有趣的彩蛋：如果你在未联网的情况下访问网页，会看到 “Unable to connect to the Internet” 或 “No internet” 的提示，旁边是一只像素恐龙。许多人可能觉得这只恐龙只是一个可爱的小图标，在断网的时候陪伴用户。但是后来有人按下空格键，小恐龙开始奔跑！这只可爱的小恐龙是设计师 Sebastien Gab">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p8.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/04/vue-chrome-rex.html">
+
+
+
+
+
+  <title>Vue 实现 Chrome 小恐龙游戏 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/04/vue-chrome-rex.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Vue 实现 Chrome 小恐龙游戏</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-04-17T10:12:32+08:00">
+                2022-04-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>几年前，Google 给 Chrome 浏览器加了一个有趣的彩蛋：如果你在未联网的情况下访问网页，会看到 “Unable to connect to the Internet” 或 “No internet” 的提示，旁边是一只像素恐龙。<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p8.png" alt><br>许多人可能觉得这只恐龙只是一个可爱的小图标，在断网的时候陪伴用户。但是后来有人按下空格键，小恐龙开始奔跑！<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p9.png" alt><br>这只可爱的小恐龙是设计师 Sebastien Gabriel 的作品。他在一次访谈中说，他觉得没有 wifi 的年代就像是史前时代，很多人都已经忘记那个只能在公司、学校或者网吧才能上网的年代，所以他就以史前时代的代表——恐龙，作为断网的图标。   </p>
+<p>本文的主要内容就是如何使用Vue实现这个小彩蛋游戏，感兴趣的同学可以直接看下效果：<a href="https://shenzhen2017.github.io/vue-rex/" target="_blank" rel="noopener">游戏地址</a></p>
+<h2 id="复刻画面"><a href="#复刻画面" class="headerlink" title="复刻画面"></a>复刻画面</h2><p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p10.png" alt><br>我们首先把这个小游戏的样式摆出来，可以看出，主要包括下面几种元素    </p>
+<ol>
+<li>恐龙  </li>
+<li>路面</li>
+<li>云彩</li>
+<li>障碍物</li>
+<li>积分</li>
+</ol>
+<p>主要就是这些内容，我们通过css将其放在合适的位置即可</p>
+<h2 id="动画效果"><a href="#动画效果" class="headerlink" title="动画效果"></a>动画效果</h2><h3 id="路面动画"><a href="#路面动画" class="headerlink" title="路面动画"></a>路面动画</h3><p>在初步将小游戏的画面复刻了之后，我们需要把画面动起来，可以看出，其实在游戏过程中，小恐龙水平方向是不动的，只是路面一直在平移，看起来小恐龙在移动了，因此我们需要给路面添加动画效果    </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">get</span> roadStyle() &#123;</span><br><span class="line">  <span class="keyword">return</span> &#123; <span class="attr">transform</span>: <span class="string">`translateX(<span class="subst">$&#123;<span class="keyword">this</span>.roadTranslate&#125;</span>px)`</span> &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">startGamerInterval() &#123;</span><br><span class="line">  clearInterval(<span class="keyword">this</span>.timer);</span><br><span class="line">  <span class="keyword">this</span>.timer = setInterval(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.gameStatus === GameStatus.RUNNING) &#123;</span><br><span class="line">      <span class="keyword">this</span>.updateGameStatus();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, <span class="number">100</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">updateGameStatus() &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.roadTranslate &lt;= <span class="number">-600</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.roadTranslate = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.roadTranslate -= GameConfig.ROAD_VELOCITY;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，主要是通过<code>setInterval</code>启动一个定时任务，然后在其中修改<code>roadTranslate</code>即可     </p>
+<h3 id="障碍物动画"><a href="#障碍物动画" class="headerlink" title="障碍物动画"></a>障碍物动画</h3><p>障硬物同样会随着路面一起做水平移动，这部分跟路面的动画部分基本一样，不同的部分在于，障碍物可能有1棵树或者多棵树，这其实是通过雪碧图和<code>background-position</code>实现的，通过雪碧图可以有效的减少我们的切图数量<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">updateGameStatus() &#123;</span><br><span class="line">  <span class="keyword">this</span>.treeItems.forEach(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (item.treeTranslateX &lt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> isBigTree = GetRandomNum(<span class="number">0</span>, <span class="number">100</span>) % <span class="number">2</span> ? <span class="literal">true</span> : <span class="literal">false</span>;</span><br><span class="line">      <span class="keyword">const</span> itemWidth = isBigTree ? <span class="number">25</span> : <span class="number">17</span>;</span><br><span class="line">      <span class="keyword">const</span> itemHeight = isBigTree ? <span class="number">50</span> : <span class="number">35</span>;</span><br><span class="line">      <span class="keyword">const</span> itemCount = GetRandomNum(<span class="number">1</span>, <span class="number">3</span>);</span><br><span class="line">      <span class="keyword">const</span> offsetPosition = GetRandomNum(<span class="number">0</span>, <span class="number">2</span>);</span><br><span class="line">      item.treeTranslateX = GetRandomNum(<span class="number">600</span>, <span class="number">1200</span>);</span><br><span class="line">      item.isBigTree = isBigTree;</span><br><span class="line">      item.width = itemWidth * itemCount;</span><br><span class="line">      item.height = itemHeight;</span><br><span class="line">      item.backgroundPosition = -itemWidth * offsetPosition;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      item.treeTranslateX -= GameConfig.TREE_VELOCITY;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>同样是定时在<code>updateGameStatus</code>中修改障碍物的<code>treeTranslateX</code>，不同之处在于障碍物还需要通过随机树设置宽度与<code>backgroundPosition</code>。<br>同时当<code>treeTranslateX &lt; 0</code>时，说明障碍物已经运行过去了，这时还需要重置状态   </p>
+<h3 id="恐龙动画"><a href="#恐龙动画" class="headerlink" title="恐龙动画"></a>恐龙动画</h3><p>除了路面背景在移动之外，为了让恐龙看起来在移动，我们还需要给恐龙添加动画效果，其实就是通过切换图片，让恐龙看起来在跑步，这也是通过雪碧图实现的。<br>除此之外，还有就是当我们按下空格键时，恐龙需要做一个跳跃动画     </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">updateGameStatus() &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.rexItem.isInJump) &#123;</span><br><span class="line">    <span class="comment">//跳跃动画	</span></span><br><span class="line">    <span class="keyword">this</span>.rexItem.rexTranslateY -= <span class="keyword">this</span>.rexItem.rexVelocity;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.rexItem.rexTranslateY &lt;= -GameConfig.REX_MAX_JUMP) &#123;</span><br><span class="line">      <span class="keyword">this</span>.rexItem.rexVelocity = -GameConfig.REX_VELOCITY;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.rexItem.rexTranslateY &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.rexItem.isInJump = <span class="literal">false</span>;</span><br><span class="line">      <span class="keyword">this</span>.rexItem.rexTranslateY = <span class="number">0</span>;</span><br><span class="line">      <span class="keyword">this</span>.rexItem.rexVelocity = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//跳步动画	</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.rexItem.rexBackgroundPostion &lt;= <span class="number">-220</span>) &#123;</span><br><span class="line">      <span class="keyword">this</span>.rexItem.rexBackgroundPostion = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.rexItem.rexBackgroundPostion -= <span class="number">44</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上，主要就是跑步与跳跃动画，其中跳跃动画在达到最大高度后，需要修改速度的方向    </p>
+<h2 id="响应事件"><a href="#响应事件" class="headerlink" title="响应事件"></a>响应事件</h2><p>在这个小游戏中，我们还需要响应键盘事件    </p>
+<ol>
+<li>游戏未开始时，按空格键开始      </li>
+<li>游戏中，按空格键跳跃         </li>
+<li>游戏结束后，按空格键重新开始     </li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">created() &#123;</span><br><span class="line">  <span class="built_in">window</span>.addEventListener(<span class="string">"keyup"</span>, <span class="keyword">this</span>.submit);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">submit(event: KeyboardEvent) &#123;</span><br><span class="line">  <span class="keyword">if</span> (event.code === <span class="string">"Space"</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (</span><br><span class="line">      <span class="keyword">this</span>.gameStatus === GameStatus.WAIT ||</span><br><span class="line">      <span class="keyword">this</span>.gameStatus === GameStatus.END</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">this</span>.gameStatus = GameStatus.RUNNING;</span><br><span class="line">      <span class="keyword">this</span>.initGame();</span><br><span class="line">      <span class="keyword">this</span>.startGame();</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.gameStatus === GameStatus.RUNNING) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.rexItem.rexTranslateY === <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.rexItem.isInJump === <span class="literal">false</span>) &#123;</span><br><span class="line">          <span class="keyword">this</span>.rexItem.isInJump = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">this</span>.rexItem.rexVelocity = GameConfig.REX_VELOCITY;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="碰撞检测"><a href="#碰撞检测" class="headerlink" title="碰撞检测"></a>碰撞检测</h2><p>在完成画面复刻与让画面动起来之后，接下来要做的就是恐龙与障碍物的碰撞检测了，这其实就是判断两个矩形有没有相交。我们可以通过判断不重叠的情况，然后取反就可以了<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/april/p11.jpeg" alt>   </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">isOverlap(rect1: Rect, <span class="attr">rect2</span>: Rect) &#123;</span><br><span class="line">  <span class="keyword">const</span> startX1 = rect1.x;</span><br><span class="line">  <span class="keyword">const</span> startY1 = rect1.y;</span><br><span class="line">  <span class="keyword">const</span> endX1 = startX1 + rect1.width;</span><br><span class="line">  <span class="keyword">const</span> endY1 = startY1 + rect1.height;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> startX2 = rect2.x;</span><br><span class="line">  <span class="keyword">const</span> startY2 = rect2.y;</span><br><span class="line">  <span class="keyword">const</span> endX2 = startX2 + rect2.width;</span><br><span class="line">  <span class="keyword">const</span> endY2 = startY2 + rect2.height;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> !(</span><br><span class="line">    endY2 &lt; startY1 ||</span><br><span class="line">    endY1 &lt; startY2 ||</span><br><span class="line">    startX1 &gt; endX2 ||</span><br><span class="line">    startX2 &gt; endX1</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><p>通过以上步骤，我们的小游戏就基本开发完成了，接下来就是部署了，在没有自己的服务器的情况下，我们可以利用GitHub Pages来部署我们的项目<br>我们将打包出来的dist目录作为Github Pages的根目录，从而实现发布与部署。关于Vue项目打包部署到GitHub Pages的具体步骤，可以参考：<a href="https://blog.csdn.net/weixin_44670973/article/details/107130231" target="_blank" rel="noopener">Vue项目打包部署到GitHub Pages</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>代码地址：<a href="https://github.com/shenzhen2017/vue-rex" target="_blank" rel="noopener">https://github.com/shenzhen2017/vue-rex</a><br>游戏地址：<a href="https://shenzhen2017.github.io/vue-rex/" target="_blank" rel="noopener">https://shenzhen2017.github.io/vue-rex/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端/" rel="tag"># 前端</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/04/android-ui-render.html" rel="next" title="关于 Android 渲染你应该了解的知识点">
+                <i class="fa fa-chevron-left"></i> 关于 Android 渲染你应该了解的知识点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/04/compose-render-performance.html" rel="prev" title="Compose 渲染性能到底怎么样?">
+                Compose 渲染性能到底怎么样? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复刻画面"><span class="nav-number">2.</span> <span class="nav-text">复刻画面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动画效果"><span class="nav-number">3.</span> <span class="nav-text">动画效果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#路面动画"><span class="nav-number">3.1.</span> <span class="nav-text">路面动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#障碍物动画"><span class="nav-number">3.2.</span> <span class="nav-text">障碍物动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#恐龙动画"><span class="nav-number">3.3.</span> <span class="nav-text">恐龙动画</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#响应事件"><span class="nav-number">4.</span> <span class="nav-text">响应事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#碰撞检测"><span class="nav-number">5.</span> <span class="nav-text">碰撞检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署"><span class="nav-number">6.</span> <span class="nav-text">部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

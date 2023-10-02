@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言本文主要包括以下内容1.MMKV有什么缺陷？2.使用kotlin委托优化MMKV调用的实用技巧 如果觉得本文对您有所帮助，请帮忙点赞，谢谢~ MMKV有什么缺陷我们在之前介绍过，MMKV相比SharedPreferences有很多优点,比如1.mmap防止数据丢失，提高读写效率;2.精简数据，以最少的数据量表示最多的信息，减少数据大小;3.增量更新，避免每次进行相对增量来说大数据量的全量写入。">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MMKV缺陷：不支持getAll?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/03/mmkv-disadvange-sum.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言本文主要包括以下内容1.MMKV有什么缺陷？2.使用kotlin委托优化MMKV调用的实用技巧 如果觉得本文对您有所帮助，请帮忙点赞，谢谢~ MMKV有什么缺陷我们在之前介绍过，MMKV相比SharedPreferences有很多优点,比如1.mmap防止数据丢失，提高读写效率;2.精简数据，以最少的数据量表示最多的信息，减少数据大小;3.增量更新，避免每次进行相对增量来说大数据量的全量写入。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.242Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MMKV缺陷：不支持getAll?">
+<meta name="twitter:description" content="前言本文主要包括以下内容1.MMKV有什么缺陷？2.使用kotlin委托优化MMKV调用的实用技巧 如果觉得本文对您有所帮助，请帮忙点赞，谢谢~ MMKV有什么缺陷我们在之前介绍过，MMKV相比SharedPreferences有很多优点,比如1.mmap防止数据丢失，提高读写效率;2.精简数据，以最少的数据量表示最多的信息，减少数据大小;3.增量更新，避免每次进行相对增量来说大数据量的全量写入。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/03/mmkv-disadvange-sum.html">
+
+
+
+
+
+  <title>MMKV缺陷：不支持getAll? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/03/mmkv-disadvange-sum.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MMKV缺陷：不支持getAll?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-13T21:35:39+08:00">
+                2021-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要包括以下内容<br>1.<code>MMKV</code>有什么缺陷？<br>2.使用<code>kotlin</code>委托优化<code>MMKV</code>调用的实用技巧</p>
+<p>如果觉得本文对您有所帮助，请帮忙点赞，谢谢~</p>
+<h2 id="MMKV有什么缺陷"><a href="#MMKV有什么缺陷" class="headerlink" title="MMKV有什么缺陷"></a><code>MMKV</code>有什么缺陷</h2><p>我们在之前介绍过，<code>MMKV</code>相比<code>SharedPreferences</code>有很多优点,比如<br>1.mmap防止数据丢失，提高读写效率;<br>2.精简数据，以最少的数据量表示最多的信息，减少数据大小;<br>3.增量更新，避免每次进行相对增量来说大数据量的全量写入。<br>详情可见：<a href="https://juejin.cn/post/6930168094983716877" target="_blank" rel="noopener">SharedPreferences替换:MMKV集成与原理</a>   </p>
+<p><strong>那么MMKV有没有什么缺点？</strong><br>MMKV的主要缺点就在于它不支持<code>getAll</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Map&lt;String, ?&gt; getAll() &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> UnsupportedOperationException(<span class="string">"use allKeys() instead, getAll() not implement because type-erasure inside mmkv"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p><code>MMKV</code>都是按字节进行存储的，实际写入文件把类型擦除了，这也是<code>MMKV</code>不支持<code>getAll</code>的原因   </p>
+</blockquote>
+<p>虽然说<code>getAll</code>用的不多问题不大，但是<code>MMKV</code>因此就不具备导出和迁移的能力了。<br>比如说，以后出了更优秀的存储框架，例如<code>DataStore</code>正式发布后，是没有办法直接从<code>MMKV</code>批量迁移到新框架的，除非代码里面写死一个个<code>key</code>迁移,这样是很麻烦的<br>所以在我们引入<code>MMKV</code>时，就应该考虑到将来可能的数据迁出   </p>
+<h3 id="如何让MMKV支持getAll"><a href="#如何让MMKV支持getAll" class="headerlink" title="如何让MMKV支持getAll?"></a>如何让<code>MMKV</code>支持<code>getAll</code>?</h3><p>既然<code>MMKV</code>不支持<code>getAll</code>的原因是因为类型被擦除了，那最简单的思路就是加上类型<br><strong>我们可以在<code>key</code>上添加一个类型后缀</strong>   </p>
+<p>但是如果我们强制规定写<code>key</code>时后面都添加上后缀是难以维护的，并且也很麻烦<br>一个更加优雅地方式是添加一个代理层，所有读写操作都代理给这个代理类，并在这里为<code>key</code>添加类型   </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SpProxy</span></span>(<span class="keyword">private</span> <span class="keyword">val</span> mmkv: MMKV?) : SharedPreferences, SharedPreferences.Editor &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getAll</span><span class="params">()</span></span>: MutableMap&lt;String, *&gt; &#123;</span><br><span class="line">        <span class="keyword">val</span> keys = mmkv?.allKeys()</span><br><span class="line">        <span class="keyword">val</span> map = mutableMapOf&lt;String, Any&gt;()</span><br><span class="line">        keys?.forEach &#123;</span><br><span class="line">            <span class="keyword">if</span> (it.contains(<span class="string">"@"</span>)) &#123;</span><br><span class="line">                <span class="keyword">val</span> typeList = it.split(<span class="string">"@"</span>)</span><br><span class="line">                <span class="keyword">when</span> (typeList[typeList.size - <span class="number">1</span>]) &#123;</span><br><span class="line">                    String::<span class="class"><span class="keyword">class</span>.<span class="title">simpleName</span> -&gt; <span class="title">map</span>[<span class="title">it</span>] = <span class="title">getString</span></span>(it, <span class="string">""</span>) ?: <span class="string">""</span></span><br><span class="line">                    <span class="built_in">Int</span>::<span class="class"><span class="keyword">class</span>.<span class="title">simpleName</span> -&gt; <span class="title">map</span>[<span class="title">it</span>] = <span class="title">getInt</span></span>(it, <span class="number">0</span>)</span><br><span class="line">                    <span class="built_in">Long</span>::<span class="class"><span class="keyword">class</span>.<span class="title">simpleName</span> -&gt; <span class="title">map</span>[<span class="title">it</span>] = <span class="title">getLong</span></span>(it, <span class="number">0L</span>)</span><br><span class="line">                    <span class="built_in">Float</span>::<span class="class"><span class="keyword">class</span>.<span class="title">simpleName</span> -&gt; <span class="title">map</span>[<span class="title">it</span>] = <span class="title">getFloat</span></span>(it, <span class="number">0f</span>)</span><br><span class="line">                    <span class="built_in">Boolean</span>::<span class="class"><span class="keyword">class</span>.<span class="title">simpleName</span> -&gt; <span class="title">map</span>[<span class="title">it</span>] = <span class="title">getBoolean</span></span>(it, <span class="literal">false</span>)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> map</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getString</span><span class="params">(key: <span class="type">String</span>?, defValue: <span class="type">String</span>?)</span></span>: String? &#123;</span><br><span class="line">        <span class="keyword">val</span> typeKey = getTypeKey&lt;String&gt;(key)</span><br><span class="line">        <span class="keyword">return</span> mmkv?.getString(typeKey, defValue)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">getBoolean</span><span class="params">(key: <span class="type">String</span>?, defValue: <span class="type">Boolean</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> typeKey = getTypeKey&lt;<span class="built_in">Boolean</span>&gt;(key)</span><br><span class="line">        <span class="keyword">return</span> mmkv?.getBoolean(typeKey, defValue) ?: defValue</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">contains</span><span class="params">(key: <span class="type">String</span>?)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> realKey = getRealKey(key)</span><br><span class="line">        <span class="keyword">return</span> realKey.isNotEmpty()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">edit</span><span class="params">()</span></span>: SharedPreferences.Editor? &#123;</span><br><span class="line">        <span class="keyword">return</span> mmkv?.edit()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">putString</span><span class="params">(key: <span class="type">String</span>?, value: <span class="type">String</span>?)</span></span>: SharedPreferences.Editor? &#123;</span><br><span class="line">        <span class="keyword">val</span> typeKey = getTypeKey&lt;String&gt;(key)</span><br><span class="line">        <span class="keyword">return</span> mmkv?.putString(typeKey, value)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">putBoolean</span><span class="params">(key: <span class="type">String</span>?, value: <span class="type">Boolean</span>)</span></span>: SharedPreferences.Editor? &#123;</span><br><span class="line">        <span class="keyword">val</span> typeKey = getTypeKey&lt;<span class="built_in">Boolean</span>&gt;(key)</span><br><span class="line">        <span class="keyword">return</span> mmkv?.putBoolean(typeKey, value)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">remove</span><span class="params">(key: <span class="type">String</span>?)</span></span>: SharedPreferences.Editor? &#123;</span><br><span class="line">        <span class="keyword">val</span> realKey = getRealKey(key)</span><br><span class="line">        <span class="keyword">if</span> (realKey.isNotEmpty())&#123;</span><br><span class="line">            <span class="keyword">return</span> mmkv?.remove(realKey)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">clear</span><span class="params">()</span></span>: SharedPreferences.Editor? &#123;</span><br><span class="line">        <span class="keyword">return</span> mmkv?.clear()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;<span class="keyword">reified</span> T&gt;</span> <span class="title">getTypeKey</span><span class="params">(key: <span class="type">String</span>?)</span></span>: String &#123;</span><br><span class="line">        <span class="keyword">val</span> type = <span class="string">"@"</span> + T::<span class="class"><span class="keyword">class</span>.<span class="title">simpleName</span></span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">if</span> (key?.contains(type) == <span class="literal">true</span>) &#123;</span><br><span class="line">            type</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            key + type</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getRealKey</span><span class="params">(key: <span class="type">String</span>?)</span></span>:String&#123;</span><br><span class="line">        <span class="keyword">val</span> typeKys = listOf(getTypeKey&lt;String&gt;(key),getTypeKey&lt;<span class="built_in">Long</span>&gt;(key),getTypeKey&lt;<span class="built_in">Float</span>&gt;(key),getTypeKey&lt;<span class="built_in">Int</span>&gt;(key),getTypeKey&lt;<span class="built_in">Boolean</span>&gt;(key))</span><br><span class="line">        typeKys.forEach &#123;</span><br><span class="line">            <span class="keyword">if</span> (mmkv?.containsKey(it)==<span class="literal">true</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> it</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">""</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示：<br>1.所有读写操作都基于<code>SpProxy</code>来做<br>2.<code>key</code>尾部添加类型字段通过<code>getTypeKey</code>方法实现<br>3.支持<code>getAll</code>方法，方便后续迁移<br>4.<code>mmkv</code>的操作全都封装在<code>SpProxy</code>类里了，后续如果要迁移到其他类，修改<code>SpProxy</code>即可，外部可完全不用修改  </p>
+<p>计算机软件中所有问题都可以通过添加一个中间层来解决，为<code>SharedPreferences</code>封装一个代理层，可以有效地拓展我们项目的扩展性      </p>
+<h3 id="如何迁移老数据"><a href="#如何迁移老数据" class="headerlink" title="如何迁移老数据"></a>如何迁移老数据</h3><p><code>MMKV</code>为我们提供了<code>importFromSharedPreferences</code>方法来从<code>SharedPreferences</code>迁移到<code>MMKV</code><br>但如果直接调用这个方法迁移，那么数据类型就丢失了，下面提供一个新的迁移方法    </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">migrate</span><span class="params">(migrateSp:<span class="type">SpProxy</span>,preferences: <span class="type">SharedPreferences</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">val</span> kvs = preferences.all</span><br><span class="line">   <span class="keyword">if</span> (kvs != <span class="literal">null</span> &amp;&amp; kvs.isNotEmpty()) &#123;</span><br><span class="line">       <span class="keyword">val</span> iterator = kvs.entries.iterator()</span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">            <span class="keyword">val</span> entry = iterator.next()</span><br><span class="line">            <span class="keyword">val</span> key = entry.key</span><br><span class="line">            <span class="keyword">val</span> value = entry.value</span><br><span class="line">            <span class="keyword">if</span> (key != <span class="literal">null</span> &amp;&amp; value != <span class="literal">null</span>) &#123;</span><br><span class="line">                migrateSp.run &#123;</span><br><span class="line">                    <span class="keyword">when</span> (value) &#123;</span><br><span class="line">                        <span class="keyword">is</span> <span class="built_in">Boolean</span> -&gt; <span class="keyword">this</span>.putBoolean(key, value)</span><br><span class="line">                        <span class="keyword">is</span> <span class="built_in">Int</span> -&gt;  <span class="keyword">this</span>.putInt(key,value)</span><br><span class="line">                        <span class="keyword">is</span> <span class="built_in">Long</span> -&gt; <span class="keyword">this</span>.putLong(key,value)</span><br><span class="line">                        <span class="keyword">is</span> <span class="built_in">Float</span> -&gt; <span class="keyword">this</span>.putFloat(key, value)</span><br><span class="line">                        <span class="keyword">is</span> String -&gt; <span class="keyword">this</span>.putString(key,value)</span><br><span class="line">                        <span class="keyword">else</span> -&gt; &#123;&#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        kvs.size</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示：支持从<code>SharedPreferences</code>迁移数据到MMKV并保留类型</p>
+<h2 id="利用委托优化存取操作"><a href="#利用委托优化存取操作" class="headerlink" title="利用委托优化存取操作"></a>利用委托优化存取操作</h2><p>我们一般利用<code>SharedPreferences</code>存取数据是这样写的<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> KEY_DEMO_STR = <span class="string">"key_demo_STR"</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">setDemoStr</span><span class="params">(str: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">    edit.putString(KEY_DEMO_STR, str).apply()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">getDemoStr</span><span class="params">()</span></span>: String? &#123;</span><br><span class="line">    <span class="keyword">return</span> preferences.getString(KEY_DEMO_STR, <span class="string">""</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先我们需要定义一个<code>key</code>，然后再定义<code>set</code>与<code>get</code>方法<br>这样一个简单的操作就需要8行代码了，但如果我们利用委托机制可以实现一行搞定    </p>
+<h3 id="一行搞定数据存取"><a href="#一行搞定数据存取" class="headerlink" title="一行搞定数据存取"></a>一行搞定数据存取</h3><p>优化后的代码实现数据存取可以一行搞定<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> TestSP : PreferenceHolder() &#123;</span><br><span class="line">    <span class="keyword">var</span> value: <span class="built_in">Long</span> <span class="keyword">by</span> bindToPreferenceField(<span class="number">0L</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//读取sp</span></span><br><span class="line"><span class="keyword">val</span> value = TestSP.value</span><br><span class="line">println(value) <span class="comment">// 0 or 100</span></span><br><span class="line"><span class="comment">//存入sp</span></span><br><span class="line">TestSP.value = <span class="number">100</span></span><br></pre></td></tr></table></figure></p>
+<p>如上所示，通过变量<code>value</code>的读取与赋值即可实现数据的存取<br>这背后的原理是根据变量名生成<code>key</code>，然后将数据地存取操作委托给了<code>ReadWriteProperty</code><br>然后在其中的<code>getValue</code>与<code>setValue</code>中调用<code>mmkv</code>或<code>SharedPreferences</code>相关方法来实现真正的存储与读取    </p>
+<p>这样做的优点在于<br>1.避免定义大量字符串key和出现重复key<br>2.简洁的委托模式不用再书写get(..) set(..)<br>3.后续如果需要修改代码，修改委托类即可，项目中的其他代码不需要变动，增强了扩展性    </p>
+<p>详情可见：<a href="https://github.com/shenzhen2017/Preferences" target="_blank" rel="noopener">Preferences委托优化</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要讲述了<code>MMKV</code>的缺陷：即不支持<code>getAll</code>导致后续迁移困难及解决方案<br>同时介绍了利用委托优化数据存取API调用的经验     </p>
+<h3 id="Show-Me-The-Code"><a href="#Show-Me-The-Code" class="headerlink" title="Show Me The Code"></a>Show Me The Code</h3><p>本文代码可见：<a href="https://github.com/shenzhen2017/Preferences/blob/master/preferences/src/main/java/com/forjrking/preferences/kt/SpProxy.kt" target="_blank" rel="noopener">SpProxy</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6857432013424001038" target="_blank" rel="noopener">SharedPreferences用Kotlin应该这样写</a><br><a href="https://juejin.cn/post/6887800985272451086" target="_blank" rel="noopener">来聊一聊MMKV的不足以及线下调试工具</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/03/paging-pain-points.html" rel="next" title="Paging痛点：必须继承PagingDataAdapter吗？">
+                <i class="fa fa-chevron-left"></i> Paging痛点：必须继承PagingDataAdapter吗？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/04/gradle-sum-up.html" rel="prev" title="7个你应该知道的Gradle实用技巧">
+                7个你应该知道的Gradle实用技巧 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MMKV有什么缺陷"><span class="nav-number">2.</span> <span class="nav-text">MMKV有什么缺陷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何让MMKV支持getAll"><span class="nav-number">2.1.</span> <span class="nav-text">如何让MMKV支持getAll?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何迁移老数据"><span class="nav-number">2.2.</span> <span class="nav-text">如何迁移老数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#利用委托优化存取操作"><span class="nav-number">3.</span> <span class="nav-text">利用委托优化存取操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一行搞定数据存取"><span class="nav-number">3.1.</span> <span class="nav-text">一行搞定数据存取</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Show-Me-The-Code"><span class="nav-number">4.1.</span> <span class="nav-text">Show Me The Code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.2.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

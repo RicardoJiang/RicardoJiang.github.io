@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="compose,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言下拉刷新是我们开发中的常见的需求，官方提供了SwipeRefreshLayout来实现下拉刷新，但我们常常需要定制Header或者Header与内容一起向下滚动，因此SwipeRefreshLayout往往不能满足我们的需求在使用XML开发时,Github上有不少开源库如SmartRefreshLayout实现了下拉刷新功能，可以方便地定制化Header与滚动方式本文主要介绍如何开发一个简单易">
+<meta name="keywords" content="compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【开源项目】Compose 版 SmartRefreshLayout,了解一下~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/10/compose-refresh-layout.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言下拉刷新是我们开发中的常见的需求，官方提供了SwipeRefreshLayout来实现下拉刷新，但我们常常需要定制Header或者Header与内容一起向下滚动，因此SwipeRefreshLayout往往不能满足我们的需求在使用XML开发时,Github上有不少开源库如SmartRefreshLayout实现了下拉刷新功能，可以方便地定制化Header与滚动方式本文主要介绍如何开发一个简单易">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p1.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p2.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p3.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p4.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p5.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p6.gif">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.245Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【开源项目】Compose 版 SmartRefreshLayout,了解一下~">
+<meta name="twitter:description" content="前言下拉刷新是我们开发中的常见的需求，官方提供了SwipeRefreshLayout来实现下拉刷新，但我们常常需要定制Header或者Header与内容一起向下滚动，因此SwipeRefreshLayout往往不能满足我们的需求在使用XML开发时,Github上有不少开源库如SmartRefreshLayout实现了下拉刷新功能，可以方便地定制化Header与滚动方式本文主要介绍如何开发一个简单易">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p1.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/10/compose-refresh-layout.html">
+
+
+
+
+
+  <title>【开源项目】Compose 版 SmartRefreshLayout,了解一下~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/10/compose-refresh-layout.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【开源项目】Compose 版 SmartRefreshLayout,了解一下~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-05T11:06:12+08:00">
+                2021-10-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>下拉刷新是我们开发中的常见的需求，官方提供了<code>SwipeRefreshLayout</code>来实现下拉刷新，但我们常常需要定制<code>Header</code>或者<code>Header</code>与内容一起向下滚动，因此<code>SwipeRefreshLayout</code>往往不能满足我们的需求<br>在使用<code>XML</code>开发时,<code>Github</code>上有不少开源库如<a href="https://github.com/scwang90/SmartRefreshLayout" target="_blank" rel="noopener">SmartRefreshLayout</a>实现了下拉刷新功能，可以方便地定制化<code>Header</code>与滚动方式<br>本文主要介绍如何开发一个简单易用的<code>Compose</code>版<code>SmartRefreshLayout</code>,快速实现下拉刷新功能，如果对您有所帮助可以点个<code>Star</code>:<a href="https://github.com/shenzhen2017/compose-refreshlayout" target="_blank" rel="noopener">Compose版SmartRefreshLayout</a></p>
+<h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h2><p>我们首先看下最终的效果图</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">基本使用</th>
+<th style="text-align:center">自定义Header</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p1.gif" alt></td>
+<td style="text-align:center"><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p2.gif" alt></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Lottie Header</th>
+<th style="text-align:center">FixedBehind(固定在背后)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p3.gif" alt></td>
+<td style="text-align:center"><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p4.gif" alt></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">FixedFront(固定在前面)</th>
+<th style="text-align:center">FixedContent(内容固定)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p5.gif" alt></td>
+<td style="text-align:center"><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p6.gif" alt></td>
+</tr>
+</tbody>
+</table>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><ol>
+<li>接入方便，使用简单，快速实现下拉刷新功能         </li>
+<li>支持自定义<code>Header</code>,<code>Header</code>可观察下拉状态并更新<code>UI</code>     </li>
+<li>自定义<code>Header</code>支持<code>Lottie</code>,并支持观察下拉状态开始与暂停动画     </li>
+<li>支持自定义<code>Translate</code>,<code>FixedBehind</code>,<code>FixedFront</code>,<code>FixedContent</code>等滚动方式       </li>
+<li>支持与<code>Paging</code>结合实现上滑加载更多功能</li>
+</ol>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="接入"><a href="#接入" class="headerlink" title="接入"></a>接入</h3><p>第 1 步:在工程的<code>build.gradle</code>中添加：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">allprojects &#123;</span><br><span class="line">	repositories &#123;</span><br><span class="line">		...</span><br><span class="line">		mavenCentral()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第2步：在应用的<code>build.gradle</code>中添加：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">        implementation <span class="string">'io.github.shenzhen2017:compose-refreshlayout:1.0.0'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h3><p><code>SwipeRefreshLayout</code>函数主要包括以下参数:   </p>
+<ol>
+<li><code>isRefreshing</code>: 是否正在刷新    </li>
+<li><code>onRefresh</code>: 触发刷新回调     </li>
+<li><code>modifier</code>: 样式修饰符</li>
+<li><code>swipeStyle</code>: 下拉刷新方式      </li>
+<li><code>swipeEnabled</code>: 是否允许下拉刷新   </li>
+<li><code>refreshTriggerRate</code>: 刷新生效高度与<code>indicator</code>高度的比例       </li>
+<li><code>maxDragRate</code>: 最大刷新距离与<code>indicator</code>高度的比例</li>
+<li><code>indicator</code>: 自定义的<code>indicator</code>,有默认值</li>
+</ol>
+<p>在默认情况下，我们只需要传入<code>isRefreshing</code>(是否正在刷新)与<code>onRefresh</code>触发刷新回调两个参数即可<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">BasicSample</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> refreshing <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="literal">false</span>) &#125;</span><br><span class="line">    LaunchedEffect(refreshing) &#123;</span><br><span class="line">        <span class="keyword">if</span> (refreshing) &#123;</span><br><span class="line">            delay(<span class="number">2000</span>)</span><br><span class="line">            refreshing = <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    SwipeRefreshLayout(isRefreshing = refreshing, onRefresh = &#123; refreshing = <span class="literal">true</span> &#125;) &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示:在触发刷新回调时将<code>refreshing</code>设置为<code>true</code>,并在刷新完成后设置为<code>false</code>即可实现简单的下拉刷新功能     </p>
+<h3 id="自定义Header"><a href="#自定义Header" class="headerlink" title="自定义Header"></a>自定义<code>Header</code></h3><p><code>SwipeRefreshLayout</code>支持传入自定义的<code>Header</code>，如下所示：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">CustomHeaderSample</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> refreshing <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="literal">false</span>) &#125;</span><br><span class="line">    LaunchedEffect(refreshing) &#123;</span><br><span class="line">        <span class="keyword">if</span> (refreshing) &#123;</span><br><span class="line">            delay(<span class="number">2000</span>)</span><br><span class="line">            refreshing = <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SwipeRefreshLayout(</span><br><span class="line">        isRefreshing = refreshing,</span><br><span class="line">        onRefresh = &#123; refreshing = <span class="literal">true</span> &#125;,</span><br><span class="line">        indicator = &#123;</span><br><span class="line">            BallRefreshHeader(state = it)</span><br><span class="line">        &#125;) &#123;</span><br><span class="line">        	<span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示：<code>BallRefreshHeader</code>即为自定义的<code>Header</code>,<code>Header</code>中会传入<code>SwipeRefreshState</code>，我们通过<code>SwipeRefreshState</code>可获得以下参数    </p>
+<ol>
+<li><code>isRefreshing</code>: 是否正在刷新    </li>
+<li><code>isSwipeInProgress</code>: 是否正在滚动     </li>
+<li><code>maxDrag</code>: 最大下拉距离           </li>
+<li><code>refreshTrigger</code>: 刷新触发距离    </li>
+<li><code>headerState</code>: 刷新状态，包括<code>PullDownToRefresh</code>,<code>Refreshing</code>,<code>ReleaseToRefresh</code>三个状态     </li>
+<li><code>indicatorOffset</code>: <code>Header</code>偏移量</li>
+</ol>
+<p>这些参数都是<code>MutableState</code>我们可以观察这些参数的变化以实现<code>Header UI</code>的更新  </p>
+<h3 id="自定义Lottile-Header"><a href="#自定义Lottile-Header" class="headerlink" title="自定义Lottile Header"></a>自定义<code>Lottile Header</code></h3><p><code>Compose</code>目前已支持<code>Lottie</code>，我们接入<code>Lottie</code>依赖后，就可以很方便地实现一个<code>Lottie Header</code>，并且在正在刷新时播放动画，其它时间暂停动画，示例如下：    </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">LottieHeaderOne</span><span class="params">(state: <span class="type">SwipeRefreshState</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> isPlaying <span class="keyword">by</span> remember &#123;</span><br><span class="line">        mutableStateOf(<span class="literal">false</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> speed <span class="keyword">by</span> remember &#123;</span><br><span class="line">        mutableStateOf(<span class="number">1f</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    isPlaying = state.isRefreshing</span><br><span class="line">    <span class="keyword">val</span> lottieComposition <span class="keyword">by</span> rememberLottieComposition(</span><br><span class="line">        spec = LottieCompositionSpec.RawRes(R.raw.refresh_one),</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">val</span> lottieAnimationState <span class="keyword">by</span> animateLottieCompositionAsState(</span><br><span class="line">        composition = lottieComposition, <span class="comment">// 动画资源句柄</span></span><br><span class="line">        iterations = LottieConstants.IterateForever, <span class="comment">// 迭代次数</span></span><br><span class="line">        isPlaying = isPlaying, <span class="comment">// 动画播放状态</span></span><br><span class="line">        speed = speed, <span class="comment">// 动画速度状态</span></span><br><span class="line">        restartOnPlay = <span class="literal">false</span> <span class="comment">// 暂停后重新播放是否从头开始</span></span><br><span class="line">    )</span><br><span class="line">    Box(</span><br><span class="line">        modifier = Modifier</span><br><span class="line">            .fillMaxWidth()</span><br><span class="line">            .wrapContentHeight(), contentAlignment = Alignment.Center</span><br><span class="line">    ) &#123;</span><br><span class="line">        LottieAnimation(</span><br><span class="line">            lottieComposition,</span><br><span class="line">            lottieAnimationState,</span><br><span class="line">            modifier = Modifier.size(<span class="number">150</span>.dp)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="自定义下滑方式"><a href="#自定义下滑方式" class="headerlink" title="自定义下滑方式"></a>自定义下滑方式</h3><p><code>SwipeRefreshLayout</code>支持以下4种下滑方式<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="class"><span class="keyword">class</span> <span class="title">SwipeRefreshStyle</span> </span>&#123;</span><br><span class="line">    Translate,  <span class="comment">//平移，即内容与Header一起向下滑动，Translate为默认样式</span></span><br><span class="line">    FixedBehind, <span class="comment">//固定在背后，即内容向下滑动，Header不动</span></span><br><span class="line">    FixedFront, <span class="comment">//固定在前面, 即Header固定在前，Header与Content都不滑动</span></span><br><span class="line">    FixedContent <span class="comment">//内容固定,Header向下滑动,即官方样式</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，其中默认方式为<code>Translate</code>,即内容与<code>Header</code>一起向下滑动<br>各位可根据需求选择相应的下滑方式，比如要实现类似官方的下滑效果，即可使用<code>FixedContent</code>    </p>
+<h3 id="上拉加载更多"><a href="#上拉加载更多" class="headerlink" title="上拉加载更多"></a>上拉加载更多</h3><p>在<code>Compose</code>中，上拉加载更多直接使用<code>Paging3</code>看起来已经足够用了，因此本库没有实现上拉加载更多相关功能<br>因此如果想要实现上拉加载更多，可自行结合<code>Paging3</code>使用     </p>
+<h2 id="主要原理"><a href="#主要原理" class="headerlink" title="主要原理"></a>主要原理</h2><p>下拉刷新功能，其实主要是嵌套滚动的问题,我们将<code>Header</code>与<code>Content</code>放到一个父布局中统一管理，然后需要做以下事           </p>
+<ol>
+<li>当我们的手指向下滚动时，首先交由<code>Content</code>处理，如果<code>Content</code>滚动到顶部了，再交由父布局处理，然后父布局根据手势进行一定的偏移,增加<code>offset</code>      </li>
+<li>当我们松手时，判断偏移的距离，如果大于刷新触发距离则触发刷新，否则回弹到顶部(<code>offset</code>置为0)</li>
+<li>当我们手指向上滚动时，首先交由父布局处理，如果父布局的<code>offset</code>&gt;0则由父布局处理，减少<code>offset</code>，否则则由<code>Content</code>消费手势    </li>
+</ol>
+<h3 id="NestedScrollConnection介绍"><a href="#NestedScrollConnection介绍" class="headerlink" title="NestedScrollConnection介绍"></a><code>NestedScrollConnection</code>介绍</h3><p>为了实现上面说的需求，我们需要对滚动进行拦截，<code>Compose</code>提供了<code>NestedScrollConnection</code>来实现嵌套滚动<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">NestedScrollConnection</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onPreScroll</span><span class="params">(available: <span class="type">Offset</span>, source: <span class="type">NestedScrollSource</span>)</span></span>: Offset = Offset.Zero</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onPostScroll</span><span class="params">(consumed: <span class="type">Offset</span>, available: <span class="type">Offset</span>, source: <span class="type">NestedScrollSource</span>)</span></span>: Offset = Offset.Zero</span><br><span class="line"></span><br><span class="line">    <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPreFling</span><span class="params">(available: <span class="type">Velocity</span>)</span></span>: Velocity = Velocity.Zero</span><br><span class="line"></span><br><span class="line">    <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPostFling</span><span class="params">(consumed: <span class="type">Velocity</span>, available: <span class="type">Velocity</span>)</span></span> = <span class="keyword">return</span> Velocity.Zero</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，<code>NestedScrollConnection</code>主要提供了4个接口   </p>
+<ol>
+<li><code>onPreScroll</code>: 先拦截滑动事件，消费后再交给子布局     </li>
+<li><code>onPostScroll</code>: 子布局处理完滑动事件后再交给父布局，可获取当前还剩下多少可用的滑动事件偏移量     </li>
+<li><code>onPreFling</code>: <code>Fling</code>开始前回调    </li>
+<li><code>onPostFling</code>: <code>Fling</code>完成后回调    </li>
+</ol>
+<blockquote>
+<p><code>Fling</code>含义：当我们手指在滑动列表时，如果是快速滑动并抬起，则列表会根据惯性继续飘一段距离后停下，这个行为就是 <code>Fling</code> ，<code>onPreFling</code> 在你手指刚抬起时便会回调，而 <code>onPostFling</code> 会在飘一段距离停下后回调。</p>
+</blockquote>
+<h3 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h3><p>上面我们已经介绍了总体思路与<code>NestedScrollConnection API</code>，然后我们应该需要重写以下方法     </p>
+<ol>
+<li><code>onPostScroll</code>: 当<code>Content</code>滑动到顶部时，如果继续往上滑，我们就应该增加父布局的<code>offset</code>,因此在<code>onPostScroll</code>中判断<code>available.y &gt; 0</code>，然后进行相应的偏移,对我们来说是个合适的时机      </li>
+<li><code>onPreScroll</code>: 当我们上滑时，如果<code>offset&gt;0</code>,则说明父布局有偏移，因此我们应先减小父布局的<code>offset</code>直到0,然后将剩余的偏移量传递给<code>Content</code>，因此下滑时应该使用<code>onPreScroll</code>拦截判断    </li>
+<li><code>onPreFling</code>: 当我们松开手时，应判断当前的偏移量是否大于刷新触发距离，如果大于则触发刷新，否则父布局的<code>offset</code>置为0,这个判断在<code>onPreFling</code>时做比较合适    </li>
+</ol>
+<p>具体实现如下：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="class"><span class="keyword">class</span> <span class="title">SwipeRefreshNestedScrollConnection</span></span>() : NestedScrollConnection &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPreScroll</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        available: <span class="type">Offset</span>,source: <span class="type">NestedScrollSource</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span>: Offset = <span class="keyword">when</span> &#123;</span><br><span class="line">        <span class="comment">// 如果用户正在上滑，需要在这里拦截处理</span></span><br><span class="line">        source == NestedScrollSource.Drag &amp;&amp; available.y &lt; <span class="number">0</span> -&gt; onScroll(available)</span><br><span class="line">        <span class="keyword">else</span> -&gt; Offset.Zero</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPostScroll</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        consumed: <span class="type">Offset</span>,available: <span class="type">Offset</span>,source: <span class="type">NestedScrollSource</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span>: Offset = <span class="keyword">when</span> &#123;</span><br><span class="line">        <span class="comment">// 如果用户正在下拉，在这里处理剩余的偏移量</span></span><br><span class="line">        source == NestedScrollSource.Drag &amp;&amp; available.y &gt; <span class="number">0</span> -&gt; onScroll(available)</span><br><span class="line">        <span class="keyword">else</span> -&gt; Offset.Zero</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">suspend</span> <span class="function"><span class="keyword">fun</span> <span class="title">onPreFling</span><span class="params">(available: <span class="type">Velocity</span>)</span></span>: Velocity &#123;</span><br><span class="line">        <span class="comment">//如果偏移量大于刷新触发距离，则触发刷新</span></span><br><span class="line">        <span class="keyword">if</span> (!state.isRefreshing &amp;&amp; state.indicatorOffset &gt;= refreshTrigger) &#123;</span><br><span class="line">            onRefresh()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//不消费速度，直接返回0</span></span><br><span class="line">        <span class="keyword">return</span> Velocity.Zero</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍如何使用及实现一个<code>Compose</code>版的<code>SmartRefreshLayout</code>，它具有以下特性:     </p>
+<ol>
+<li>接入方便，使用简单，快速实现下拉刷新功能         </li>
+<li>支持自定义<code>Header</code>,<code>Header</code>可观察下拉状态并更新<code>UI</code>     </li>
+<li>自定义<code>Header</code>支持<code>Lottie</code>,并支持观察下拉状态开始与暂停动画     </li>
+<li>支持自定义<code>Translate</code>,<code>FixedBehind</code>,<code>FixedFront</code>,<code>FixedContent</code>等滚动方式       </li>
+<li>支持与<code>Paging</code>结合实现上滑加载更多功能   </li>
+</ol>
+<h3 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h3><p><a href="https://github.com/shenzhen2017/compose-refreshlayout" target="_blank" rel="noopener">Compose版SmartRefreshLayout</a><br>开源不易，如果项目对你有所帮助，欢迎点赞,<code>Star</code>,收藏~   </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/compose/" rel="tag"># compose</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/09/compose-state-layout.html" rel="next" title="【开源项目】简单易用的Compose版StateLayout,了解一下~">
+                <i class="fa fa-chevron-left"></i> 【开源项目】简单易用的Compose版StateLayout,了解一下~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/10/okhttp-knowledge-sum.html" rel="prev" title="【知识点】OkHttp 原理 8 连问">
+                【知识点】OkHttp 原理 8 连问 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#效果图"><span class="nav-number">2.</span> <span class="nav-text">效果图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特性"><span class="nav-number">3.</span> <span class="nav-text">特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">4.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#接入"><span class="nav-number">4.1.</span> <span class="nav-text">接入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单使用"><span class="nav-number">4.2.</span> <span class="nav-text">简单使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义Header"><span class="nav-number">4.3.</span> <span class="nav-text">自定义Header</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义Lottile-Header"><span class="nav-number">4.4.</span> <span class="nav-text">自定义Lottile Header</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义下滑方式"><span class="nav-number">4.5.</span> <span class="nav-text">自定义下滑方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上拉加载更多"><span class="nav-number">4.6.</span> <span class="nav-text">上拉加载更多</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主要原理"><span class="nav-number">5.</span> <span class="nav-text">主要原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NestedScrollConnection介绍"><span class="nav-number">5.1.</span> <span class="nav-text">NestedScrollConnection介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体实现"><span class="nav-number">5.2.</span> <span class="nav-text">具体实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#项目地址"><span class="nav-number">6.1.</span> <span class="nav-text">项目地址</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

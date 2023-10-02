@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Gradle在android开发中应用地十分广泛，但相信有很多同学并不很了解gradle本文主要介绍了使用gradle的一些实用技巧，帮助读者增进对这个熟悉的陌生人的了解主要包括以下内容     1.Gradle依赖树查询 2.使用循环优化Gradle依赖管理 3.支持代码提示的Gradle依赖管理 4.Gradle模块化 5.Library模块Gradle代码复用 6.资源文件分包 7.AA">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="7个你应该知道的Gradle实用技巧">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/04/gradle-sum-up.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Gradle在android开发中应用地十分广泛，但相信有很多同学并不很了解gradle本文主要介绍了使用gradle的一些实用技巧，帮助读者增进对这个熟悉的陌生人的了解主要包括以下内容     1.Gradle依赖树查询 2.使用循环优化Gradle依赖管理 3.支持代码提示的Gradle依赖管理 4.Gradle模块化 5.Library模块Gradle代码复用 6.资源文件分包 7.AA">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/559c9e60f6604600958f09cd16420229~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2020/5/27/172543b2eb81973a?imageslim">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/2/21/1690ef7f0ab38477?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.242Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="7个你应该知道的Gradle实用技巧">
+<meta name="twitter:description" content="前言Gradle在android开发中应用地十分广泛，但相信有很多同学并不很了解gradle本文主要介绍了使用gradle的一些实用技巧，帮助读者增进对这个熟悉的陌生人的了解主要包括以下内容     1.Gradle依赖树查询 2.使用循环优化Gradle依赖管理 3.支持代码提示的Gradle依赖管理 4.Gradle模块化 5.Library模块Gradle代码复用 6.资源文件分包 7.AA">
+<meta name="twitter:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/559c9e60f6604600958f09cd16420229~tplv-k3u1fbpfcp-watermark.image">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/04/gradle-sum-up.html">
+
+
+
+
+
+  <title>7个你应该知道的Gradle实用技巧 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/04/gradle-sum-up.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">7个你应该知道的Gradle实用技巧</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-04T16:00:24+08:00">
+                2021-04-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Gradle</code>在<code>android</code>开发中应用地十分广泛，但相信有很多同学并不很了解<code>gradle</code><br>本文主要介绍了使用<code>gradle</code>的一些实用技巧，帮助读者增进对这个熟悉的陌生人的了解<br>主要包括以下内容   </p>
+<ul>
+<li>1.<code>Gradle</code>依赖树查询</li>
+<li>2.使用循环优化<code>Gradle</code>依赖管理</li>
+<li>3.支持代码提示的<code>Gradle</code>依赖管理</li>
+<li>4.<code>Gradle</code>模块化</li>
+<li>5.<code>Library</code>模块<code>Gradle</code>代码复用</li>
+<li>6.资源文件分包</li>
+<li>7.<code>AAR</code>依赖与源码依赖快速切换</li>
+</ul>
+<h2 id="1-Gradle依赖树查询"><a href="#1-Gradle依赖树查询" class="headerlink" title="1.Gradle依赖树查询"></a>1.<code>Gradle</code>依赖树查询</h2><p>有时我们在分析依赖冲突时，需要查看依赖树，我们常用的查看依赖树的命令为<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gradlew <span class="string">app:</span>dependencies</span><br></pre></td></tr></table></figure></p>
+<p>不过这种命令行方式查看依赖树出来的信息太多，看的有些费劲<br>所以官方又推出了<code>Scan</code>工具来帮助我们更加方便地查看依赖树<br>在项目根目录位置下运行<code>gradle build --scan</code>即可，然后会生成 <code>HTML</code> 格式的分析文件的分析文件  </p>
+<p>分析文件会直接上传到<code>Scan</code>官网，命令行最后会给出远程地址<br>第一次跑会让你在 <code>Scan</code> 官网注册一下，邮件确认后就能看了<br><code>scan</code> 工具是按照依赖变体挨个分类的，<code>debugCompileClassPath</code> 就是 <code>dedug</code> 打包中的依赖包了<br><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/559c9e60f6604600958f09cd16420229~tplv-k3u1fbpfcp-watermark.image" alt><br>如上，使用这种方式分析依赖树更加方便简洁   </p>
+<h2 id="2-使用循环优化Gradle依赖管理"><a href="#2-使用循环优化Gradle依赖管理" class="headerlink" title="2.使用循环优化Gradle依赖管理"></a>2.使用循环优化<code>Gradle</code>依赖管理</h2><p>如下所示，我们常常使用<code>ext</code>来管理依赖<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    implementation fileTree(<span class="string">include:</span> [<span class="string">'*.jar'</span>], <span class="string">dir:</span> <span class="string">'libs'</span>)</span><br><span class="line">    implementation rootProject.ext.dependencies[<span class="string">"appcompat-v7"</span>]</span><br><span class="line">    implementation rootProject.ext.dependencies[<span class="string">"cardview-v7"</span>]</span><br><span class="line">    implementation rootProject.ext.dependencies[<span class="string">"design"</span>]</span><br><span class="line">    implementation rootProject.ext.dependencies[<span class="string">"constraint-layout"</span>]</span><br><span class="line">    annotationProcessor rootProject.ext.dependencies[<span class="string">"glide_compiler"</span>]</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样虽然实现了依赖的统一管理，但是随着项目越来越大，依赖也会越来越多，常常会有几十甚至上百行，导致<code>build.gradle</code>越来越长     </p>
+<p>有没有一种好的方式不在 <code>build.gradle</code> 中写这么多的依赖配置？<br>有，就是使用循环遍历依赖。<br>示例如下，首先添加<code>config.gradle</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">ext&#123;</span><br><span class="line">	dependencies = [</span><br><span class="line">            <span class="comment">// base</span></span><br><span class="line">            <span class="string">"appcompat-v7"</span>                      : <span class="string">"com.android.support:appcompat-v7:$&#123;version["</span>supportLibraryVersion<span class="string">"]&#125;"</span>，</span><br><span class="line">            ...</span><br><span class="line">    ]</span><br><span class="line">    </span><br><span class="line">    annotationProcessor = [</span><br><span class="line">            <span class="string">"glide_compiler"</span>                    : <span class="string">"com.github.bumptech.glide:compiler:$&#123;version["</span>glideVersion<span class="string">"]&#125;"</span>,</span><br><span class="line">            ...</span><br><span class="line">    ]</span><br><span class="line">    </span><br><span class="line">    apiFileDependencies = [</span><br><span class="line">            <span class="string">"launchstarter"</span>                                   :<span class="string">"libs/launchstarter-release-1.0.0.aar"</span></span><br><span class="line">    ]</span><br><span class="line">    </span><br><span class="line">    debugImplementationDependencies = [</span><br><span class="line">            <span class="string">"MethodTraceMan"</span>                                  : <span class="string">"com.github.zhengcx:MethodTraceMan:1.0.7"</span></span><br><span class="line">    ]</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    implementationExcludes = [</span><br><span class="line">            <span class="string">"com.android.support.test.espresso:espresso-idling-resource:3.0.2"</span> : [</span><br><span class="line">                    <span class="string">'com.android.support'</span> : <span class="string">'support-annotations'</span></span><br><span class="line">            ]</span><br><span class="line">    ]</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后在<code>build.gradle</code>中配置如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">apply from config.gradle</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> implementationDependencies = project.ext.dependencies</span><br><span class="line"><span class="keyword">def</span> processors = project.ext.annotationProcesso</span><br><span class="line"><span class="keyword">def</span> implementationExcludes = project.ext.implementationExcludes</span><br><span class="line">dependencies&#123;</span><br><span class="line">    <span class="comment">// 处理所有的 xxximplementation 依赖</span></span><br><span class="line">    implementationDependencies.each &#123; k, v -&gt; implementation v &#125;   </span><br><span class="line">    <span class="comment">// 处理 annotationProcessor 依赖</span></span><br><span class="line">    processors.each &#123; k, v -&gt; annotationProcessor v &#125;</span><br><span class="line">    <span class="comment">// 处理所有包含 exclude 的依赖</span></span><br><span class="line">    implementationExcludes.each &#123; entry -&gt;</span><br><span class="line">        implementation(entry.key) &#123;</span><br><span class="line">            entry.value.each &#123; childEntry -&gt;</span><br><span class="line">                exclude(<span class="string">group:</span> childEntry)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样做的优点在于<br>1.后续添加依赖不需要改动<code>build.gradle</code>,直接在<code>config.gradle</code>中添加即可<br>2.精简了<code>build.gradle</code>的长度   </p>
+<h2 id="3-支持代码提示的Gradle依赖管理"><a href="#3-支持代码提示的Gradle依赖管理" class="headerlink" title="3.支持代码提示的Gradle依赖管理"></a>3.支持代码提示的<code>Gradle</code>依赖管理</h2><p>上面介绍了通过<code>config.gradle</code>管理依赖的方法<br>在我们添加<code>Gradle</code>依赖时，还有一些痛点<br>1.不支持代码提示<br>2.不支持单击跳转<br>3.多模块开发时，不现模块相同的依赖需要复制粘贴   </p>
+<p>使用<code>buildSrc</code>+<code>kotlin</code>可以解决这个问题<br>效果如下：<br><img src="https://user-gold-cdn.xitu.io/2020/5/27/172543b2eb81973a?imageslim" alt><br>由于<code>buildSrc</code>是对全局的所有<code>module</code>的配置,所以可以在所有<code>module</code>中直接使用   </p>
+<p>这里就不多介绍了，详细开发及引入<code>buildSrc</code>的过程可见:<br><a href="https://juejin.cn/post/6844903615346245646#heading-0" target="_blank" rel="noopener">[译]Kotlin + buildSrc：更好的管理Gadle依赖</a>   </p>
+<h3 id="buildSrc-vs-includeBuild"><a href="#buildSrc-vs-includeBuild" class="headerlink" title="buildSrc vs includeBuild"></a><code>buildSrc</code> vs <code>includeBuild</code></h3><p>上面介绍的方法使用的是<code>buildSrc</code>,使用起来比较方便<br>不过它的缺点在于构建速度上会慢一些，使用<code>includeBuild</code>可以实现同样的效果<br>两者实现的最终效果是差不多的，详细实现可见:<a href="https://juejin.cn/post/6844904169833234439" target="_blank" rel="noopener">【奇技淫巧】除了 buildSrc 还能这样统一配置依赖版本？巧用 includeBuild</a></p>
+<h2 id="4-Gradle模块化"><a href="#4-Gradle模块化" class="headerlink" title="4.Gradle模块化"></a>4.<code>Gradle</code>模块化</h2><p>我们在开发中，引入一些插件时，有时需要在<code>build.gradle</code>中引入一些配置，比如<code>greendao</code>,推送,<code>tinker</code>等<br>这些其实是可以封装在相应<code>gradle</code>文件中，然后通过<code>apply from</code>引入<br>举个例子，例如在我们使用<code>greendao</code>数据库时，需要在<code>build.gradle</code>中指定版本     </p>
+<p>这种时候应该新建一个<code>greendao-config.gradle</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="string">plugin:</span> <span class="string">'org.greenrobot.greendao'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//greenDao指定版本和路劲等</span></span><br><span class="line">greendao &#123;</span><br><span class="line">    <span class="comment">//数据库的schema版本，也可以理解为数据库版本号</span></span><br><span class="line">    schemaVersion <span class="number">1</span></span><br><span class="line">    <span class="comment">//设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。</span></span><br><span class="line">    daoPackage <span class="string">'com.example.ausu.big_progect.dao'</span></span><br><span class="line">    <span class="comment">//设置DaoMaster、DaoSession、Dao目录</span></span><br><span class="line">    targetGenDir <span class="string">'src/main/java'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后再在<code>build.gradle</code>中引入<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply from <span class="string">'greendao-config.gradle'</span></span><br></pre></td></tr></table></figure></p>
+<p>这样做主要有2个优点<br>1.单一职责原则，将<code>greendao</code>的相关配置封装在一个文件里，不与其他文件混淆<br>2.精简了<code>build.gradle</code>的代码，同时后续修改数据库相关时不需要修改<code>build.gradle</code>的代码</p>
+<h2 id="5-Library模块Gradle代码复用"><a href="#5-Library模块Gradle代码复用" class="headerlink" title="5.Library模块Gradle代码复用"></a>5.<code>Library</code>模块<code>Gradle</code>代码复用</h2><p>随着我们项目的越来越大，<code>Library Module</code>也越建越多，每个<code>Module</code>都有自己的<code>build.gradle</code><br>但其实每个<code>build.gradle</code>的内容都差不多，我们能不能将重复的部分封装起来复用？   </p>
+<p>我们可以做一个 <code>basic</code> 抽取，同样将共有参数/信息提取到 <code>basic.gradle</code> 中，每个 <code>module</code> <code>apply</code>，这样就是减少了不少代码量    </p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="string">plugin:</span> <span class="string">'com.android.library'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'kotlin-android'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'kotlin-android-extensions'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'kotlin-kapt'</span></span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="comment">// 指定用于编译项目的 API 级别</span></span><br><span class="line">    compileSdkVersion Versions.compileSDK</span><br><span class="line">    <span class="comment">// 指定在生成项目时要使用的 SDK 工具的版本，Android Studio 3.0 后不需要手动配置。</span></span><br><span class="line">    buildToolsVersion Versions.buildTools</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定 Android 插件适用于所有构建版本的版本属性的默认值</span></span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        minSdkVersion Versions.minSDK</span><br><span class="line">        targetSdkVersion Versions.targetSDK</span><br><span class="line">        versionCode <span class="number">1</span></span><br><span class="line">        versionName <span class="string">"1.0"</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 配置 Java 编译(编码格式、编译级别、生成字节码版本)</span></span><br><span class="line">    compileOptions &#123;</span><br><span class="line">        encoding = <span class="string">'utf-8'</span></span><br><span class="line">        sourceCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">        targetCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    kotlinOptions &#123;</span><br><span class="line">        jvmTarget = JavaVersion.VERSION_1_8.toString()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    lintOptions &#123;</span><br><span class="line">        <span class="comment">// lint 异常后继续执行</span></span><br><span class="line">        abortOnError <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    implementation fileTree(<span class="string">dir:</span> <span class="string">'libs'</span>, <span class="string">include:</span> [<span class="string">'*.jar'</span>])</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在相应的模块的<code>build.gradle</code>中引入即可<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="string">from:</span><span class="string">"../basic.gradle"</span></span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    api Deps.constraintLayout</span><br><span class="line">    api Deps.retrofit</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样是不是简洁很多？读者可根据项目实际情况判断是否适合抽取<code>basic.gradle</code>使用    </p>
+<h2 id="6-资源文件分包"><a href="#6-资源文件分包" class="headerlink" title="6.资源文件分包"></a>6.资源文件分包</h2><p>随着项目越来越大，项目中的资源文件也越来越大，比如<code>layout</code>与<code>drawable</code>文件夹下的文件数量常常可达几百甚至上千个<br>我们能不能像代码一样，对资源文件进行分包呢？    </p>
+<p>答案是可以的，主要是利用<code>gradle</code>的<code>sourceSets</code>属性<br>我们可以将资源文件像代码一样按业务分包,具体操作如下    </p>
+<p>1.新建res_xxx目录<br><img src="https://user-gold-cdn.xitu.io/2019/2/21/1690ef7f0ab38477?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt><br>在 <code>main</code> 目录下新建 <code>res_core</code>, <code>res_feed</code>（根据业务模块命名）等目录，在<code>res_core</code>中新建<code>res</code>目录中相同的文件夹如：<code>layout</code>、<code>drawable-xxhdpi</code>、<code>values</code>等。   </p>
+<p>2.在<code>gradle</code>中配置<code>res_xx</code>目录<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    sourceSets &#123;</span><br><span class="line">        main &#123;</span><br><span class="line">            res.srcDirs(</span><br><span class="line">                    <span class="string">'src/main/res'</span>,</span><br><span class="line">                    <span class="string">'src/main/res_core'</span>,</span><br><span class="line">                    <span class="string">'src/main/res_feed'</span>,</span><br><span class="line">            )</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>以上就完成了资源文件分包,这样做主要有几点好处<br>1.按业务分包查找方便，结构清晰<br>2.<code>strings.xml</code>等<code>key-value</code>型文件多人修改可以减少冲突<br>3.当删除模块或做组件化改造时资源文件删除或迁移方便，不必像以前一样一个个去找    </p>
+<h2 id="7-AAR依赖与源码依赖快速切换"><a href="#7-AAR依赖与源码依赖快速切换" class="headerlink" title="7.AAR依赖与源码依赖快速切换"></a>7.<code>AAR</code>依赖与源码依赖快速切换</h2><p>当我们的项目中<code>Module</code>越来越多，为了加快编译速度，常常把<code>Module</code>发布成<code>AAR</code>，然后在项目中直接依赖<code>AAR</code><br>但是我们有时候又需要修改<code>AAR</code>，就需要依赖于源码<br>所以我们需要一个可以快速地切换依赖<code>AAR</code>与依赖源码的方式    </p>
+<p>我们下面举个例子，以<code>retrofit</code>为例<br>假如我们要修改<code>retrofit</code>的源码，修改步骤如下：<br>1.首先下载<code>retrofit</code>，可以放到和项目同级的目录,并修改目录名为<code>retrofit-source</code>,以便区分<br>2.在<code>settings.gradle</code>文件中添加需要修改的<code>aar</code>库的源码<code>project</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">include <span class="string">':retrofit-source'</span></span><br><span class="line">project(<span class="string">':retrofit-source'</span>).projectDir = <span class="keyword">new</span> File(<span class="string">"../retrofit-source"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>3.替换<code>aar</code>为源码<br><code>build.gradle(android)</code> 脚本中添加替换策略<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">allprojects &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">...</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    configurations.all &#123;</span><br><span class="line">        resolutionStrategy &#123;</span><br><span class="line">            dependencySubstitution &#123;</span><br><span class="line">                substitute module( <span class="string">"com.squareup.retrofit2:retrofit"</span>) with project(<span class="string">':retofit-source'</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上几步，就可以比较方便地实现<code>aar</code>依赖与源码依赖间的互换了<br>这样做的主要优点在于<br>1.不需要修改原有的依赖配置，而是通过全局的配置，利用本地的源码替换掉<code>aar</code>，侵入性低<br>2.如果有多个<code>Module</code>依赖于同一个<code>aar</code>，不需要重复修改，只需在根目录<code>build.gradle</code>中修改一处   </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了几个实用的<code>Gradle</code>技巧，如果觉得有所帮助，可以帮忙点赞<br>如果发现本文还有什么不足，欢迎在评论区指出~   </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6895299152226615309#heading-3" target="_blank" rel="noopener">Gradle Scan使用介绍</a><br><a href="https://juejin.cn/post/6844904122492125198#heading-24" target="_blank" rel="noopener">使用循环进行依赖优化</a><br><a href="https://juejin.cn/post/6872721978898743310#heading-11" target="_blank" rel="noopener">Android 重构 ｜ 持续优化统一管理 Gradle</a><br><a href="https://juejin.cn/post/6844903780547297288" target="_blank" rel="noopener">Android res 资源 分包</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/03/mmkv-disadvange-sum.html" rel="next" title="MMKV缺陷：不支持getAll?">
+                <i class="fa fa-chevron-left"></i> MMKV缺陷：不支持getAll?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/04/android-ui-monitor.html" rel="prev" title="【从入门到放弃】android布局优化深入解析">
+                【从入门到放弃】android布局优化深入解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Gradle依赖树查询"><span class="nav-number">2.</span> <span class="nav-text">1.Gradle依赖树查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用循环优化Gradle依赖管理"><span class="nav-number">3.</span> <span class="nav-text">2.使用循环优化Gradle依赖管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-支持代码提示的Gradle依赖管理"><span class="nav-number">4.</span> <span class="nav-text">3.支持代码提示的Gradle依赖管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#buildSrc-vs-includeBuild"><span class="nav-number">4.1.</span> <span class="nav-text">buildSrc vs includeBuild</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Gradle模块化"><span class="nav-number">5.</span> <span class="nav-text">4.Gradle模块化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Library模块Gradle代码复用"><span class="nav-number">6.</span> <span class="nav-text">5.Library模块Gradle代码复用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-资源文件分包"><span class="nav-number">7.</span> <span class="nav-text">6.资源文件分包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-AAR依赖与源码依赖快速切换"><span class="nav-number">8.</span> <span class="nav-text">7.AAR依赖与源码依赖快速切换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">9.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

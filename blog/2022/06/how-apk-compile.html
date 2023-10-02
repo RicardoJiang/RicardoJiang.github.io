@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编译技术,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言作为一个Android开发，每天都会有相当一部分的时间花在编译打包上，如果项目比较大的话编译一次可能就要十几分钟。         那么在编译打包的过程中AGP到底做了什么？为什么编译那么耗时，又该怎么优化？要解决这些问题，首先就需要我们对编译打包的流程有个总体的了解 本文主要包括以下内容      编译打包总体流程 编译打包主要步骤 编译打包过程中的Task  编译打包总体流程首先看下And">
+<meta name="keywords" content="编译技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Apk 编译打包流程，了解一下~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/06/how-apk-compile.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言作为一个Android开发，每天都会有相当一部分的时间花在编译打包上，如果项目比较大的话编译一次可能就要十几分钟。         那么在编译打包的过程中AGP到底做了什么？为什么编译那么耗时，又该怎么优化？要解决这些问题，首先就需要我们对编译打包的流程有个总体的了解 本文主要包括以下内容      编译打包总体流程 编译打包主要步骤 编译打包过程中的Task  编译打包总体流程首先看下And">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/679fae0479294940bcb9f136ebc5e7af~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c23a4a87024042bcaaa226eee7ebbf57~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/june/p5.png">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/35cae24dd2a74099bae30d62ba636eca~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/926de7469e724d8c9d49bc87458451f7~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/43f200e494dc4cec8fee65f9e0bbea76~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ab68a4f6847a41ca983100b0c832af95~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.248Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Apk 编译打包流程，了解一下~">
+<meta name="twitter:description" content="前言作为一个Android开发，每天都会有相当一部分的时间花在编译打包上，如果项目比较大的话编译一次可能就要十几分钟。         那么在编译打包的过程中AGP到底做了什么？为什么编译那么耗时，又该怎么优化？要解决这些问题，首先就需要我们对编译打包的流程有个总体的了解 本文主要包括以下内容      编译打包总体流程 编译打包主要步骤 编译打包过程中的Task  编译打包总体流程首先看下And">
+<meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/679fae0479294940bcb9f136ebc5e7af~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/06/how-apk-compile.html">
+
+
+
+
+
+  <title>Android Apk 编译打包流程，了解一下~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/06/how-apk-compile.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android Apk 编译打包流程，了解一下~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-26T16:06:15+08:00">
+                2022-06-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>作为一个<code>Android</code>开发，每天都会有相当一部分的时间花在编译打包上，如果项目比较大的话编译一次可能就要十几分钟。        </p>
+<p>那么在编译打包的过程中<code>AGP</code>到底做了什么？为什么编译那么耗时，又该怎么优化？要解决这些问题，首先就需要我们对编译打包的流程有个总体的了解</p>
+<p>本文主要包括以下内容    </p>
+<ol>
+<li>编译打包总体流程</li>
+<li>编译打包主要步骤</li>
+<li>编译打包过程中的<code>Task</code></li>
+</ol>
+<h2 id="编译打包总体流程"><a href="#编译打包总体流程" class="headerlink" title="编译打包总体流程"></a>编译打包总体流程</h2><p>首先看下<code>Android</code>官网给出的编译打包总体流程</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/679fae0479294940bcb9f136ebc5e7af~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<p>典型 <code>Android</code> 应用的构建流程如图所示，主要分为以下几步：       </p>
+<ol>
+<li>编译器将您的源代码转换成 <code>DEX</code> 文件（<code>Dalvik</code> 可执行文件，其中包括在 <code>Android</code> 设备上运行的字节码），并将其他所有内容转换成编译后的资源。</li>
+<li>打包器将 <code>DEX</code> 文件和编译后的资源组合成 <code>APK</code> 或 <code>AAB</code>（具体取决于所选的 <code>build</code> 目标）。 </li>
+<li>打包器使用调试或发布密钥库为 <code>APK</code> 或 <code>AAB</code> 签名。</li>
+<li>在生成最终 <code>APK</code> 之前，打包器会使用 <code>zipalign</code> 工具对应用进行优化，以减少其在设备上运行时所占用的内存</li>
+</ol>
+<h2 id="编译打包主要步骤"><a href="#编译打包主要步骤" class="headerlink" title="编译打包主要步骤"></a>编译打包主要步骤</h2><p>关于<code>Android</code>编译打包还有一张更加复杂的图</p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c23a4a87024042bcaaa226eee7ebbf57~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<p>这个看起来是相当复杂的，但其实我们也可以把这些步骤做一个分类，跟总体流程的四个步骤做一个对应</p>
+<h3 id="资源与代码编译"><a href="#资源与代码编译" class="headerlink" title="资源与代码编译"></a>资源与代码编译</h3><h4 id="资源文件编译"><a href="#资源文件编译" class="headerlink" title="资源文件编译"></a>资源文件编译</h4><p><code>apk</code>资源包含:     </p>
+<ul>
+<li>工程中<code>res</code>目录下的所有文件</li>
+<li><code>assets</code>目录下的文件</li>
+<li><code>AndroidManifest.xml</code></li>
+</ul>
+<p><code>apk</code>的资源编译是编译过程中的一项主要工作，<code>AGP3.0.0</code>之后默认通过<code>AAPT2</code>来编译资源。     </p>
+<p><code>AAPT2</code>（<code>Android Asset Packaging Tool2</code>）是一种构建工具，<code>Android Studio</code> 和 <code>Android Gradle</code> 插件使用它来编译和打包应用的资源。<code>AAPT2</code> 会解析资源、为资源编制索引，并将资源编译为针对 <code>Android</code>平台进行过优化的二进制格式。</p>
+<h5 id="AAPT2做了什么优化"><a href="#AAPT2做了什么优化" class="headerlink" title="AAPT2做了什么优化?"></a><code>AAPT2</code>做了什么优化?</h5><p>为什么<code>AGP3.0.0</code>之后默认通过<code>AAPT2</code>来编译资源呢？它又做了什么优化呢?     </p>
+<p><code>AAPT2</code> 支持通过启用增量编译实现更快的资源编译。这是通过将资源处理拆分为两个步骤来实现的：     </p>
+<ul>
+<li><p>1、编译：将资源文件编译为二进制格式。<br>把所有的<code>Android</code>资源文件进行解析，生成扩展名为<code>.flat</code>的二进制文件。比如是<code>png</code>图片，那么就会被压缩处理，采用<code>.png.flat</code>的扩展名。可以在<code>build/intermediates/merged_res/</code>文件下查看生成的中间产物</p>
+</li>
+<li><p>2、链接：合并所有已编译的文件并将它们打包到一个软件包中。<br>首先，这一步会生成辅助文件，比如<code>R.java</code>与<code>resources.arsc</code>，<code>R</code>文件大家应该都比较熟悉，就是一个资源索引文件，我们平时引用也都是通过<code>R.</code>的方式引用资源<code>id</code>。而<code>resources.arsc</code>则是资源索引表，供在程序运行时根据id索引到具体的资源<br>最后，会将<code>R</code>文件，<code>ressources.arsc</code>文件和之前的二进制文件进行打包，打包到一个软件包中。       </p>
+</li>
+</ul>
+<p><strong>这种拆分方式有助于提高增量编译的性能</strong>。例如，如果某个文件中有更改，您只需要重新编译该文件。</p>
+<h4 id="AIDL文件编译"><a href="#AIDL文件编译" class="headerlink" title="AIDL文件编译"></a><code>AIDL</code>文件编译</h4><p>对于<code>AIDL</code>，大家应该都很熟悉，它是一种用于进程间通信的接口文件。</p>
+<p>其实它是<code>Google</code>为了帮助我们进行进程间通信的简便写法，最后还是需要被解析编译为<code>java</code>文件，而做这个工作的就是<code>aidl</code>工具，存在于<code>sdk/build-tools</code>目录。</p>
+<p><strong>这个阶段的主要的工作就是将项目中的<code>aidl</code>文件编译为<code>java</code>文件</strong>。</p>
+<h4 id="Java与Kotlin文件编译"><a href="#Java与Kotlin文件编译" class="headerlink" title="Java与Kotlin文件编译"></a><code>Java</code>与<code>Kotlin</code>文件编译</h4><ul>
+<li>通过<code>Java Compiler</code> 编译项目中所有的<code>Java</code>代码，包括<code>R.java</code>、<code>.aidl</code>文件生成的<code>.java</code>文件、<code>Java</code>源文件，生成<code>.class</code>文件。在对应的<code>build</code>目录下可以找到相关的代码</li>
+<li>通过<code>Kotlin Compiler</code>编译项目中的所有<code>Kotlin</code>代码，生成<code>.class文件</code></li>
+</ul>
+<p>注解处理器(<code>APT</code>,<code>KAPT</code>)生成代码也是在这个阶段生成的。当注解的生命周期被设置为<code>CLASS</code>的时候，就代表该注解会在编译<code>class</code>文件的时候生效，并且生成<code>java</code>源文件和<code>Class</code>字节码文件。</p>
+<h4 id="Class文件打包成DEX"><a href="#Class文件打包成DEX" class="headerlink" title="Class文件打包成DEX"></a><code>Class</code>文件打包成<code>DEX</code></h4><p>这一步就是将<code>.class</code>文件打包成<code>dex</code>文件。</p>
+<p>有人可能会奇怪了，<code>.class</code>文件不就是<code>JVM</code>可以识别的二进制文件吗，为什么还要进行一次转化呢？</p>
+<p>这就涉及到另一个问题：<code>JVM</code> 和 <code>Dalvik（ART</code> 的区别。</p>
+<p>其中一个重要的区别就是<code>Dalvik（ART）</code>有自己的二进制文件，也就是<code>.dex</code>文件，所以需要将<code>class</code>文件进行再一次转换。</p>
+<p>你可以把<code>dex</code>文件理解为一个<code>class</code>文件包，里面装着很多的<code>class</code>文件，让这些类能够共享数据，类似这种关系：</p>
+<p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/june/p5.png" alt></p>
+<h5 id="D8编译器与R8工具"><a href="#D8编译器与R8工具" class="headerlink" title="D8编译器与R8工具"></a><code>D8</code>编译器与<code>R8</code>工具</h5><p>在 <code>AGP 3.X</code> 以后，<code>Google</code> 分别引入 <code>D8</code> 编译器和 <code>R8</code> 工具作为默认的 <code>DEX</code> 编译器和混淆压缩工具。            </p>
+<ul>
+<li>在<code>AGP3.0.1</code>之后,<code>D8</code>编译器取代了<code>Dx</code>，用于将<code>class</code>文件打包成<code>DEX</code>，<code>D8</code>编译器编译更快、时间更短；<code>DEX</code> 编译时占用内容更小；生成的<code>dex</code>文件大小更小；同时拥有相同或者是更好的运行时性能；</li>
+<li>在<code>AGP3.4.0</code>之后，默认开启<code>R8</code>，<code>R8</code> 是 <code>ProGuard</code> 的替代工具，用于代码的压缩（<code>shrinking</code>）和混淆（<code>obfuscation</code>）</li>
+</ul>
+<p>在 <code>AGP3.4.0</code>版本中，<code>R8</code> 把 <code>desugaring</code>、<code>shrinking</code>、<code>obfuscating</code>、<code>optimizing</code> 和 <code>dexing</code> 都合并到一步进行执行。在 <code>AGP3.4.0</code> 以前的版本编译流程如下：        </p>
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/35cae24dd2a74099bae30d62ba636eca~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<p>在<code>AGP3.4.0</code>之后的编译流程如下：   </p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/926de7469e724d8c9d49bc87458451f7~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<h3 id="生成APK包"><a href="#生成APK包" class="headerlink" title="生成APK包"></a>生成<code>APK</code>包</h3><p>在资源文件与代码文件都编译完成后，接下来就是生成<code>apk</code>包了，将<code>manifest</code>文件、<code>resources</code>文件、<code>dex</code>文件、<code>assets</code>文件等等打包成一个压缩包，也就是<code>apk</code>文件。</p>
+<p>在老版本使用的工具是<code>apkbuilder</code>，但是在最新的版本我发现没有这个工具了，<code>sdk</code>目录下也找不到了。</p>
+<p>在<code>AGP3.6.0</code>之后，使用<code>zipflinger</code>作为默认打包工具来构建<code>APK</code>，以提高构建速度</p>
+<h3 id="zipalign（对齐处理）"><a href="#zipalign（对齐处理）" class="headerlink" title="zipalign（对齐处理）"></a><code>zipalign</code>（对齐处理）</h3><p><code>zipalign</code> 是一种归档对齐工具，可对 <code>Android</code> 应用 (<code>APK</code>) 文件提供重要的优化</p>
+<p><code>zipalign</code>会对<code>apk</code>中未压缩的数据进行4字节对齐，对齐的主要过程是将<code>APK</code>包中所有的资源文件距离文件起始偏移为4字节整数倍，对齐后就可以使用<code>mmap</code>函数读取文件，可以像读取内存一样对普通文件进行操作。如果没有4字节对齐，就必须显式的读取，这样比较缓慢并且会耗费额外的内存。</p>
+<p>有的同学可能会有疑问，这个对齐处理不是应该放在签名之后吗？其实这里就涉及到了签名工具的不同带来的对齐处理的顺序不同：</p>
+<ul>
+<li>如果使用的是 <code>apksigner</code>，只能在为 <code>APK</code> 文件签名之前执行 <code>zipalign</code>。</li>
+<li>如果使用的是 <code>jarsigner</code>，只能在为 <code>APK</code> 文件签名之后执行 <code>zipalign</code>。</li>
+</ul>
+<h3 id="对APK进行签名"><a href="#对APK进行签名" class="headerlink" title="对APK进行签名"></a>对<code>APK</code>进行签名</h3><p>在生成APK文件之后，必须对该<code>apk</code>文件进行签名，否则无法被安装。</p>
+<p>之前大家比较熟知的签名工具是<code>JDK</code>提供的<code>jarsigner</code>，而<code>apksigner</code>是<code>Google</code>专门为<code>Android</code>提供的签名和签证工具。</p>
+<p>其区别就在于<code>jarsigner</code>只能进行<code>v1</code>签名，而<code>apksigner</code>可以进行<code>v2</code>、<code>v3</code>、<code>v4</code>签名。下面我们简单介绍下<code>V1</code>签名和<code>V2</code>签名的区别，关于<code>V3</code>,<code>V4</code>签名的内容可参考：<a href="https://juejin.cn/post/7111116047960244254" target="_blank" rel="noopener">Android开发应该知道的签名知识！</a></p>
+<h4 id="V1签名"><a href="#V1签名" class="headerlink" title="V1签名"></a><code>V1</code>签名</h4><p><code>v1</code>签名方式主要是利用<code>META-INFO</code>文件夹中以<code>MF</code>、<code>SF</code> 和 <code>RSA</code> 的三个文件，流程如下所示：<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/43f200e494dc4cec8fee65f9e0bbea76~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt>      </p>
+<p>首先，将<code>apk</code>中除了<code>META-INFO</code>文件夹中的所有文件进行进行摘要写到 <code>META-INFO/MANIFEST.MF</code>；然后计算<code>MANIFEST.MF</code>文件的摘要写到<code>CERT.SF</code>；最后计算<code>CERT.SF</code>的摘要，使用私钥计算签名，将签名和开发者证书写到<code>CERT.RSA</code>。</p>
+<p>所以<code>META-INFO</code>文件夹中这三个文件就能保证<code>apk</code>不会被修改。但是<code>V1</code>签名方案主要有两个问题    </p>
+<ul>
+<li>一是签名校验慢，在签名校验时要针对 <code>Apk</code> 中所有的文件进行校验，这会拖累老设备的安装时间。</li>
+<li>二是<code>META-INFO</code>文件夹不会被签名，存在一定安全隐患</li>
+</ul>
+<h4 id="V2签名"><a href="#V2签名" class="headerlink" title="V2签名"></a><code>V2</code>签名</h4><p><code>Android7.0</code>之后，<code>Google</code>推出了<code>V2</code>签名，解决<code>V1</code>签名速度慢以及签名不完整的问题。</p>
+<p>apk本质上是一个压缩包，而压缩包文件格式一般分为三块：</p>
+<p>文件数据区，中央目录，中央目录结束节。</p>
+<p>而<code>V2</code>要做的就是，在文件中插入一个<code>APK</code>签名分块，位于中央目录部分之前，如下图：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ab68a4f6847a41ca983100b0c832af95~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt>   </p>
+<p>这样处理之后，文件签名完成就无法修改了，这也是为什么<code>ZipAlign</code>对齐只能在<code>ApkSigner</code>签名之前执行的原因。</p>
+<h2 id="编译打包过程中的Task"><a href="#编译打包过程中的Task" class="headerlink" title="编译打包过程中的Task"></a>编译打包过程中的<code>Task</code></h2><p>上面介绍了<code>Apk</code>编译打包过程的主要步骤，这些步骤也都是通过<code>AGP</code>插件实现的，那么这些主要步骤又对应<code>AGP</code>中的哪些<code>Task</code>呢</p>
+<p>当我们在<code>Android Studio</code>中点击<code>Run</code>时，便可以在控制台看到一系列的<code>Task</code>执行</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">Executing <span class="string">tasks:</span> [:<span class="string">app:</span>assembleDebug] <span class="keyword">in</span> project</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>preBuild UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>preDebugBuild UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugNativeDebugMetadata NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugAidl NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugRenderscript NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>dataBindingMergeDependencyArtifactsDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>dataBindingMergeGenClassesDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>generateDebugResValues UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>generateDebugResources UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugResources UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>packageDebugResources UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>parseDebugLocalResources UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>dataBindingGenBaseClassesDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>generateDebugBuildConfig UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>checkDebugAarMetadata UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mapDebugSourceSetPaths UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>createDebugCompatibleScreenManifests UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>extractDeepLinksDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugMainManifest UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugManifest UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugManifestForPackage UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugResources UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>javaPreCompileDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugShaders UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugShaders NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>generateDebugAssets UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugAssets UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compressDebugAssets UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugJavaRes NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>checkDebugDuplicateClasses UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>desugarDebugFileDependencies UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeExtDexDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeLibDexDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugJniLibFolders UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugNativeLibs NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>stripDebugDebugSymbols NO-SOURCE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>validateSigningDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>writeDebugAppMetadata UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>writeDebugSigningConfigVersions UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugKotlin</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugJavaWithJavac</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugJavaResource UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>dexBuilderDebug UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeProjectDexDebug</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>packageDebug</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>createDebugApkListingFileRedirect UP-TO-DATE</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>assembleDebug</span><br><span class="line"></span><br><span class="line">BUILD SUCCESSFUL <span class="keyword">in</span> <span class="number">2</span>s</span><br><span class="line"><span class="number">35</span> actionable <span class="string">tasks:</span> <span class="number">4</span> executed, <span class="number">31</span> up-to-date</span><br></pre></td></tr></table></figure>
+<p>上面就是点击运行过程中运行的所有<code>Task</code>，我们精简一下，列出上面主要步骤中提到的<code>Task</code>       </p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//aidl 转换aidl文件为java文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugAidl</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成BuildConfig文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>generateDebugBuildConfig</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取gradle中配置的资源文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>generateDebugResValues</span><br><span class="line"></span><br><span class="line"><span class="comment">// merge资源文件，AAPT2 编译阶段</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugResources</span><br><span class="line"></span><br><span class="line"><span class="comment">// merge assets文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>mergeDebugAssets</span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compressDebugAssets</span><br><span class="line"></span><br><span class="line"><span class="comment">// merge所有的manifest文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugManifest</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成R文件 AAPT2 链接阶段</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>processDebugResources</span><br><span class="line"></span><br><span class="line"><span class="comment">//编译kotlin文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugKotlin</span><br><span class="line"></span><br><span class="line"><span class="comment">//javac 编译java文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>compileDebugJavaWithJavac</span><br><span class="line"></span><br><span class="line"><span class="comment">//转换class文件为dex文件</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>dexBuilderDebug</span><br><span class="line"></span><br><span class="line"><span class="comment">//打包成apk并签名</span></span><br><span class="line">&gt; <span class="string">Task :</span><span class="string">app:</span>packageDebug</span><br></pre></td></tr></table></figure>
+<p>上面这些<code>Task</code>就对应于上面说的编译过程中的主要步骤，比如<code>mergeDebugResources</code>就对应于<code>AAPT2</code>的编译阶段，在<code>Task</code>结束后，会在<code>build/intermediates/merged_res/</code>文件夹中生成<code>Flat</code>文件<br>而<code>processDebugResources</code>则对应于<code>AAPT2</code>的链接阶段，会生成<code>R.java</code>与<code>resources.arsc</code>，并合并所有已编译的文件并将它们打包到一个软件包中</p>
+<p>关于其他<code>Task</code>内容也都比较多，感兴趣的同学可以自行查看相关源码，这里就不缀述了</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要详细介绍了<code>Android APK</code>打包编译的总体流程，主要步骤，以及<code>AGP</code>中相关的<code>Task</code>。这些知识点在平常的开发中或许没有多大用处，但是如果你要做包体积优化，或者编译优化相关的一些工作的话，这些应该是需要了解的前置知识，希望对你有所帮助~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6924918885259378702" target="_blank" rel="noopener">Android&amp;Kotlin编译速度原理剖析（上）</a><br><a href="https://mp.weixin.qq.com/s/6Cb6MqV9GQG60hBltss61A" target="_blank" rel="noopener">从构建工具看 Android APK 编译打包流程</a><br><a href="https://juejin.cn/post/6973089862278725640" target="_blank" rel="noopener">Android D8 编译器 和 R8 工具</a><br><a href="https://juejin.cn/post/7111116047960244254" target="_blank" rel="noopener">Android开发应该知道的签名知识！</a>          </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编译技术/" rel="tag"># 编译技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/06/asm-method-record.html" rel="next" title="ASM 插桩采集方法入参，出参及耗时信息">
+                <i class="fa fa-chevron-left"></i> ASM 插桩采集方法入参，出参及耗时信息
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/07/ksp-version-butterknife.html" rel="prev" title="别了 KAPT , 使用 KSP 快速实现 ButterKnife">
+                别了 KAPT , 使用 KSP 快速实现 ButterKnife <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译打包总体流程"><span class="nav-number">2.</span> <span class="nav-text">编译打包总体流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译打包主要步骤"><span class="nav-number">3.</span> <span class="nav-text">编译打包主要步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#资源与代码编译"><span class="nav-number">3.1.</span> <span class="nav-text">资源与代码编译</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#资源文件编译"><span class="nav-number">3.1.1.</span> <span class="nav-text">资源文件编译</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#AAPT2做了什么优化"><span class="nav-number">3.1.1.1.</span> <span class="nav-text">AAPT2做了什么优化?</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AIDL文件编译"><span class="nav-number">3.1.2.</span> <span class="nav-text">AIDL文件编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Java与Kotlin文件编译"><span class="nav-number">3.1.3.</span> <span class="nav-text">Java与Kotlin文件编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Class文件打包成DEX"><span class="nav-number">3.1.4.</span> <span class="nav-text">Class文件打包成DEX</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#D8编译器与R8工具"><span class="nav-number">3.1.4.1.</span> <span class="nav-text">D8编译器与R8工具</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成APK包"><span class="nav-number">3.2.</span> <span class="nav-text">生成APK包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zipalign（对齐处理）"><span class="nav-number">3.3.</span> <span class="nav-text">zipalign（对齐处理）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对APK进行签名"><span class="nav-number">3.4.</span> <span class="nav-text">对APK进行签名</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#V1签名"><span class="nav-number">3.4.1.</span> <span class="nav-text">V1签名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#V2签名"><span class="nav-number">3.4.2.</span> <span class="nav-text">V2签名</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译打包过程中的Task"><span class="nav-number">4.</span> <span class="nav-text">编译打包过程中的Task</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

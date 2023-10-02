@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Glide可以说是最常用的图片加载框架了，Glide链式调用使用方便，性能上也可以满足大多数场景的使用，Glide源码与原理也是面试中的常客。但是Glide的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.本文以Glide做了哪些优化为切入点，介绍与学习Glide的源码与原理，如果对您有所帮助，欢迎点赞.               Glide做了哪些优化?  要想要回答这个问题">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【一道面试题】 Glide做了哪些优化?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/05/glide-optimize-sum.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Glide可以说是最常用的图片加载框架了，Glide链式调用使用方便，性能上也可以满足大多数场景的使用，Glide源码与原理也是面试中的常客。但是Glide的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.本文以Glide做了哪些优化为切入点，介绍与学习Glide的源码与原理，如果对您有所帮助，欢迎点赞.               Glide做了哪些优化?  要想要回答这个问题">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog5/p11.png">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/9/26/16d6ce1ae35966f3?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/9/26/16d6ce19e147ab45?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/9/26/16d6ce1ae2b3f7ec?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/926e97d193d14bb88184079b4932dc86~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a433a5e33dfb47b8a60a76eebeb11e13~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.243Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【一道面试题】 Glide做了哪些优化?">
+<meta name="twitter:description" content="前言Glide可以说是最常用的图片加载框架了，Glide链式调用使用方便，性能上也可以满足大多数场景的使用，Glide源码与原理也是面试中的常客。但是Glide的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.本文以Glide做了哪些优化为切入点，介绍与学习Glide的源码与原理，如果对您有所帮助，欢迎点赞.               Glide做了哪些优化?  要想要回答这个问题">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog5/p11.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/05/glide-optimize-sum.html">
+
+
+
+
+
+  <title>【一道面试题】 Glide做了哪些优化? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/05/glide-optimize-sum.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【一道面试题】 Glide做了哪些优化?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-30T15:37:10+08:00">
+                2021-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Glide</code>可以说是最常用的图片加载框架了，<code>Glide</code>链式调用使用方便，性能上也可以满足大多数场景的使用，<code>Glide</code>源码与原理也是面试中的常客。<br>但是<code>Glide</code>的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.<br>本文以<code>Glide</code>做了哪些优化为切入点，介绍与学习<code>Glide</code>的源码与原理，如果对您有所帮助，欢迎点赞.             </p>
+<blockquote>
+<p><code>Glide</code>做了哪些优化?</p>
+</blockquote>
+<p>要想要回答这个问题，我们可以先想一想，如果我们自己要实现一个图片加载框架，我们会思考什么问题？<br>1.图片下载是个耗时过程，我们首先需要考虑的就是图片缓存的问题<br>2.图片加载也是个耗内存的操作，很多<code>OOM</code>都是图片加载导致的，所以我们也要考虑内存优化问题<br>3.图片加载到一半，页面关闭了，图片加载也应该中止，这又牵扯到了生命周期管理的问题<br>4.还有就是图片加载框架是否支持大图加载？大图情况下会有什么问题？     </p>
+<p>以上就是我们提出的有关于<code>Glide</code>的几个问题了，这样我们可以轻松得出本文主要包括的内容<br>1.<code>Glide</code>图片加载的总体流程介绍<br>2.<code>Glide</code>缓存机制做了哪些优化？<br>3.<code>Glide</code>做了哪些内存优化？<br>4.<code>Glide</code>如何管理生命周期?<br>5.<code>Glide</code>怎么做大图加载?</p>
+<p>下面就带着问题进入正文~</p>
+<h2 id="1-Glide图片加载总体流程介绍"><a href="#1-Glide图片加载总体流程介绍" class="headerlink" title="1.Glide图片加载总体流程介绍"></a>1.<code>Glide</code>图片加载总体流程介绍</h2><p>在开始了解<code>Glide</code>具体做了哪些优化之前，我们先对<code>Glide</code>图片加载的总体流程做一个简单的介绍，让大家首先有个整体概念。<br>同时在后面对<code>Glide</code>做的优化具体发生在哪一步也可以方便的知道.<br>概括来说，图片加载包含封装，解析，下载，解码，变换，缓存，显示等操作，如下图所示：<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog5/p11.png" alt>       </p>
+<ul>
+<li>1.封装参数：从指定来源，到输出结果，中间可能经历很多流程，所以第一件事就是封装参数，这些参数会贯穿整个过程；</li>
+<li>2.解析路径：图片的来源有多种，格式也不尽相同，需要规范化；</li>
+<li>3.读取缓存：为了减少计算，通常都会做缓存；同样的请求，从缓存中取图片（<code>Bitmap</code>）即可；</li>
+<li>4.查找文件/下载文件：如果是本地的文件，直接解码即可；如果是网络图片，需要先下载；</li>
+<li>5.解码：这一步是整个过程中最复杂的步骤之一，有不少细节；</li>
+<li>6.变换：解码出<code>Bitmap</code>之后，可能还需要做一些变换处理（圆角，滤镜等）；</li>
+<li>7.缓存：得到最终bitmap之后，可以缓存起来，以便下次请求时直接取结果；</li>
+<li>8.显示：显示结果，可能需要做些动画（淡入动画，crossFade等）。</li>
+</ul>
+<p>以上就是<code>Glide</code>图片加载的总体流程,这里只做了简单的介绍，详情可见：<a href="https://juejin.cn/post/6844904002551808013" target="_blank" rel="noopener">聊一聊关于Glide在面试中的那些事</a></p>
+<h2 id="2-Glide缓存机制做了哪些优化？"><a href="#2-Glide缓存机制做了哪些优化？" class="headerlink" title="2.Glide缓存机制做了哪些优化？"></a>2.<code>Glide</code>缓存机制做了哪些优化？</h2><p>我们知道，下载图片是非常耗费资源的，所以图片缓存机制是图片加载框架很重要的一部分,下面就以一张表格来说明下 Glide 缓存。     </p>
+<table>
+<thead>
+<tr>
+<th>缓存类型</th>
+<th>缓存代表</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>活动缓存</td>
+<td>ActiveResources</td>
+<td>如果当前对应的图片资源是从内存缓存中获取的，那么会将这个图片存储到活动资源中。</td>
+</tr>
+<tr>
+<td>内存缓存</td>
+<td>LruResourceCache</td>
+<td>图片解析完成并最近被加载过，则放入内存中</td>
+</tr>
+<tr>
+<td>磁盘缓存-资源类型</td>
+<td>DiskLruCacheWrapper</td>
+<td>被解码后的图片写入磁盘文件中</td>
+</tr>
+<tr>
+<td>磁盘缓存-原始数据</td>
+<td>DiskLruCacheWrapper</td>
+<td>网络请求成功后将原始数据在磁盘中缓存</td>
+</tr>
+</tbody>
+</table>
+<p>在介绍具体缓存前，先来看一张加载缓存执行顺序，有个大概的印象<br><img src="https://user-gold-cdn.xitu.io/2019/9/26/16d6ce1ae35966f3?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt><br><code>Glide</code>的缓存机制，主要分为2种缓存，一种是内存缓存，一种是磁盘缓存。<br>之所以使用内存缓存的原因是：防止应用重复将图片读入到内存，造成内存资源浪费。<br>之所以使用磁盘缓存的原因是：防止应用重复的从网络或者其他地方下载和读取数据。<br>正式因为有着这两种缓存的结合，才构成了<code>Glide</code>极佳的缓存效果。        </p>
+<h3 id="2-1-内存缓存"><a href="#2-1-内存缓存" class="headerlink" title="2.1 内存缓存"></a>2.1 内存缓存</h3><p><code>Glide</code>默认开启内存缓存，我们也可以通过<code>skipMemoryCache</code>关闭<br>上面我们可以看到内存缓存其实分两个部分，<code>ActiveResource</code>缓存与<code>LRU</code>缓存<br><code>ActiveResources</code> 就是一个弱引用的 <code>HashMap</code> ，用来缓存正在使用中的图片,使用 <code>ActiveResources</code> 来缓存正在使用中的图片，可以保护这些图片不会被 <code>LruCache</code> 算法回收掉     </p>
+<p>内存缓存加载顺序如下：<br>1.根据图片地址，宽高，变换，签名等生成<code>key</code><br>2.第一次加载没有获取到活动缓存。<br>3.接着加载内存资源缓存，先清理掉内存缓存，在添加进行活动缓存。<br>4.第二次加载活动缓存已经存在。<br>5.当前图片引用为 0 的时候，清理活动资源，并且添加进内存资源。<br>6.又回到了第一步，然后就这样环环相扣。    </p>
+<p>总结为流程图如下：<br><img src="https://user-gold-cdn.xitu.io/2019/9/26/16d6ce19e147ab45?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt><br>这里没有贴出源码，如果想要看源码的同学可参考：<a href="https://juejin.cn/post/6844903953604280328#heading-3" target="_blank" rel="noopener">从源码的角度分析 Glide 缓存策略</a>    </p>
+<p>我们上面总结了<code>Glide</code>内存缓存加载的流程,看到这里我们很容易有个疑问，为什么<code>Glide</code>要设计两种内存缓存？    </p>
+<h4 id="2-1-1-为什么设计两种内存缓存？"><a href="#2-1-1-为什么设计两种内存缓存？" class="headerlink" title="2.1.1 为什么设计两种内存缓存？"></a>2.1.1 为什么设计两种内存缓存？</h4><blockquote>
+<p><code>LruCache</code>算法的实现，你会发现它其实是用一个<code>Set</code>来缓存对象的，每次内存超出缓存设定触发<code>trim</code>操作的时候，其实是对这个<code>Set</code>进行遍历，然后移除缓存。但是我们都知道<code>Set</code>是无序的，因此遍历的时候有可能会把正在使用的缓存给误伤了，我还在用着它呢就给移出去了。因此这个弱引用可能是对正在使用中的图片的一种保护，使用的时候先从<code>LruCache</code>里面移出去，用完了再把它重新加到缓存里面。</p>
+</blockquote>
+<p>举个例子<br><img src="https://user-gold-cdn.xitu.io/2019/9/26/16d6ce1ae2b3f7ec?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt><br>比如我们 <code>Lru</code> 内存缓存 <code>size</code> 设置装 99 张图片，在滑动 <code>RecycleView</code> 的时候，如果刚刚滑动到 100 张，那么就会回收掉我们已经加载出来的第一张，这个时候如果返回滑动到第一张，会重新判断是否有内存缓存，如果没有就会重新开一个 <code>Request</code> 请求，很明显这里如果清理掉了第一张图片并不是我们要的效果。所以在从内存缓存中拿到资源数据的时候就主动添加到活动资源中，并且清理掉内存缓存中的资源。这么做很显然好处是 保护不想被回收掉的图片不被 <code>LruCache</code> 算法回收掉,充分利用了资源。</p>
+<h4 id="2-1-1-小结"><a href="#2-1-1-小结" class="headerlink" title="2.1.1 小结"></a>2.1.1 小结</h4><p>本节主要总结了<code>Glide</code>内存缓存加载的流程<br>1.首先去获取活动缓存，如果加载到则直接返回，没有则进入下一步<br>2.接着去获取<code>LRU</code>缓存，在获取时会将其从<code>LRU</code>中删除并添加到活动缓存中<br>3.下次加载就可以直接加载活动缓存了<br>4.当图片引用为0时，会从活动缓存中清除并添加到<code>LRU</code>缓存中<br>5.之所以要设计两种内存缓存的原因是为了防止加载中的图片被<code>LRU</code>回收     </p>
+<h3 id="2-2-磁盘缓存"><a href="#2-2-磁盘缓存" class="headerlink" title="2.2 磁盘缓存"></a>2.2 磁盘缓存</h3><p>首先了解一下磁盘缓存策略   </p>
+<ul>
+<li><code>DiskCacheStrategy.NONE</code>： 表示不缓存任何内容。</li>
+<li><code>DiskCacheStrategy.RESOURCE</code>： 在资源解码后将数据写入磁盘缓存，即经过缩放等转换后的图片资源。</li>
+<li><code>DiskCacheStrategy.DATA</code>： 在资源解码前将原始数据写入磁盘缓存。</li>
+<li><code>DiskCacheStrategy.ALL</code> ： 使用<code>DATA</code>和<code>RESOURCE</code>缓存远程数据，仅使用<code>RESOURCE</code>来缓存本地数据。</li>
+<li><code>DiskCacheStrategy.AUTOMATIC</code>：它会尝试对本地和远程图片使用最佳的策略。当你加载远程数据时，<code>AUTOMATIC</code> 策略仅会存储未被你的加载过程修改过的原始数据，因为下载远程数据相比调整磁盘上已经存在的数据要昂贵得多。对于本地数据，<code>AUTOMATIC</code> 策略则会仅存储变换过的缩略图，因为即使你需要再次生成另一个尺寸或类型的图片，取回原始数据也很容易。默认使用这种缓存策略</li>
+</ul>
+<p>在了解磁盘缓存时我们主要需要明确一个概念，是当我们使用 <code>Glide</code> 去加载一张图片的时候，<code>Glide</code> 默认并不会将原始图片展示出来，而是会对图片进行压缩和转换，总之就是经过种种一系列操作之后得到的图片，就叫转换过后的图片。<br>我们既可以缓存变换之前的原始图片，也可以缓存变换后的图片     </p>
+<h4 id="2-2-1-为什么需要两种磁盘缓存"><a href="#2-2-1-为什么需要两种磁盘缓存" class="headerlink" title="2.2.1 为什么需要两种磁盘缓存"></a>2.2.1 为什么需要两种磁盘缓存</h4><p>上文已经说了，<code>DiskCacheStrategy.RESOURCE</code>缓存的是变换后的资源，<code>DiskCacheStrategy.DATA</code>缓存的是变换前的资源<br>举个例子，同一张图片，我们先在<code>100*100</code>的<code>View</code>是展示，再在<code>200*200</code>的<code>View</code>上展示<br>如果不缓存变换后的类型相当于每次都要进行一次变换操作，如果不缓存原始数据则每次都要去重新下载数据<br>如下可以看出，两种缓存的<code>key</code>不一样<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DiskCacheStrategy.RESOURCE</span><br><span class="line">currentKey = <span class="keyword">new</span> ResourceCacheKey(helper.getArrayPool(),sourceId,helper.getSignature(),helper.getWidth(),helper.getHeight(),transformation,resourceClass,helper.getOptions());</span><br><span class="line"></span><br><span class="line">DiskCacheStrategy.DATA</span><br><span class="line">DataCacheKey newOriginalKey = <span class="keyword">new</span> DataCacheKey(loadData.sourceKey, helper.getSignature());</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-2-2-小结"><a href="#2-2-2-小结" class="headerlink" title="2.2.2 小结"></a>2.2.2 小结</h4><p>本节主要介绍了<code>Glide</code>磁盘缓存的几种策略并介绍了为什么需要两种磁盘缓存的原因<br>这里也没有贴什么源码，如果想要看源码的同学可参考：<a href="https://juejin.cn/post/6844903953604280328#heading-8" target="_blank" rel="noopener">从源码的角度分析 Glide 缓存策略</a></p>
+<h2 id="3-Glide做了哪些内存优化？"><a href="#3-Glide做了哪些内存优化？" class="headerlink" title="3.Glide做了哪些内存优化？"></a>3.<code>Glide</code>做了哪些内存优化？</h2><p><code>Glide</code>的内存优化主要也是对<code>Bitmap</code>的优化，在回答这个问题前，我们可以想想有哪些常见的<code>Bitmap</code>优化手段<br>1.当图片大小与<code>View</code>大小不一致时，可以用<code>inSampleSize</code>进行尺寸优化<br>2.图片所占内存即宽<em>高</em>每像素所占内存大小，不同的模式每个像素所占的内存大小不同，我们可以利用<code>inpreferredconfig</code>配置<br>3.<code>Bitmpa</code>所占内存比较大，如果频繁创建回收<code>Bitmap</code>内存可能造成内存抖动，我们可以利用<code>inBitmap</code>利用<code>Bitmap</code>内存<br>4.内存缓存，上文我们已经介绍了<code>Glide</code>的弱引用缓存与<code>LRU</code>缓存     </p>
+<p>其实常见的<code>Bitmap</code>内存优化也就这么几种了，不过我们在工作中比较少直接使用他们。<br>下面我们就介绍下<code>Glide</code>中具体是怎么使用他们的.</p>
+<h3 id="3-1-尺寸优化"><a href="#3-1-尺寸优化" class="headerlink" title="3.1 尺寸优化"></a>3.1 尺寸优化</h3><p>当装载图片的容器例如ImageView只有<code>100*100</code>，而图片的分辨率为<code>800 * 800</code>，这个时候将图片直接放置在容器上，很容易<code>OOM</code>，同时也是对图片和内存资源的一种浪费。当容器的宽高都很小于图片的宽高，其实就需要对图片进行尺寸上的压缩，将图片的分辨率调整为<code>ImageView</code>宽高的大小，一方面不会对图片的质量有影响，同时也可以很大程度上减少内存的占用</p>
+<p>我们通常使用<code>inSampleSize</code>对<code>Bitmap</code>进行尺寸缩放    </p>
+<blockquote>
+<p>如果<code>inSampleSize</code> 设置的值大于1，则请求解码器对原始的<code>bitmap</code>进行子采样图像，然后返回较小的图片来减少内存的占用，例如<code>inSampleSize</code> == 4，则采样后的图像宽高为原图像的1/4，而像素值为原图的1/16，也就是说采样后的图像所占内存也为原图所占内存的1/16；当<code>inSampleSize</code> &lt;=1时，就当作1来处理也就是和原图一样大小。另外最后一句还注明，<code>inSampleSize</code>的值一直为2的幂，如1，2，4，8。任何其他的值也都是四舍五入到最接近2的幂。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line"><span class="keyword">int</span> widthScaleFactor = orientedSourceWidth / outWidth;</span><br><span class="line"><span class="keyword">int</span> heightScaleFactor = orientedSourceHeight / outHeight;</span><br><span class="line"><span class="comment">//2</span></span><br><span class="line"><span class="keyword">int</span> scaleFactor =</span><br><span class="line">    rounding == SampleSizeRounding.MEMORY</span><br><span class="line">        ? Math.max(widthScaleFactor, heightScaleFactor)</span><br><span class="line">        : Math.min(widthScaleFactor, heightScaleFactor);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> powerOfTwoSampleSize;</span><br><span class="line"><span class="comment">//3</span></span><br><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &lt;= <span class="number">23</span></span><br><span class="line">    &amp;&amp; NO_DOWNSAMPLE_PRE_N_MIME_TYPES.contains(options.outMimeType)) &#123;</span><br><span class="line">  powerOfTwoSampleSize = <span class="number">1</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="comment">//4</span></span><br><span class="line">  powerOfTwoSampleSize = Math.max(<span class="number">1</span>, Integer.highestOneBit(scaleFactor));</span><br><span class="line">  <span class="comment">//5</span></span><br><span class="line">  <span class="keyword">if</span> (rounding == SampleSizeRounding.MEMORY</span><br><span class="line">  	  <span class="comment">// exactScaleFactor由各个裁剪策略如CenterCrop重写得到，详情可见代码</span></span><br><span class="line">      &amp;&amp; powerOfTwoSampleSize &lt; (<span class="number">1</span>.f / exactScaleFactor)) &#123;</span><br><span class="line">    powerOfTwoSampleSize = powerOfTwoSampleSize &lt;&lt; <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">options.inSampleSize = powerOfTwoSampleSize;</span><br></pre></td></tr></table></figure>
+<p>如上就是<code>Glide</code>图片进行尺寸缩放相关的代码<br>1.首先计算出图片与<code>View</code>的宽高比<br>2.根据缩放策略是省内存还是高品质，决定取宽高比的最大值还是最小值<br>3.当<code>Build.VERSION.SDK_INT&lt;=23</code>时，一些格式的图片不能缩放<br>4.<code>highestOneBit</code>的功能是把我们计算的比例四舍五入到最接近2的幂<br>5.如果缩放策略为省内存，并且我们计算的<code>SampleSize&lt;exactScaleFactor</code>,将<code>inSampleSize*2</code></p>
+<p>如上就是<code>Glide</code>图片加载时做尺寸优化的大概逻辑</p>
+<h3 id="3-2-图片格式优化"><a href="#3-2-图片格式优化" class="headerlink" title="3.2 图片格式优化"></a>3.2 图片格式优化</h3><p>我们知道，<code>Bitmap</code>所占内存大小，由<code>宽*高*每像素所占内存</code>决定<br>上面的尺寸优化决定宽高，图片格式优化决定每像素所占内存    </p>
+<p>在<code>API29</code>中，将<code>Bitmap</code>分为<code>ALPHA_8</code>, <code>RGB_565</code>, <code>ARGB_4444</code>, <code>ARGB_8888</code>, <code>RGBA_F16</code>, <code>HARDWARE</code>六个等级。</p>
+<ul>
+<li><code>ALPHA_8</code>：不存储颜色信息，每个像素占1个字节；</li>
+<li><code>RGB_565</code>：仅存储<code>RGB</code>通道，每个像素占2个字节，对<code>Bitmap</code>色彩没有高要求，可以使用该模式；</li>
+<li><code>ARGB_4444</code>：已弃用，用<code>ARGB_8888</code>代替；</li>
+<li><code>ARGB_8888</code>：每个像素占用4个字节，保持高质量的色彩保真度，默认使用该模式；</li>
+<li><code>RGBA_F16</code>：每个像素占用8个字节，适合宽色域和<code>HDR</code>；</li>
+<li><code>HARDWARE</code>：一种特殊的配置，减少了内存占用同时也加快了<code>Bitmap</code>的绘制。</li>
+</ul>
+<p>每个等级每个像素所占用的字节也都不一样，所存储的色彩信息也不同。同一张100像素的图片，<code>ARGB_8888</code>就占了400字节，<code>RGB_565</code>才占200字节，RGB_565在内存上取得了优势，但是<code>Bitmap</code>的色彩值以及清晰度却不如<code>ARGB_8888</code>模式下的<code>Bitmap</code></p>
+<p>值得注意的是在<code>Glide4.0</code>之前,<code>Glide</code>默认使用<code>RGB565</code>格式，比较省内存<br>但是<code>Glide4.0</code>之后，默认格式已经变成了<code>ARGB_8888</code>格式了,这一优势也就不存在了。<br>这本身也就是质量与内存之间的取舍，如果应用所需图片的质量要求不高，也可以修改默认格式   </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//默认格式修改为了ARGB_8888</span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Option&lt;DecodeFormat&gt; DECODE_FORMAT =</span><br><span class="line">      Option.memory(</span><br><span class="line">          <span class="string">"com.bumptech.glide.load.resource.bitmap.Downsampler.DecodeFormat"</span>, DecodeFormat.DEFAULT);</span><br></pre></td></tr></table></figure>
+<h3 id="3-3-内存复用优化"><a href="#3-3-内存复用优化" class="headerlink" title="3.3 内存复用优化"></a>3.3 内存复用优化</h3><p><code>Bitmap</code>所占内存比较大，如果我们频繁创建与回收<code>Bitmap</code>，那么很容易造成内存抖动,所以我们应该尽量复用<code>Bitmap</code>内存<br><code>Glide</code>主要使用了<code>inBitmap</code>与<code>BitmapPool</code>来实现内存的复用</p>
+<h4 id="3-3-1-inBitmap介绍"><a href="#3-3-1-inBitmap介绍" class="headerlink" title="3.3.1 inBitmap介绍"></a>3.3.1 <code>inBitmap</code>介绍</h4><p>在 <code>Android 3.0（API 级别 11）</code>开始，系统引入了 <code>BitmapFactory.Options.inBitmap</code> 字段。如果设置了此选项，那么采用 <code>Options</code> 对象的解码方法会在生成目标 <code>Bitmap</code> 时尝试复用 <code>inBitmap</code>，这意味着 <code>inBitmap</code> 的内存得到了重复使用，从而提高了性能，同时移除了内存分配和取消分配。不过 <code>inBitmap</code> 的使用方式存在某些限制，在 <code>Android 4.4（API 级别 19）</code>之前系统仅支持复用大小相同的位图，4.4 之后只要 <code>inBitmap</code> 的大小比目标 <code>Bitmap</code> 大即可</p>
+<h4 id="3-3-2-BitmapPool介绍"><a href="#3-3-2-BitmapPool介绍" class="headerlink" title="3.3.2 BitmapPool介绍"></a>3.3.2 <code>BitmapPool</code>介绍</h4><p>通过上文我们知道了可以通过<code>inBitmap</code>复用内存，但是还需要一个地方存储可复用的<code>Bitmap</code>,这就是<code>BitmapPool</code><br><code>JDK</code> 中的 <code>ThreadPoolExecutor</code> 相信大多数开发者都很熟悉，我们一般将之称为“线程池”。池化是一个很常见的概念，其目的都是为了实现对象复用，例如 <code>ThreadPoolExecutor</code> 就实现了线程的复用机制<br><code>BitmapPool</code>即实现了<code>Bitmap</code>的池化     </p>
+<h4 id="3-3-3-Glide的应用"><a href="#3-3-3-Glide的应用" class="headerlink" title="3.3.3 Glide的应用"></a>3.3.3 <code>Glide</code>的应用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setInBitmap</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    BitmapFactory.Options options, BitmapPool bitmapPool, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Nullable</span> Bitmap.Config expectedConfig = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">if</span> (expectedConfig == <span class="keyword">null</span>) &#123;</span><br><span class="line">    expectedConfig = options.inPreferredConfig;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// BitmapFactory will clear out the Bitmap before writing to it, so getDirty is safe.</span></span><br><span class="line">  options.inBitmap = bitmapPool.getDirty(width, height, expectedConfig);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上即是<code>Glide</code>设置<code>inBitmap</code>的代码，向<code>BitmapPool</code>中传入宽高与格式，得到一个可复用的对象，这样就实现了<code>Bitmap</code>的内存复用<br>由于篇幅原因，详细的源码这里没有贴出来，想要了解更多的读者可参考:<a href="https://juejin.cn/post/6956090846470995975" target="_blank" rel="noopener">Coil 和 Glide 的 Bitmap 缓存复用机制</a></p>
+<h2 id="4-Glide如何管理生命周期"><a href="#4-Glide如何管理生命周期" class="headerlink" title="4.Glide如何管理生命周期?"></a>4.<code>Glide</code>如何管理生命周期?</h2><p>当我们在做一个网络请示时，页面退出时应该中止请示，不然容易造成内存泄漏<br>对于图片加载也是如此，我们在页面退出时应该中止请示，销毁资源。<br>但是我们使用<code>Glide</code>的时候却不需要在页面退出时做什么操作，说明<code>Glide</code>可以做到在页面关闭时自动释放资源<br>下面我们一起看下<code>Glide</code>是如何实现的<br>主要是两步:<br>1.调用时通过<code>Glide.with</code>传入<code>context</code>,利用<code>context</code>构建一个<code>Fragment</code><br>2.监听<code>Fragment</code>生命周期，销毁时释放<code>Glide</code>资源   </p>
+<h3 id="4-1-传入context构建Fragment"><a href="#4-1-传入context构建Fragment" class="headerlink" title="4.1 传入context构建Fragment"></a>4.1 传入<code>context</code>构建<code>Fragment</code></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过Activity拿到RequestManager</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RequestManager <span class="title">get</span><span class="params">(@NonNull Activity activity)</span> </span>&#123;</span><br><span class="line">      <span class="comment">//拿到当前Activity的FragmentManager</span></span><br><span class="line">      android.app.FragmentManager fm = activity.getFragmentManager();</span><br><span class="line">      <span class="comment">//生成一个Fragment去绑定一个请求管理RequestManager</span></span><br><span class="line">      <span class="keyword">return</span> fragmentGet(</span><br><span class="line">          activity, fm, <span class="comment">/*parentHint=*/</span> <span class="keyword">null</span>, isActivityVisible(activity));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> RequestManager <span class="title">fragmentGet</span><span class="params">(@NonNull Context context,</span></span></span><br><span class="line"><span class="function"><span class="params">     @NonNull android.app.FragmentManager fm,</span></span></span><br><span class="line"><span class="function"><span class="params">     @Nullable android.app.Fragment parentHint,</span></span></span><br><span class="line"><span class="function"><span class="params">     <span class="keyword">boolean</span> isParentVisible)</span> </span>&#123;</span><br><span class="line">   <span class="comment">//①在当前Activity添加一个Fragment用于管理请求的生命周期</span></span><br><span class="line">   RequestManagerFragment current = getRequestManagerFragment(fm, parentHint, isParentVisible);</span><br><span class="line">   <span class="comment">//获取RequestManager</span></span><br><span class="line">   RequestManager requestManager = current.getRequestManager();</span><br><span class="line">   <span class="comment">//如果不存在RequestManager，则创建</span></span><br><span class="line">   <span class="keyword">if</span> (requestManager == <span class="keyword">null</span>) &#123;</span><br><span class="line">     Glide glide = Glide.get(context);</span><br><span class="line">     <span class="comment">//②构建RequestManager  </span></span><br><span class="line">     <span class="comment">//current.getGlideLifecycle()就是ActivityFragmentLifecycle，也就是构建RequestManager时会传入fragment中的ActivityFragmentLifecycle</span></span><br><span class="line">     requestManager =</span><br><span class="line">         factory.build(</span><br><span class="line">             glide, current.getGlideLifecycle(), current.getRequestManagerTreeNode(), context);</span><br><span class="line">     <span class="comment">//将构建出来的RequestManager绑定到fragment中</span></span><br><span class="line">     current.setRequestManager(requestManager);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//返回当前请求的管理者</span></span><br><span class="line">   <span class="keyword">return</span> requestManager;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示：<br>1.在当前<code>Activity</code>添加一个透明<code>Fragment</code>用于管理请示生命周期<br>2.构建<code>RequestManager</code>并传入<code>Fragment</code>生命周期    </p>
+<h3 id="4-2-RequestManager监听生命周期"><a href="#4-2-RequestManager监听生命周期" class="headerlink" title="4.2 RequestManager监听生命周期"></a>4.2 <code>RequestManager</code>监听生命周期</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RequestManager</span> <span class="keyword">implements</span> <span class="title">LifecycleListener</span>,</span></span><br><span class="line"><span class="class">    <span class="title">ModelTypes</span>&lt;<span class="title">RequestBuilder</span>&lt;<span class="title">Drawable</span>&gt;&gt; </span>&#123; </span><br><span class="line"></span><br><span class="line">	RequestManager(</span><br><span class="line">      Glide glide,</span><br><span class="line">      Lifecycle lifecycle,</span><br><span class="line">      RequestManagerTreeNode treeNode,</span><br><span class="line">      RequestTracker requestTracker,</span><br><span class="line">      ConnectivityMonitorFactory factory,</span><br><span class="line">      Context context) &#123;</span><br><span class="line">    ... </span><br><span class="line">    <span class="comment">//将当前对象注册到ActivityFragmentLifecycle</span></span><br><span class="line">    lifecycle.addListener(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">    </span><br><span class="line">  <span class="comment">//RequestManager实现了fragment生命周期回调</span></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    resumeRequests();</span><br><span class="line">    targetTracker.onStart();</span><br><span class="line">  &#125;</span><br><span class="line">      </span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    pauseRequests();</span><br><span class="line">    targetTracker.onStop();</span><br><span class="line">  &#125;</span><br><span class="line">      </span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    targetTracker.onDestroy();</span><br><span class="line">  &#125;</span><br><span class="line">      </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RequestManagerFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">  <span class="comment">//生命周期的关键就在ActivityFragmentLifecycle</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> ActivityFragmentLifecycle lifecycle;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">RequestManagerFragment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(<span class="keyword">new</span> ActivityFragmentLifecycle());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  RequestManagerFragment(<span class="meta">@NonNull</span> ActivityFragmentLifecycle lifecycle) &#123;</span><br><span class="line">    <span class="keyword">this</span>.lifecycle = lifecycle;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onStart();</span><br><span class="line">    lifecycle.onStart();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onStop();</span><br><span class="line">    lifecycle.onStop();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onDestroy();</span><br><span class="line">    lifecycle.onDestroy();</span><br><span class="line">    unregisterFragmentWithRoot();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>逻辑很简单：<code>Fragment</code>生命周期变化会回调<code>RequestManager</code>生命周期，然后在进行相关的资源释放工作</p>
+<h3 id="4-3-小结"><a href="#4-3-小结" class="headerlink" title="4.3 小结"></a>4.3 小结</h3><p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/926e97d193d14bb88184079b4932dc86~tplv-k3u1fbpfcp-watermark.image" alt><br><code>Glide.with(this)</code>绑定了<code>Activity</code>的生命周期。在<code>Activity</code>内新建了一个无<code>UI</code>的<code>Fragment</code>，这个<code>Fragment</code>持有一个<code>Lifecycle</code>，通过<code>Lifecycle</code>在<code>Fragment</code>关键生命周期通知<code>RequestManager进</code>行相关从操作。在生命周期<code>onStart</code>时继续加载，<code>onStop</code>时暂停加载，<code>onDestory</code>时停止加载任务和清除操作。</p>
+<p>由于篇幅有限，这里没有贴太多代码，更多细节可参考:<a href="https://www.jianshu.com/p/190285e18ae1" target="_blank" rel="noopener">Glide生命周期管理</a></p>
+<h2 id="5-大图加载"><a href="#5-大图加载" class="headerlink" title="5.大图加载"></a>5.大图加载</h2><p>对于图片加载还有种情况，就是单个图片非常巨大，并且还不允许压缩。比如显示：世界地图、清明上河图、微博长图等<br>首先不压缩，按照原图尺寸加载，那么屏幕肯定是不够大的，并且考虑到内存的情况，不可能一次性整图加载到内存中<br>所以这种情况的优化思路一般是局部加载，通过<code>BitmapRegionDecoder</code>来实现<br>这种情况下通常<code>Glide</code>只负责将图片下载下来,图片的加载由我们自定义的<code>ImageView</code>来实现      </p>
+<h3 id="5-1-BitmapRegionDecoder介绍"><a href="#5-1-BitmapRegionDecoder介绍" class="headerlink" title="5.1 BitmapRegionDecoder介绍"></a>5.1 <code>BitmapRegionDecoder</code>介绍</h3><p><code>BitmapRegionDecoder</code>主要用于显示图片的某一块矩形区域，如果你需要显示某个图片的指定区域，那么这个类非常合适。<br>对于该类的用法，非常简单，既然是显示图片的某一块区域，那么至少只需要一个方法去设置图片；一个方法传入显示的区域即可<br>举个例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置显示图片的中心区域</span></span><br><span class="line">BitmapRegionDecoder bitmapRegionDecoder = BitmapRegionDecoder.newInstance(inputStream, <span class="keyword">false</span>);</span><br><span class="line">BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line">options.inPreferredConfig = Bitmap.Config.RGB_565;</span><br><span class="line">Bitmap bitmap = bitmapRegionDecoder.decodeRegion(<span class="keyword">new</span> Rect(width / <span class="number">2</span> - <span class="number">100</span>, height / <span class="number">2</span> - <span class="number">100</span>, width / <span class="number">2</span> + <span class="number">100</span>, height / <span class="number">2</span> + <span class="number">100</span>), options);</span><br><span class="line">mImageView.setImageBitmap(bitmap);</span><br></pre></td></tr></table></figure></p>
+<p>更详细的实现可见：<a href="https://blog.csdn.net/lmj623565791/article/details/49300989/" target="_blank" rel="noopener">Android 高清加载巨图方案 拒绝压缩图片</a><br>不过这种方法虽然也能加载大图，但做的还不够，滑动时内存抖动，卡顿现象比较明显，不能用于线上<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a433a5e33dfb47b8a60a76eebeb11e13~tplv-k3u1fbpfcp-zoom-1.image" alt><br>下面介绍一种可以用于线上的大图加载方案     </p>
+<h3 id="5-2-可用于线上的大图加载方案"><a href="#5-2-可用于线上的大图加载方案" class="headerlink" title="5.2 可用于线上的大图加载方案"></a>5.2 可用于线上的大图加载方案</h3><p>介绍一个开源库：<a href="https://github.com/davemorrissey/subsampling-scale-image-view" target="_blank" rel="noopener">subsampling-scale-image-view</a><br><code>SubsamplingScaleImageView</code>将大图切片，再判断是否可见，如果可见则加入内存中，否则回收，减少了内存占用与抖动 同时根据不同的缩放比例选择合适的采样率，进一步减少内存占用 同时在子线程进行decodeRegion操作，解码成功后回调至主线程，减少UI卡顿.</p>
+<p>之前我也做<code>BitmapRegionDecoder</code>与<code>SubsamplingScaleImageView</code>的内存分析<br>有兴趣的同学也可以了解下:<a href="https://juejin.cn/post/6870389004387385352" target="_blank" rel="noopener">Android性能优化之UI卡顿优化实例分析</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要以<code>Glide</code>做了哪些优化为切入点，回答了如下几个问题<br>1.说一下<code>Glide</code>图片加载的总体流程<br>2.<code>Glide</code>缓存机制做了哪些优化？<br>3.<code>Glide</code>做了哪些内存优化？<br>4.<code>Glide</code>如何管理生命周期?<br>5.<code>Glide</code>怎么做大图加载?    </p>
+<p>如果对您有所帮助，欢迎点赞，谢谢~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6844903986412126216" target="_blank" rel="noopener">面试官：简历上最好不要写Glide，不是问源码那么简单</a><br><a href="https://juejin.cn/post/6844904002551808013" target="_blank" rel="noopener">聊一聊关于Glide在面试中的那些事</a><br><a href="https://juejin.cn/post/6844903953604280328" target="_blank" rel="noopener">从源码的角度分析 Glide 缓存策略</a><br><a href="https://juejin.cn/post/6844904099297624077" target="_blank" rel="noopener">【优化篇】不使用第三方库，Bitmap的优化策略</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/05/leakcanary-sum-up.html" rel="next" title="【带着问题学】 关于LeakCanary2.0的四个问题">
+                <i class="fa fa-chevron-left"></i> 【带着问题学】 关于LeakCanary2.0的四个问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/06/coroutine-thread-expection.html" rel="prev" title="【带着问题学】协程到底是怎么切换线程的？">
+                【带着问题学】协程到底是怎么切换线程的？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Glide图片加载总体流程介绍"><span class="nav-number">2.</span> <span class="nav-text">1.Glide图片加载总体流程介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Glide缓存机制做了哪些优化？"><span class="nav-number">3.</span> <span class="nav-text">2.Glide缓存机制做了哪些优化？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-内存缓存"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 内存缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-为什么设计两种内存缓存？"><span class="nav-number">3.1.1.</span> <span class="nav-text">2.1.1 为什么设计两种内存缓存？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-小结"><span class="nav-number">3.1.2.</span> <span class="nav-text">2.1.1 小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-磁盘缓存"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 磁盘缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-为什么需要两种磁盘缓存"><span class="nav-number">3.2.1.</span> <span class="nav-text">2.2.1 为什么需要两种磁盘缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-小结"><span class="nav-number">3.2.2.</span> <span class="nav-text">2.2.2 小结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Glide做了哪些内存优化？"><span class="nav-number">4.</span> <span class="nav-text">3.Glide做了哪些内存优化？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-尺寸优化"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 尺寸优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-图片格式优化"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 图片格式优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-内存复用优化"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 内存复用优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1-inBitmap介绍"><span class="nav-number">4.3.1.</span> <span class="nav-text">3.3.1 inBitmap介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2-BitmapPool介绍"><span class="nav-number">4.3.2.</span> <span class="nav-text">3.3.2 BitmapPool介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-3-Glide的应用"><span class="nav-number">4.3.3.</span> <span class="nav-text">3.3.3 Glide的应用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Glide如何管理生命周期"><span class="nav-number">5.</span> <span class="nav-text">4.Glide如何管理生命周期?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-传入context构建Fragment"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 传入context构建Fragment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-RequestManager监听生命周期"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 RequestManager监听生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-小结"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-大图加载"><span class="nav-number">6.</span> <span class="nav-text">5.大图加载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-BitmapRegionDecoder介绍"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 BitmapRegionDecoder介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-可用于线上的大图加载方案"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 可用于线上的大图加载方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

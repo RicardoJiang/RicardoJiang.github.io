@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="性能优化,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Android的绘制优化其实可以分为两个部分，即布局(UI)优化和卡顿优化，而布局优化的核心问题就是要解决因布局渲染性能不佳而导致应用卡顿的问题，所以它可以认为是卡顿优化的一个子集。本文主要包括以下内容1.为什么要进行布局优化及android绘制，布局加载原理2.获取布局文件加载耗时的方法3.介绍一些布局优化的手段与方法4.为什么放弃使用这些优化方法? 1.为什么要进行布局优化？为什么要进行布">
+<meta name="keywords" content="性能优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【从入门到放弃】android布局优化深入解析">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/04/android-ui-monitor.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Android的绘制优化其实可以分为两个部分，即布局(UI)优化和卡顿优化，而布局优化的核心问题就是要解决因布局渲染性能不佳而导致应用卡顿的问题，所以它可以认为是卡顿优化的一个子集。本文主要包括以下内容1.为什么要进行布局优化及android绘制，布局加载原理2.获取布局文件加载耗时的方法3.介绍一些布局优化的手段与方法4.为什么放弃使用这些优化方法? 1.为什么要进行布局优化？为什么要进行布">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog3/p11.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog3/p12.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog10/p1.webp">
+<meta property="og:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog10/p5.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.242Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【从入门到放弃】android布局优化深入解析">
+<meta name="twitter:description" content="前言Android的绘制优化其实可以分为两个部分，即布局(UI)优化和卡顿优化，而布局优化的核心问题就是要解决因布局渲染性能不佳而导致应用卡顿的问题，所以它可以认为是卡顿优化的一个子集。本文主要包括以下内容1.为什么要进行布局优化及android绘制，布局加载原理2.获取布局文件加载耗时的方法3.介绍一些布局优化的手段与方法4.为什么放弃使用这些优化方法? 1.为什么要进行布局优化？为什么要进行布">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog3/p11.webp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/04/android-ui-monitor.html">
+
+
+
+
+
+  <title>【从入门到放弃】android布局优化深入解析 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/04/android-ui-monitor.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【从入门到放弃】android布局优化深入解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-05T20:04:24+08:00">
+                2021-04-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android的绘制优化其实可以分为两个部分，即布局(UI)优化和卡顿优化，而布局优化的核心问题就是要解决因布局渲染性能不佳而导致应用卡顿的问题，所以它可以认为是卡顿优化的一个子集。<br>本文主要包括以下内容<br>1.为什么要进行布局优化及android绘制，布局加载原理<br>2.获取布局文件加载耗时的方法<br>3.介绍一些布局优化的手段与方法<br>4.为什么放弃使用这些优化方法?</p>
+<h2 id="1-为什么要进行布局优化？"><a href="#1-为什么要进行布局优化？" class="headerlink" title="1.为什么要进行布局优化？"></a>1.为什么要进行布局优化？</h2><p>为什么要进行布局优化？<br>答案是显而易见的，如果布局嵌套过深，或者其他原因导致布局渲染性能不佳，可能会导致应用卡顿<br>那么布局到底是如何导致渲染性能不佳的呢？首先我们应该了解下<code>android</code>绘制原理与布局加载原理         </p>
+<h3 id="android绘制原理"><a href="#android绘制原理" class="headerlink" title="android绘制原理"></a><code>android</code>绘制原理</h3><p><code>Android</code>的屏幕刷新中涉及到最重要的三个概念（为便于理解，这里先做简单介绍）     </p>
+<ul>
+<li><code>CPU</code>：执行应用层的<code>measure</code>、<code>layout</code>、<code>draw</code>等操作，绘制完成后将数据提交给<code>GPU</code></li>
+<li><code>GPU</code>：进一步处理数据，并将数据缓存起来</li>
+<li>屏幕：由一个个像素点组成，以固定的频率（16.6ms，即1秒60帧）从缓冲区中取出数据来填充像素点</li>
+</ul>
+<p>总结一句话就是：<code>CPU</code> 绘制后提交数据、<code>GPU</code> 进一步处理和缓存数据、最后屏幕从缓冲区中读取数据并显示<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog3/p11.webp" alt>  </p>
+<h3 id="双缓冲机制"><a href="#双缓冲机制" class="headerlink" title="双缓冲机制"></a>双缓冲机制</h3><p>看完上面的流程图，我们很容易想到一个问题，屏幕是以16.6ms的固定频率进行刷新的，但是我们应用层触发绘制的时机是完全随机的（比如我们随时都可以触摸屏幕触发绘制）.<br>如果在<code>GPU</code>向缓冲区写入数据的同时，屏幕也在向缓冲区读取数据，会发生什么情况呢？<br>有可能屏幕上就会出现一部分是前一帧的画面，一部分是另一帧的画面，这显然是无法接受的，那怎么解决这个问题呢？</p>
+<p>所以，在屏幕刷新中，<strong><code>Android</code>系统引入了双缓冲机制</strong>    </p>
+<p><code>GPU</code>只向<code>Back Buffer</code>中写入绘制数据，且<code>GPU</code>会定期交换<code>Back Buffer</code>和<code>Frame Buffer</code>，交换的频率也是60次/秒，这就与屏幕的刷新频率保持了同步。<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog3/p12.webp" alt><br>虽然我们引入了双缓冲机制，但是我们知道，当布局比较复杂，或设备性能较差的时候，<code>CPU</code>并不能保证在16.6ms内就完成绘制数据的计算，所以这里系统又做了一个处理。<br>当你的应用正在往<code>Back Buffer</code>中填充数据时，系统会将<code>Back Buffer</code>锁定。<br>如果到了<code>GPU</code>交换两个<code>Buffer</code>的时间点，你的应用还在往<code>Back Buffer</code>中填充数据，<code>GPU</code>会发现<code>Back Buffer</code>被锁定了，它会放弃这次交换。     </p>
+<p>这样做的后果就是手机屏幕仍然显示原先的图像，这就是我们常常说的掉帧   </p>
+<h3 id="布局加载原理"><a href="#布局加载原理" class="headerlink" title="布局加载原理"></a>布局加载原理</h3><p>由上面可知，导致掉帧的原因是<code>CPU</code>无法在16.6ms内完成绘制数据的计算。<br>而之所以布局加载可能会导致掉帧，正是因为它在主线程上进行了耗时操作，可能导致<code>CPU</code>无法按时完成数据计算    </p>
+<p>布局加载主要通过<code>setContentView</code>来实现，我们就不在这里贴源码了，一起来看看它的时序图<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog10/p1.webp" alt><br>我们可以看到，在<code>setContentView</code>中主要有两个耗时操作     </p>
+<ul>
+<li>1.解析<code>xml</code>,获取<code>XmlResourceParser</code>,这是IO过程</li>
+<li>2.通过<code>createViewFromTag</code>,创建<code>View</code>对象，用到了反射</li>
+</ul>
+<p>以上两点就是布局加载可能导致卡顿的原因，也是布局的性能瓶颈    </p>
+<h2 id="2-获取布局文件加载耗时的方法"><a href="#2-获取布局文件加载耗时的方法" class="headerlink" title="2.获取布局文件加载耗时的方法"></a>2.获取布局文件加载耗时的方法</h2><p>我们如果需要优化布局卡顿问题，首先最重要的就是：<strong>确定定量标准</strong><br>所以我们首先介绍几种获取布局文件加载耗时的方法    </p>
+<h3 id="常规获取"><a href="#常规获取" class="headerlink" title="常规获取"></a>常规获取</h3><p>首先介绍一下常规方法<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> start = System.currentTimeMillis()</span><br><span class="line">setContentView(R.layout.activity_layout_optimize)</span><br><span class="line"><span class="keyword">val</span> inflateTime = System.currentTimeMillis() - start</span><br></pre></td></tr></table></figure></p>
+<p>这种方法很简单，因为<code>setContentView</code>是同步方法，如果想要计算耗时，直接将前后时间计算相减即可得到结果了     </p>
+<h3 id="AOP-Aspectj-ASM"><a href="#AOP-Aspectj-ASM" class="headerlink" title="AOP(Aspectj,ASM)"></a><code>AOP</code>(<code>Aspectj</code>,<code>ASM</code>)</h3><p>上面的方式虽然简单，但是却不够优雅，同时代码有侵入性，如果要对所有Activity测量时，就需要在基类中复写相关方法了，比较麻烦了<br>下面介绍一种<code>AOP</code>的方式计算耗时<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Around</span>(<span class="string">"execution(* android.app.Activity.setContentView(..))"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getSetContentViewTime</span><span class="params">(ProceedingJoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">    Signature signature = joinPoint.getSignature();</span><br><span class="line">    String name = signature.toShortString();</span><br><span class="line">    <span class="keyword">long</span> time = System.currentTimeMillis();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        joinPoint.proceed();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable throwable) &#123;</span><br><span class="line">        throwable.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    Log.i(<span class="string">"aop inflate"</span>,name + <span class="string">" cost "</span> + (System.currentTimeMillis() - time));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面用的<code>Aspectj</code>，比较简单，上面的注解的意思是在<code>setContentView</code>方法执行内部去调用我们写好的<code>getSetContentViewTime</code>方法<br>这样就可以获取相应的耗时<br>我们可以看下打印的日志<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">I/aop</span> <span class="attr">inflate:</span> <span class="string">AppCompatActivity.setContentView(..)</span> <span class="string">cost</span> <span class="number">69</span></span><br><span class="line"><span class="string">I/aop</span> <span class="attr">inflate:</span> <span class="string">AppCompatActivity.setContentView(..)</span> <span class="string">cost</span> <span class="number">25</span></span><br></pre></td></tr></table></figure></p>
+<p>这样就可以实现无侵入的监控每个页面布局加载的耗时<br>具体源码可见文末     </p>
+<h3 id="获取任一控件耗时"><a href="#获取任一控件耗时" class="headerlink" title="获取任一控件耗时"></a>获取任一控件耗时</h3><p>有时为了更精确的知道到底是哪个控件加载耗时，比如我们新添加了自定义<code>View</code>,需要监控它的性能<br>我们可以利用<code>setFactory2</code>来监听每个控件的加载耗时<br>首先我们来回顾下<code>setContentView</code>方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> View <span class="title">tryCreateView</span><span class="params">(@Nullable View parent, @NonNull String name,</span></span></span><br><span class="line"><span class="function"><span class="params">  	...</span></span></span><br><span class="line"><span class="function"><span class="params">    View view;</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">if</span> (mFactory2 != <span class="keyword">null</span>)</span> </span>&#123;</span><br><span class="line">        view = mFactory2.onCreateView(parent, name, context, attrs);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mFactory != <span class="keyword">null</span>) &#123;</span><br><span class="line">        view = mFactory.onCreateView(name, context, attrs);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        view = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> view;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在真正进行反射实例化<code>xml</code>结点前，会调用<code>mFactory2</code>的<code>onCreateView</code>方法<br>这样如果我们重写<code>onCreateView</code>方法，在其前后加上耗时统计，即可获取每个控件的加载耗时<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">initItemInflateListener</span><span class="params">()</span></span>&#123;</span><br><span class="line">    LayoutInflaterCompat.setFactory2(layoutInflater, <span class="keyword">object</span> : Factory2 &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateView</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            parent: <span class="type">View</span>?,</span></span></span><br><span class="line"><span class="function"><span class="params">            name: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">            context: <span class="type">Context</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">            attrs: <span class="type">AttributeSet</span></span></span></span><br><span class="line"><span class="function"><span class="params">        )</span></span>: View? &#123;</span><br><span class="line">            <span class="keyword">val</span> time = System.currentTimeMillis()</span><br><span class="line">            <span class="keyword">val</span> view = delegate.createView(parent, name, context, attrs)</span><br><span class="line">            Log.i(<span class="string">"inflate Item"</span>,name + <span class="string">" cost "</span> + (System.currentTimeMillis() - time))</span><br><span class="line">            <span class="keyword">return</span> view</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreateView</span><span class="params">(name: <span class="type">String</span>, context: <span class="type">Context</span>, attrs: <span class="type">AttributeSet</span>)</span></span>: View? &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示：真正的创建<code>View</code>的方法，仍然是调用<code>delegate.createView</code>,我们只是其之前与之后做了埋点<br>注意，<code>initItemInflateListener</code>需要在<code>onCreate</code>之前调用<br>这样就可以比较方便地实现监听每个控件的加载耗时    </p>
+<h2 id="3-布局加载优化的一些方法介绍"><a href="#3-布局加载优化的一些方法介绍" class="headerlink" title="3.布局加载优化的一些方法介绍"></a>3.布局加载优化的一些方法介绍</h2><p>布局加载慢的主要原因有两个,一个是<code>IO</code>,一个是反射<br>所以我们的优化思路一般有两个<br>1.侧面缓解(异步加载)<br>2.根本解决(不需要IO,反射过程,如X2C,anko,compose等)</p>
+<h3 id="AsyncLayoutInflater方案"><a href="#AsyncLayoutInflater方案" class="headerlink" title="AsyncLayoutInflater方案"></a><code>AsyncLayoutInflater</code>方案</h3><blockquote>
+<p><code>AsyncLayoutInflater</code> 是来帮助做异步加载 <code>layout</code> 的，<code>inflate(int, ViewGroup, OnInflateFinishedListener)</code> 方法运行结束之后 <code>OnInflateFinishedListener</code> 会在主线程回调返回 <code>View</code>；这样做旨在 <code>UI</code> 的懒加载或者对用户操作的高响应。</p>
+</blockquote>
+<p>简单的说我们知道默认情况下 <code>setContentView</code> 函数是在 <code>UI</code> 线程执行的，其中有一系列的耗时动作：<code>Xml</code>的解析、<code>View</code>的反射创建等过程同样是在<code>UI</code>线程执行的，<code>AsyncLayoutInflater</code> 就是来帮我们把这些过程以异步的方式执行，保持<code>UI</code>线程的高响应。</p>
+<p>使用如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    <span class="keyword">new</span> AsyncLayoutInflater(AsyncLayoutActivity.<span class="keyword">this</span>)</span><br><span class="line">            .inflate(R.layout.async_layout, <span class="keyword">null</span>, <span class="keyword">new</span> AsyncLayoutInflater.OnInflateFinishedListener() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInflateFinished</span><span class="params">(View view, <span class="keyword">int</span> resid, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">                    setContentView(view);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">    <span class="comment">// 别的操作</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样做的优点在于将<code>UI</code>加载过程迁移到了子线程，保证了<code>UI</code>线程的高响应<br>缺点在于牺牲了易用性，同时如果在初始化过程中调用了<code>UI</code>可能会导致崩溃     </p>
+<h3 id="X2C方案"><a href="#X2C方案" class="headerlink" title="X2C方案"></a><code>X2C</code>方案</h3><p><code>X2C</code>是掌阅开源的一套布局加载框架<br>它的主要是思路是在编译期，将需要翻译的layout翻译生成对应的java文件，这样对于开发人员来说写布局还是写原来的xml，但对于程序来说，运行时加载的是对应的java文件。<br>这就将运行时的开销转移到了编译时<br>如下所示,原始xml文件：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">RelativeLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">xmlns:app</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">xmlns:tools</span>=<span class="string">"http://schemas.android.com/tools"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:layout_width</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:layout_height</span>=<span class="string">"match_parent"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">android:paddingLeft</span>=<span class="string">"10dp"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">include</span></span></span><br><span class="line"><span class="tag">      <span class="attr">android:id</span>=<span class="string">"@+id/head"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">layout</span>=<span class="string">"@layout/head"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">android:layout_centerHorizontal</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">ImageView</span></span></span><br><span class="line"><span class="tag">      <span class="attr">android:id</span>=<span class="string">"@+id/ccc"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">style</span>=<span class="string">"@style/bb"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">android:layout_below</span>=<span class="string">"@id/head"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">RelativeLayout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><code>X2C</code> 生成的 <code>Java</code> 文件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">X2C_2131296281_Activity_Main</span> <span class="keyword">implements</span> <span class="title">IViewCreator</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> View <span class="title">createView</span><span class="params">(Context ctx, <span class="keyword">int</span> layoutId)</span> </span>&#123;</span><br><span class="line">    	Resources res = ctx.getResources();</span><br><span class="line"></span><br><span class="line">        RelativeLayout relativeLayout0 = <span class="keyword">new</span> RelativeLayout(ctx);</span><br><span class="line">        relativeLayout0.setPadding((<span class="keyword">int</span>)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,<span class="number">10</span>,res.getDisplayMetrics())),<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        View view1 =(View) <span class="keyword">new</span> X2C_2131296283_Head().createView(ctx,<span class="number">0</span>);</span><br><span class="line">        RelativeLayout.LayoutParams layoutParam1 = <span class="keyword">new</span> RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);</span><br><span class="line">        view1.setLayoutParams(layoutParam1);</span><br><span class="line">        relativeLayout0.addView(view1);</span><br><span class="line">        view1.setId(R.id.head);</span><br><span class="line">        layoutParam1.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);</span><br><span class="line"></span><br><span class="line">        ImageView imageView2 = <span class="keyword">new</span> ImageView(ctx);</span><br><span class="line">        RelativeLayout.LayoutParams layoutParam2 = <span class="keyword">new</span> RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(<span class="keyword">int</span>)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,<span class="number">1</span>,res.getDisplayMetrics())));</span><br><span class="line">        imageView2.setLayoutParams(layoutParam2);</span><br><span class="line">        relativeLayout0.addView(imageView2);</span><br><span class="line">        imageView2.setId(R.id.ccc);</span><br><span class="line">        layoutParam2.addRule(RelativeLayout.BELOW,R.id.head);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> relativeLayout0;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用时如下所示,使用<code>X2C.setContentView</code>替代原始的<code>setContentView即可</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// this.setContentView(R.layout.activity_main);</span></span><br><span class="line">X2C.setContentView(<span class="keyword">this</span>, R.layout.activity_main);</span><br></pre></td></tr></table></figure></p>
+<p><strong><code>X2C</code>优点</strong><br>1.在保留<code>xml</code>的同时，又解决了它带来的性能问题<br>2.据<code>X2C</code>统计，加载耗时可以缩小到原来的1/3    </p>
+<p><strong><code>X2C</code>问题</strong><br>1.部分属性不能通过代码设置,<code>Java</code>不兼容<br>2.将加载时间转移到了编译期，增加了编译期耗时<br>3.不支持<code>kotlin-android-extensions</code>插件，牺牲了部分易用性   </p>
+<h3 id="Anko方案"><a href="#Anko方案" class="headerlink" title="Anko方案"></a><code>Anko</code>方案</h3><p><code>Anko</code>是<code>JetBrains</code>开发的一个强大的库,支持使用<code>kotlin DSL</code>的方式来写<code>UI</code>,如下所示<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?, persistentState: <span class="type">PersistableBundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState, persistentState)</span><br><span class="line">        MyActivityUI().setContentView(<span class="keyword">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActivityUI</span> : <span class="type">AnkoComponent</span>&lt;<span class="type">MyActivity</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">createView</span><span class="params">(ui: <span class="type">AnkoContext</span>&lt;<span class="type">MyActivity</span>&gt;)</span></span> = with(ui) &#123;</span><br><span class="line">        verticalLayout &#123;</span><br><span class="line">            <span class="keyword">val</span> name = editText()</span><br><span class="line">            button(<span class="string">"Say Hello"</span>) &#123;</span><br><span class="line">                onClick &#123; ctx.toast(<span class="string">"Hello, <span class="subst">$&#123;name.text&#125;</span>!"</span>) &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，<code>Anko</code>使用<code>kotlin DSL</code>实现布局，它比我们使用<code>Java</code>动态创建布局方便很多，主要是更简洁，它和拥有<code>xml</code>创建布局的层级关系，能让我们更容易阅读<br>同时，它去除了<code>IO</code>与反射过程,性能更好，以下是<code>Anko</code>与<code>XML</code>的性能对比<br><img src="https://raw.githubusercontent.com/shenzhen2017/newImage/master/blog10/p5.png" alt>    </p>
+<blockquote>
+<p>以上数据来源于:<a href="https://android.jlelse.eu/400-faster-layouts-with-anko-da17f32c45dd" target="_blank" rel="noopener">https://android.jlelse.eu/400-faster-layouts-with-anko-da17f32c45dd</a></p>
+</blockquote>
+<p>不过由于<code>AnKo</code>已经停止维护了，这里不建议大家使用，了解原理即可<br><code>AnKo</code>建议大家使用<code>Jetpack Compose</code>来替代使用   </p>
+<h3 id="Compose方案"><a href="#Compose方案" class="headerlink" title="Compose方案"></a><code>Compose</code>方案</h3><p><code>Compose</code> 是 <code>Jetpack</code> 中的一个新成员，是 <code>Android</code> 团队在2019年<code>I/O</code>大会上公布的新的<code>UI</code>库,目前处于<code>Beta</code>阶段<br><code>Compose</code>使用纯<code>kotlin</code>开发，使用简洁方便，但它并不是像<code>Anko</code>一样对<code>ViewGroup</code>的封装<br><code>Compose</code> 并不是对 <code>View</code> 和 <code>ViewGroup</code> 这套系统做了个上层包装来让写法更简单，而是完全抛弃了这套系统，自己把整个的渲染机制从里到外做了个全新的。</p>
+<p>可以确定的是,<strong><code>Compose</code>是取代<code>XML</code>的官方方案</strong>      </p>
+<p><code>Compose</code>的主要优点就在于它的简单好用，具体来说就是两点<br>1.它的声明式 <code>UI</code><br>2.去掉了 <code>xml</code>，只使用 <code>Kotlin</code> 一种语言   </p>
+<p>由于本文并不是介绍<code>Compose</code>的，所以就不继续介绍<code>Compose</code>了，总得来说，<code>Compose</code>是未来<code>android UI</code>开发的方向,读者可以自行查阅相关资料</p>
+<h2 id="4-为什么放弃使用这些优化方法"><a href="#4-为什么放弃使用这些优化方法" class="headerlink" title="4.为什么放弃使用这些优化方法?"></a>4.为什么放弃使用这些优化方法?</h2><p>上面介绍了不少布局加载优化方法，而我最后在项目中最后都没有使用，这就是从真<strong>从入门到放弃</strong><br>总得来说有以下几个原因<br>1.有些方式(如<code>AsyncLayoutInflater</code>,<code>X2C</code>)牺牲了易用性，虽然性能提升了，但是开发变得麻烦了<br>2.<code>Anko</code>使用上比较方便同时性能较高，但是比起<code>XML</code>方式改动很大，同时<code>Anko</code>已经放弃维护了，在团队中推动难度大<br>3.<code>Compose</code>是未来<code>android UI</code>开发的方向，但目前仍处于<code>Beta</code>阶段，相信在<code>Release</code>后，会成为我们替换<code>XML</code>的有效手段<br>4.还有最主要的一点是，针对我们的项目，布局加载耗时并不是主要耗时的地方，所以优化收益不大，可以将精力投入到其他地方    </p>
+<p>如下所示，我们将<code>setConteView</code>前后时间相减，得到布局加载时间<br>而<code>onWindowFocusChanged</code>是<code>Activity</code>真正可见时间，将其与<code>onCreate</code>时间相减，可得页面显示时间<br>在我们的项目中测试效果如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">android <span class="number">5.0</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">inflateTime:</span><span class="number">33</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">activityShowTime:</span><span class="number">252</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">inflateTime:</span><span class="number">11</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">activityShowTime:</span><span class="number">642</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">inflateTime:</span><span class="number">83</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">activityShowTime:</span><span class="number">637</span></span><br><span class="line"></span><br><span class="line">android <span class="number">10.0</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">inflateTime:</span><span class="number">11</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">activityShowTime:</span><span class="number">88</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">inflateTime:</span><span class="number">5</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">activityShowTime:</span><span class="number">217</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">inflateTime:</span><span class="number">27</span></span><br><span class="line">I/<span class="string">Log:</span> <span class="string">activityShowTime:</span><span class="number">221</span></span><br></pre></td></tr></table></figure></p>
+<p>我在<code>android</code>5.0手机与10.0手机上分别做了测试，在我们的项目中布局加载耗时并不很长，同时它们在整个页面可见过程中，占得比例也并不高<br>所以得出结论：<strong>针对我们项目，布局加载耗时并不是主要耗时的地方，优化收益不大</strong><br>这就是从入门到放弃的原因    </p>
+<h3 id="一些常规优化手段"><a href="#一些常规优化手段" class="headerlink" title="一些常规优化手段"></a>一些常规优化手段</h3><p>上面介绍了一些改动比较大的方案，其实我们在实际开发中也有些常规的方法可以优化布局加载<br>比如优化布局层级，避免过度绘制等，这些简单的手段可能正是可以应用到项目中的     </p>
+<h4 id="优化布局层级及复杂度"><a href="#优化布局层级及复杂度" class="headerlink" title="优化布局层级及复杂度"></a>优化布局层级及复杂度</h4><p>1.使用<code>ConstraintLayout</code>,可以实现完全扁平化的布局，减少层级<br>2.<code>RelativeLayout</code>本身尽量不要嵌套使用<br>3.嵌套的<code>LinearLayout</code>中，尽量不要使用<code>weight</code>，因为<code>weight</code>会重新测量两次<br>4.推荐使用<code>merge</code>标签，可以减少一个层级<br>5.使用<code>ViewStub</code>延迟加载    </p>
+<h4 id="避免过度绘制"><a href="#避免过度绘制" class="headerlink" title="避免过度绘制"></a>避免过度绘制</h4><p>1.去掉多余背景色,减少复杂<code>shape</code>的使用<br>2.避免层级叠加<br>3.自定义<code>View</code>使用<code>clipRect</code>屏蔽被遮盖<code>View</code>绘制    </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了以下内容<br>1.<code>andrid</code>绘制原理与布局加载原理<br>2.如何定量的获取<code>android</code>布局加载耗时<br>3.介绍了一些布局加载优化的方法与手段(<code>AsyncLayoutInflater</code>,<code>X2C</code>,<code>Anko</code>,<code>Compose</code>等)<br>4.介绍了因为在我们在项目中布局加载耗时优化收益不大，所以没有引入上述优化手段   </p>
+<h3 id="Show-Me-The-Code"><a href="#Show-Me-The-Code" class="headerlink" title="Show Me The Code"></a>Show Me The Code</h3><p><a href="https://github.com/shenzhen2017/android-apm/tree/main/app/src/main/java/com/zj/android_apm/layout" target="_blank" rel="noopener">本文相关源码</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6844904047355363341" target="_blank" rel="noopener">深入探索Android布局优化（上）</a><br><a href="https://juejin.cn/post/6844904179048120334" target="_blank" rel="noopener">Android “退一步”的布局加载优化</a>     </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/04/gradle-sum-up.html" rel="next" title="7个你应该知道的Gradle实用技巧">
+                <i class="fa fa-chevron-left"></i> 7个你应该知道的Gradle实用技巧
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/04/android-start-optimize.html" rel="prev" title="【从入门到实用】android启动优化深入解析">
+                【从入门到实用】android启动优化深入解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-为什么要进行布局优化？"><span class="nav-number">2.</span> <span class="nav-text">1.为什么要进行布局优化？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#android绘制原理"><span class="nav-number">2.1.</span> <span class="nav-text">android绘制原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双缓冲机制"><span class="nav-number">2.2.</span> <span class="nav-text">双缓冲机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#布局加载原理"><span class="nav-number">2.3.</span> <span class="nav-text">布局加载原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-获取布局文件加载耗时的方法"><span class="nav-number">3.</span> <span class="nav-text">2.获取布局文件加载耗时的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常规获取"><span class="nav-number">3.1.</span> <span class="nav-text">常规获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOP-Aspectj-ASM"><span class="nav-number">3.2.</span> <span class="nav-text">AOP(Aspectj,ASM)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取任一控件耗时"><span class="nav-number">3.3.</span> <span class="nav-text">获取任一控件耗时</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-布局加载优化的一些方法介绍"><span class="nav-number">4.</span> <span class="nav-text">3.布局加载优化的一些方法介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AsyncLayoutInflater方案"><span class="nav-number">4.1.</span> <span class="nav-text">AsyncLayoutInflater方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#X2C方案"><span class="nav-number">4.2.</span> <span class="nav-text">X2C方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Anko方案"><span class="nav-number">4.3.</span> <span class="nav-text">Anko方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Compose方案"><span class="nav-number">4.4.</span> <span class="nav-text">Compose方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-为什么放弃使用这些优化方法"><span class="nav-number">5.</span> <span class="nav-text">4.为什么放弃使用这些优化方法?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一些常规优化手段"><span class="nav-number">5.1.</span> <span class="nav-text">一些常规优化手段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优化布局层级及复杂度"><span class="nav-number">5.1.1.</span> <span class="nav-text">优化布局层级及复杂度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#避免过度绘制"><span class="nav-number">5.1.2.</span> <span class="nav-text">避免过度绘制</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Show-Me-The-Code"><span class="nav-number">6.1.</span> <span class="nav-text">Show Me The Code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">6.2.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

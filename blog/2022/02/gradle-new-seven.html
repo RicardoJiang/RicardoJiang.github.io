@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="原文链接：https://gradle.org/whats-new/gradle-7/  Gradle 7.0的发布已经一段时间了，我们来看下从Gradle 6.0到7.0，都有哪些有趣的特性。             加快增量编译速度 通过验证构建依赖项的完整性，使您的构建更安全。 支持使用Java 16开发       使用included builds简化构建    通过新的依赖管理特性降">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle 7.0都有哪些新特性?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/02/gradle-new-seven.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="原文链接：https://gradle.org/whats-new/gradle-7/  Gradle 7.0的发布已经一段时间了，我们来看下从Gradle 6.0到7.0，都有哪些有趣的特性。             加快增量编译速度 通过验证构建依赖项的完整性，使您的构建更安全。 支持使用Java 16开发       使用included builds简化构建    通过新的依赖管理特性降">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/147a658ea6664b8d9e6df9662267d8c6~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/28ce5dff2e124384ac4e763174795973~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fb567df501064f83ad573e224a27666c~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b277113bf4464ca69b1e9000165aba9f~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e39eb76e4c2f442b99f9fe5359ee4e25~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d66f8cc20579410ca42c5b8824a26b4a~tplv-k3u1fbpfcp-watermark.image?">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.247Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gradle 7.0都有哪些新特性?">
+<meta name="twitter:description" content="原文链接：https://gradle.org/whats-new/gradle-7/  Gradle 7.0的发布已经一段时间了，我们来看下从Gradle 6.0到7.0，都有哪些有趣的特性。             加快增量编译速度 通过验证构建依赖项的完整性，使您的构建更安全。 支持使用Java 16开发       使用included builds简化构建    通过新的依赖管理特性降">
+<meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/147a658ea6664b8d9e6df9662267d8c6~tplv-k3u1fbpfcp-zoom-1.image">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/02/gradle-new-seven.html">
+
+
+
+
+
+  <title>Gradle 7.0都有哪些新特性? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/02/gradle-new-seven.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gradle 7.0都有哪些新特性?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-02-19T22:15:48+08:00">
+                2022-02-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原文链接：<a href="https://gradle.org/whats-new/gradle-7/" target="_blank" rel="noopener">https://gradle.org/whats-new/gradle-7/</a></p>
+</blockquote>
+<p><code>Gradle 7.0</code>的发布已经一段时间了，我们来看下从Gradle 6.0到7.0，都有哪些有趣的特性。           </p>
+<ul>
+<li>加快增量编译速度</li>
+<li>通过验证构建依赖项的完整性，使您的构建更安全。</li>
+<li>支持使用<code>Java 16</code>开发      </li>
+<li>使用<code>included builds</code>简化构建   </li>
+<li>通过新的依赖管理特性降低了<code>Multi-Project</code>构建的维护成本     </li>
+<li>使用最新版本的<code>Groovy</code>和<code>Kotlin</code>开发</li>
+</ul>
+<h2 id="性能方面的优化"><a href="#性能方面的优化" class="headerlink" title="性能方面的优化"></a>性能方面的优化</h2><h3 id="更快的up-to-date检查"><a href="#更快的up-to-date检查" class="headerlink" title="更快的up-to-date检查"></a>更快的<code>up-to-date</code>检查</h3><p>本地增量编译的快速反馈对于提高开发效率至关重要。文件系统监视通过减少判断哪些文件发生了变化的<code>IO</code>操作，来提高增量编译速度<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/147a658ea6664b8d9e6df9662267d8c6~tplv-k3u1fbpfcp-zoom-1.image" alt><br>截至<code>Gradle 7.0</code>，在包括最近版本的<code>Windows</code>，<code>Linux</code>和<code>MacOS</code>的所有支持的操作系统上，默认情况下启用此优化。        </p>
+<p>关于文件系统监视的更多细节与原理，可参见：<a href="https://blog.gradle.org/introducing-file-system-watching" target="_blank" rel="noopener">Introducing file system watching</a>     </p>
+<h3 id="加快kotlin-DSL脚本编译速度"><a href="#加快kotlin-DSL脚本编译速度" class="headerlink" title="加快kotlin DSL脚本编译速度"></a>加快<code>kotlin DSL</code>脚本编译速度</h3><p><code>Gradle 7.0</code>可以以更快的速度，更小的内存编译<code>Kotlin DSL</code>构建脚本，即<code>KTS</code><br>此前当我们修改<code>buildsrc</code>中的代码时，会使大多数缓存失效，从而触发完全的重新编译<br>而在<code>Gradle 7.0</code>之后，修改<code>buildsrc</code>中的<code>kts</code>插件可以完全跳过未受影响的构建脚本文件的编译。<br>因此当修改<code>buildsrc</code>时，在<code>Gradle7.0</code>中，<code>kts</code>插件编译会远比<code>gradle</code>插件要快       </p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/28ce5dff2e124384ac4e763174795973~tplv-k3u1fbpfcp-zoom-1.image" alt>     </p>
+<h3 id="提高build-cache命中率"><a href="#提高build-cache命中率" class="headerlink" title="提高build cache命中率"></a>提高<code>build cache</code>命中率</h3><p><code>Gradle7.0</code>通过有选择的忽略不会影响系统行为的一些更改，从而提高<code>build cache</code>的命中率<br>例如空的文件目录，属性文件中的空格和注释等，这些更改都会被忽略        </p>
+<h3 id="支持configuration-cache-实验性质"><a href="#支持configuration-cache-实验性质" class="headerlink" title="支持configuration cache(实验性质)"></a>支持<code>configuration cache</code>(实验性质)</h3><p><code>Gradle</code>已经支持了<code>build cache</code>，但是在执行任何<code>Task</code>之前，<code>Gradle</code>需要经过<code>configuration</code>阶段。目前<code>configuration</code>在每次构建时都会执行，并且可能导致明显的延迟，特别是在大型项目中。     </p>
+<p><code>configuration cache</code>通过缓存<code>configuration</code>阶段的结果来提高构建性能。使用<code>configuration cache</code>，当没有影响<code>configuration</code>的更改时，<code>Gradle</code>可以完全跳过<code>configuration</code>阶段，以加快构建速度。</p>
+<p>此外，使用<code>configuration cache</code>时，更多的工作是并行执行的，也可以加速构建的<code>execution</code>阶段。<br>请注意，此功能目前是实验性的，默认情况下未启用，并且自 <code>Gradle 7.0</code> 起也并非所有核心插件都支持。<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fb567df501064f83ad573e224a27666c~tplv-k3u1fbpfcp-zoom-1.image" alt>     </p>
+<p>关于<code>configuration cache</code>的更多细节与原理,可参见：<a href="https://docs.gradle.org/7.0/userguide/configuration_cache.html" target="_blank" rel="noopener">Configuration cache</a>      </p>
+<h3 id="更快的临时构建速度"><a href="#更快的临时构建速度" class="headerlink" title="更快的临时构建速度"></a>更快的临时构建速度</h3><p>有时我们会进行一些临时的构建，临时构建机器需要重新下载所有依赖，这会付出比较大的代价。 <code>Gradle 7.0</code>可以通过跨机器重用<code>dependency cache</code>来加快临时构建的速度。      </p>
+<h4 id="重定向dependency-cache"><a href="#重定向dependency-cache" class="headerlink" title="重定向dependency cache"></a>重定向<code>dependency cache</code></h4><p><code>dependency cache</code>的默认位置为：<code>$GRADLE_HOME/caches/modules-2</code>，缓存目录可以重新定位到另一个目录或主机以缓存依赖项。<br>当重定向到新位置或新主机时，如果已下载依赖项，则使用<code>dependency cache</code>的构建将不需要访问网络来下载依赖      </p>
+<p>值得注意的是，应该使用兼容的 <code>Gradle</code> 版本来创建和使用缓存。可以浏览<a href="https://docs.gradle.org/7.0/userguide/dependency_resolution.html#sub:cache_copy" target="_blank" rel="noopener">文档</a>以了解更多细节   </p>
+<h4 id="共享只读的dependency-cache"><a href="#共享只读的dependency-cache" class="headerlink" title="共享只读的dependency cache"></a>共享只读的<code>dependency cache</code></h4><p><code>Gradle</code>提供了在多个<code>Gradle</code>实例之间共享<code>dependency cache</code>的能力。<br>这使得我们可以创建一个共享目录，其中包含所有构建所需的依赖项。      </p>
+<ul>
+<li>每个<code>Gradle</code>实例都可以访问共享只读依赖性缓存，这避免了构建之间的冗余下载。</li>
+<li>可以在<code>Gradle</code>实例之间安全地共享此高速缓存，而无需创建其单独的副本。</li>
+</ul>
+<h2 id="易用性与新特性优化"><a href="#易用性与新特性优化" class="headerlink" title="易用性与新特性优化"></a>易用性与新特性优化</h2><h3 id="JVM项目的工具链支持"><a href="#JVM项目的工具链支持" class="headerlink" title="JVM项目的工具链支持"></a><code>JVM</code>项目的工具链支持</h3><p>默认情况下，<code>Gradle</code>使用相同的<code>Java</code>版本来运行<code>Gradle</code>本身并构建<code>JVM</code>项目，但这并不总是适用的。<br>在不同的开发机和 <code>CI</code> 服务器上构建，可能会使用不同的<code>Java</code>版本，这可能会导致预料之外的问题。此外，您可能希望使用与运行 <code>Gradle</code> 不兼容的 <code>Java</code> 版本来构建项目。     </p>
+<p><code>Gradle</code> 提供了可以设置项目构建的<code>Java</code>版本的工具链：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java &#123;</span><br><span class="line">    toolchain &#123;</span><br><span class="line">        languageVersion = JavaLanguageVersion.of(<span class="number">14</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>Gradle</code>将检查本地<code>Java</code>的安装情况，如果本地没有与构建要求匹配的 <code>Java</code> 版本，<code>Gradle</code> 将从 <code>AdoptOpenJDK</code> 的网站下载匹配的 <code>JDK</code>。<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b277113bf4464ca69b1e9000165aba9f~tplv-k3u1fbpfcp-zoom-1.image" alt>      </p>
+<p>关于<code>JVM</code>项目工具链支持的具体使用，可参见：<a href="https://docs.gradle.org/7.0/userguide/toolchains.html" target="_blank" rel="noopener">Toolchains for JVM projects</a>    </p>
+<h3 id="处理用户凭据"><a href="#处理用户凭据" class="headerlink" title="处理用户凭据"></a>处理用户凭据</h3><p>构建有时需要用户提供凭据。 例如，为了发布<code>aar</code>，<code>Maven</code>库可能需要身份验证，而将凭据保存在构建脚本之外是一种很好的做法。        </p>
+<p><code>Gradle</code> 提供了一个 <code>API</code>，提供了一个 <code>Gradle</code> 属性来提供凭据，方便我们更轻松地使用凭据，这些属性可以作为命令行参数、环境变量或 <code>gradle.properties</code> 文件中的键值对，然后在构建脚本中可以读取这些值。 当 <code>Gradle</code> 知道构建在某些时候需要凭据并且缺少凭据时，它还会引入快速失败行为。       </p>
+<p>关于<code>Gradle</code>用户凭据的使用示例，可参考：<a href="https://docs.gradle.org/7.0/samples/sample_publishing_credentials.html" target="_blank" rel="noopener">Publishing Credentials Sample</a></p>
+<h3 id="支持执行included-builds中的task"><a href="#支持执行included-builds中的task" class="headerlink" title="支持执行included builds中的task"></a>支持执行<code>included builds</code>中的task</h3><p><code>Gradle</code> 允许用户直接从命令行从<code>included builds</code>中执行<code>Task</code>。 例如，如果您的构建<code>included build</code>了 <code>my-other-project</code>，并且它有一个带有<code>Task foo</code>的子项目 <code>sub</code>，那么您可以使用以下命令执行 <code>foo</code>：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">gradle :</span>my-other-<span class="string">project:</span><span class="string">sub:</span>foo</span><br></pre></td></tr></table></figure></p>
+<h3 id="依赖锁定文件只保留一个"><a href="#依赖锁定文件只保留一个" class="headerlink" title="依赖锁定文件只保留一个"></a>依赖锁定文件只保留一个</h3><p>依赖锁定是一种在使用动态依赖版本时确保可重现构建的机制。<code>Gradle 7.0</code> 使用单个锁定文件将动态依赖项锁定到其解析的版本。而以前版本的 <code>Gradle</code> 每个<code>Configuration</code>使用一个文件, 在<code>Gradle7.0</code>中 会自动迁移到单锁文件。</p>
+<h2 id="安全性优化"><a href="#安全性优化" class="headerlink" title="安全性优化"></a>安全性优化</h2><h3 id="依赖验证"><a href="#依赖验证" class="headerlink" title="依赖验证"></a>依赖验证</h3><p>我们的项目中常常会使用大量外部依赖项，这使他们面临使用不受信任代码的风险。 例如，有人可能会通过传递依赖意外引入恶意代码。同样，您的构建脚本本身也可能通过执行被感染插件的恶意代码，从而受到攻击。<br>为了减轻这些风险，<code>Gradle</code> 提供了依赖关系验证。 依赖项验证可以验证校验和以及构建期间使用的依赖项和插件的签名。</p>
+<p>如果启用依赖项验证，<code>Gradle</code> 将：      </p>
+<ul>
+<li>确保依赖项没有被篡改（通过验证它们的校验和）</li>
+<li>确保您使用的依赖项和插件的出处（通过验证它们的签名）</li>
+<li>从而降低将恶意代码发送到生产环境的风险。</li>
+</ul>
+<p>关于依赖验证的更多细节和使用，可以参见：<a href="https://docs.gradle.org/7.0/userguide/dependency_verification.html" target="_blank" rel="noopener">Verifying dependencies</a></p>
+<h3 id="声明专有存储库依赖"><a href="#声明专有存储库依赖" class="headerlink" title="声明专有存储库依赖"></a>声明专有存储库依赖</h3><p><code>Gradle</code> 允许您声明应在哪些存储库中搜索特定依赖项。<br><code>Gradle</code> 还允许您声明只能在一个存储库中找到且不应在任何其他存储库中搜索的专有依赖。</p>
+<p>关于存储库专有依赖的具体细节，可以参见：<a href="https://docs.gradle.org/7.0/userguide/declaring_repositories.html#declaring_content_exclusively_found_in_one_repository" target="_blank" rel="noopener">user manual</a></p>
+<h3 id="验证-Gradle-Wrappers-的完整性"><a href="#验证-Gradle-Wrappers-的完整性" class="headerlink" title="验证 Gradle Wrappers 的完整性"></a>验证 <code>Gradle Wrappers</code> 的完整性</h3><p><code>Gradle Wrapper</code> 是一个可执行代码的二进制文件，在数百万个 <code>GitHub</code> 存储库中使用。如果这个文件发生改变，可能存在一定的安全隐患<br>我们创建了一个官方 <code>GitHub Action</code>，它允许 <code>GitHub</code> 上的项目自动验证其存储库中的 <code>gradle-wrapper.jar</code> 是否由 <code>Gradle</code> 发布。<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e39eb76e4c2f442b99f9fe5359ee4e25~tplv-k3u1fbpfcp-zoom-1.image" alt>         </p>
+<p>当然，你也可以通过<a href="https://docs.gradle.org/7.0/userguide/gradle_wrapper.html#sec:wrapper_checksum_verification" target="_blank" rel="noopener">user manual</a>中的步骤，手动检验<code>Gradle Wrapper</code>文件的合法性    </p>
+<h2 id="依赖管理"><a href="#依赖管理" class="headerlink" title="依赖管理"></a>依赖管理</h2><h3 id="依赖解析一致性"><a href="#依赖解析一致性" class="headerlink" title="依赖解析一致性"></a>依赖解析一致性</h3><p><code>configurations</code>之间的依赖关系是独立解析的。这可能会导致一个问题，即测试的运行时<code>classpath</code>可能使用与生产代码的运行时<code>classpath</code>不同的版本。    </p>
+<p>为了缓解这个问题，<code>Gradle</code> 允许您<a href="https://docs.gradle.org/7.0/userguide/resolution_strategy_tuning.html#resolution_consistency" target="_blank" rel="noopener">声明依赖项<code>configurations</code>之间的一致性</a>，以便保证两个<code>classpath</code>的公共依赖项的版本是一致的。    </p>
+<h3 id="存储库统一声明"><a href="#存储库统一声明" class="headerlink" title="存储库统一声明"></a>存储库统一声明</h3><p>此前我们一般是在根目录的<code>build.gradle</code>中声明存储库，现在也可以在 <code>settings.gradle (.kts)</code> 中方便地为整个构建定义存储库：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dependencyResolutionManagement &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral ()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这允许 <code>Gradle</code> 确保您使用相同的存储库来解决构建的所有项目中的依赖关系。 了解更多，可以参考<a href="https://docs.gradle.org/7.0/userguide/declaring_repositories.html#sub:centralized-repository-declaration" target="_blank" rel="noopener">如何为整个构建声明存储库</a>     </p>
+<h3 id="组件元数据规则的统一声明"><a href="#组件元数据规则的统一声明" class="headerlink" title="组件元数据规则的统一声明"></a>组件元数据规则的统一声明</h3><p>从存储库中提取的每个模块都有与之关联的元数据，例如其组、名称、版本以及它提供的不同变体及其工件和依赖项。有时元数据不完整或不正确。为了在构建脚本中操作这些不完整的元数据，<code>Gradle</code> 提供了一个 <code>API</code> 来编写组件元数据规则。 这些规则在模块的元数据下载后，并且在用于依赖解析之前生效。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dependencyResolutionManagement &#123;</span><br><span class="line">    components &#123;</span><br><span class="line">        withModule (<span class="string">'com.google.guava: guava'</span>, GuavaRule)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关于组件元数据规则统一声明的具体细节，可参见：<a href="https://docs.gradle.org/7.0/userguide/component_metadata_rules.html" target="_blank" rel="noopener">Fixing metadata with component metadata rules</a></p>
+<h3 id="依赖统一管理的新特性"><a href="#依赖统一管理的新特性" class="headerlink" title="依赖统一管理的新特性"></a>依赖统一管理的新特性</h3><p>我们有多种方法可以在多项目构建中的项目之间共享依赖版本。 例如，用户可以直接在构建脚本的<code>ext</code> 块、外部文件（例如 <code>dependencies.gradle</code>）、<code>buildSrc</code> 甚至专用插件中声明版本或依赖坐标。     然而，没有任何标准机制可以结合每种方法的优点来做到这一点。</p>
+<p><code>Gradle</code> 引入了<code>Version Catalog</code>，使构建者能够将其第三方依赖项的依赖坐标（组、工件、版本）集中在常规配置文件中，并以类型安全的方式声明实际依赖项。        </p>
+<p>关于<code>Version Catalog</code>的具体使用，之前也写过一篇介绍，感兴趣的同学可以参见：<a href="https://juejin.cn/post/6997396071055900680" target="_blank" rel="noopener">【Gradle7.0】依赖统一管理的全新方式，了解一下~</a></p>
+<h3 id="类型安全的Project访问器"><a href="#类型安全的Project访问器" class="headerlink" title="类型安全的Project访问器"></a>类型安全的<code>Project</code>访问器</h3><p><code>Gradle</code> 为类型安全的<code>Project</code>访问器提供了一个实验性功能，它可以在 <code>IDE</code> 中完成代码自动补全地声明对其它<code>Project</code>的依赖<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d66f8cc20579410ca42c5b8824a26b4a~tplv-k3u1fbpfcp-watermark.image?" alt="1_Tf11L05IMeC1Y0u42zsPqw.gif"><br>这比较大地解决了我们此前添加依赖的痛点，但目前似乎只对<code>kts</code>有效，了解更多细节可参见：<a href="https://docs.gradle.org/7.0/userguide/declaring_dependencies.html#sec:type-safe-project-accessors" target="_blank" rel="noopener">Type-safe project dependencies</a></p>
+<h2 id="如何升级"><a href="#如何升级" class="headerlink" title="如何升级"></a>如何升级</h2><p>可以直接查看<code>Gradle</code>文档：<a href="https://docs.gradle.org/7.0/userguide/upgrading_version_6.html" target="_blank" rel="noopener">Upgrading your build from Gradle 6.x to the latest</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/02/groovy-knowlege-sum.html" rel="next" title="关于 Gradle 你应该知道的知识点">
+                <i class="fa fa-chevron-left"></i> 关于 Gradle 你应该知道的知识点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/02/kts-performance-evaluate.html" rel="prev" title="相比 Groovy 脚本, KTS 性能到底怎么样？">
+                相比 Groovy 脚本, KTS 性能到底怎么样？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#性能方面的优化"><span class="nav-number">1.</span> <span class="nav-text">性能方面的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更快的up-to-date检查"><span class="nav-number">1.1.</span> <span class="nav-text">更快的up-to-date检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加快kotlin-DSL脚本编译速度"><span class="nav-number">1.2.</span> <span class="nav-text">加快kotlin DSL脚本编译速度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提高build-cache命中率"><span class="nav-number">1.3.</span> <span class="nav-text">提高build cache命中率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#支持configuration-cache-实验性质"><span class="nav-number">1.4.</span> <span class="nav-text">支持configuration cache(实验性质)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更快的临时构建速度"><span class="nav-number">1.5.</span> <span class="nav-text">更快的临时构建速度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#重定向dependency-cache"><span class="nav-number">1.5.1.</span> <span class="nav-text">重定向dependency cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#共享只读的dependency-cache"><span class="nav-number">1.5.2.</span> <span class="nav-text">共享只读的dependency cache</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#易用性与新特性优化"><span class="nav-number">2.</span> <span class="nav-text">易用性与新特性优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM项目的工具链支持"><span class="nav-number">2.1.</span> <span class="nav-text">JVM项目的工具链支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理用户凭据"><span class="nav-number">2.2.</span> <span class="nav-text">处理用户凭据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#支持执行included-builds中的task"><span class="nav-number">2.3.</span> <span class="nav-text">支持执行included builds中的task</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖锁定文件只保留一个"><span class="nav-number">2.4.</span> <span class="nav-text">依赖锁定文件只保留一个</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全性优化"><span class="nav-number">3.</span> <span class="nav-text">安全性优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖验证"><span class="nav-number">3.1.</span> <span class="nav-text">依赖验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#声明专有存储库依赖"><span class="nav-number">3.2.</span> <span class="nav-text">声明专有存储库依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证-Gradle-Wrappers-的完整性"><span class="nav-number">3.3.</span> <span class="nav-text">验证 Gradle Wrappers 的完整性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖管理"><span class="nav-number">4.</span> <span class="nav-text">依赖管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖解析一致性"><span class="nav-number">4.1.</span> <span class="nav-text">依赖解析一致性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#存储库统一声明"><span class="nav-number">4.2.</span> <span class="nav-text">存储库统一声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组件元数据规则的统一声明"><span class="nav-number">4.3.</span> <span class="nav-text">组件元数据规则的统一声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖统一管理的新特性"><span class="nav-number">4.4.</span> <span class="nav-text">依赖统一管理的新特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类型安全的Project访问器"><span class="nav-number">4.5.</span> <span class="nav-text">类型安全的Project访问器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何升级"><span class="nav-number">5.</span> <span class="nav-text">如何升级</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

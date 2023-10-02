@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言OkHttp可以说是Android开发中最常见的网络请求框架,OkHttp使用方便，扩展性强，功能强大，OKHttp源码与原理也是面试中的常客但是OKHttp的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.本文从几个问题出发梳理OKHttp相关知识点，以便快速构建OKHttp知识体系，如果对你有用，欢迎点赞~      本文主要包括以下内容       OKHttp请求的整体流">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【知识点】OkHttp 原理 8 连问">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/10/okhttp-knowledge-sum.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言OkHttp可以说是Android开发中最常见的网络请求框架,OkHttp使用方便，扩展性强，功能强大，OKHttp源码与原理也是面试中的常客但是OKHttp的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.本文从几个问题出发梳理OKHttp相关知识点，以便快速构建OKHttp知识体系，如果对你有用，欢迎点赞~      本文主要包括以下内容       OKHttp请求的整体流">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/newImage/master/blog4/p12.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/newImage/master/blog4/p13.png">
+<meta property="og:image" content="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/6/14/172b2ffdbdb88963~tplv-t2oaga2asx-watermark.awebp">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p7.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.245Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【知识点】OkHttp 原理 8 连问">
+<meta name="twitter:description" content="前言OkHttp可以说是Android开发中最常见的网络请求框架,OkHttp使用方便，扩展性强，功能强大，OKHttp源码与原理也是面试中的常客但是OKHttp的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.本文从几个问题出发梳理OKHttp相关知识点，以便快速构建OKHttp知识体系，如果对你有用，欢迎点赞~      本文主要包括以下内容       OKHttp请求的整体流">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/newImage/master/blog4/p12.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/10/okhttp-knowledge-sum.html">
+
+
+
+
+
+  <title>【知识点】OkHttp 原理 8 连问 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/10/okhttp-knowledge-sum.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【知识点】OkHttp 原理 8 连问</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-06T11:00:07+08:00">
+                2021-10-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>OkHttp</code>可以说是<code>Android</code>开发中最常见的网络请求框架,<code>OkHttp</code>使用方便，扩展性强，功能强大，<code>OKHttp</code>源码与原理也是面试中的常客<br>但是<code>OKHttp</code>的源码内容比较多，想要学习它的源码往往千头万绪，一时抓不住重点.<br>本文从几个问题出发梳理<code>OKHttp</code>相关知识点，以便快速构建<code>OKHttp</code>知识体系，如果对你有用，欢迎点赞~     </p>
+<p>本文主要包括以下内容     </p>
+<ol>
+<li><code>OKHttp</code>请求的整体流程是怎样的?    </li>
+<li><code>OKHttp</code>分发器是怎样工作的?     </li>
+<li><code>OKHttp</code>拦截器是如何工作的?    </li>
+<li>应用拦截器和网络拦截器有什么区别?      </li>
+<li><code>OKHttp</code>如何复用<code>TCP</code>连接?    </li>
+<li><code>OKHttp</code>空闲连接如何清除?     </li>
+<li><code>OKHttp</code>有哪些优点?    </li>
+<li><code>OKHttp</code>框架中用到了哪些设计模式?      </li>
+</ol>
+<h2 id="1-OKHttp请求整体流程介绍"><a href="#1-OKHttp请求整体流程介绍" class="headerlink" title="1. OKHttp请求整体流程介绍"></a>1. <code>OKHttp</code>请求整体流程介绍</h2><p>首先来看一个最简单的<code>Http</code>请求是如何发送的。<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> okHttpClient = OkHttpClient()</span><br><span class="line"><span class="keyword">val</span> request: Request = Request.Builder()</span><br><span class="line">    .url(<span class="string">"https://www.google.com/"</span>)</span><br><span class="line">    .build()</span><br><span class="line"></span><br><span class="line">okHttpClient.newCall(request).enqueue(<span class="keyword">object</span> :Callback&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onFailure</span><span class="params">(call: <span class="type">Call</span>, e: <span class="type">IOException</span>)</span></span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onResponse</span><span class="params">(call: <span class="type">Call</span>, response: <span class="type">Response</span>)</span></span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>这段代码看起来比较简单,<code>OkHttp</code>请求过程中最少只需要接触<code>OkHttpClient</code>、<code>Request</code>、<code>Call</code>、 <code>Response</code>，但是框架内部会进行大量的逻辑处理。<br>所有网络请求的逻辑大部分集中在拦截器中，但是在进入拦截器之前还需要依靠分发器来调配请求任务。<br>关于分发器与拦截器，我们在这里先简单介绍下，后续会有更加详细的讲解    </p>
+<ul>
+<li>分发器:内部维护队列与线程池，完成请求调配; </li>
+<li>拦截器:五大默认拦截器完成整个请求过程。</li>
+</ul>
+<p><img src="https://raw.githubusercontents.com/shenzhen2017/newImage/master/blog4/p12.png" alt><br>整个网络请求过程大致如上所示      </p>
+<ol>
+<li>通过建造者模式构建<code>OKHttpClient</code>与 <code>Request</code>     </li>
+<li><code>OKHttpClient</code>通过<code>newCall</code>发起一个新的请求   </li>
+<li>通过分发器维护请求队列与线程池，完成请求调配   </li>
+<li>通过五大默认拦截器完成请求重试，缓存处理，建立连接等一系列操作    </li>
+<li>得到网络请求结果</li>
+</ol>
+<h2 id="2-OKHttp分发器是怎样工作的"><a href="#2-OKHttp分发器是怎样工作的" class="headerlink" title="2. OKHttp分发器是怎样工作的?"></a>2. <code>OKHttp</code>分发器是怎样工作的?</h2><p>分发器的主要作用是维护请求队列与线程池,比如我们有100个异步请求，肯定不能把它们同时请求，而是应该把它们排队分个类，分为正在请求中的列表和正在等待的列表，<br>等请求完成后，即可从等待中的列表中取出等待的请求，从而完成所有的请求    </p>
+<p>而这里同步请求各异步请求又略有不同   </p>
+<p><strong>同步请求</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">executed</span><span class="params">(RealCall call)</span> </span>&#123;</span><br><span class="line">	runningSyncCalls.add(call);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因为同步请求不需要线程池，也不存在任何限制。所以分发器仅做一下记录。后续按照加入队列的顺序同步请求即可      </p>
+<p><strong>异步请求</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">enqueue</span><span class="params">(AsyncCall call)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//请求数最大不超过64,同一Host请求不能超过5个</span></span><br><span class="line">	<span class="keyword">if</span> (runningAsyncCalls.size() &lt; maxRequests &amp;&amp; runningCallsForHost(call) &lt; maxRequestsPerHost) 	  &#123;</span><br><span class="line">		runningAsyncCalls.add(call);</span><br><span class="line">		executorService().execute(call);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		readyAsyncCalls.add(call);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当正在执行的任务未超过最大限制64，同时同一<code>Host</code>的请求不超过5个，则会添加到正在执行队列，同时提交给线程池。否则先加入等待队列。<br>每个任务完成后，都会调用分发器的<code>finished</code>方法,这里面会取出等待队列中的任务继续执行     </p>
+<h2 id="3-OKHttp拦截器是怎样工作的"><a href="#3-OKHttp拦截器是怎样工作的" class="headerlink" title="3. OKHttp拦截器是怎样工作的?"></a>3. <code>OKHttp</code>拦截器是怎样工作的?</h2><p>经过上面分发器的任务分发，下面就要利用拦截器开始一系列配置了<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># RealCall</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">execute</span><span class="params">()</span></span>: Response &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      client.dispatcher.executed(<span class="keyword">this</span>)</span><br><span class="line">      <span class="keyword">return</span> getResponseWithInterceptorChain()</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      client.dispatcher.finished(<span class="keyword">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们再来看下<code>RealCall</code>的<code>execute</code>方法，可以看出，最后返回了<code>getResponseWithInterceptorChain</code>,责任链的构建与处理其实就是在这个方法里面<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="function"><span class="keyword">fun</span> <span class="title">getResponseWithInterceptorChain</span><span class="params">()</span></span>: Response &#123;</span><br><span class="line">    <span class="comment">// Build a full stack of interceptors.</span></span><br><span class="line">    <span class="keyword">val</span> interceptors = mutableListOf&lt;Interceptor&gt;()</span><br><span class="line">    interceptors += client.interceptors</span><br><span class="line">    interceptors += RetryAndFollowUpInterceptor(client)</span><br><span class="line">    interceptors += BridgeInterceptor(client.cookieJar)</span><br><span class="line">    interceptors += CacheInterceptor(client.cache)</span><br><span class="line">    interceptors += ConnectInterceptor</span><br><span class="line">    <span class="keyword">if</span> (!forWebSocket) &#123;</span><br><span class="line">      interceptors += client.networkInterceptors</span><br><span class="line">    &#125;</span><br><span class="line">    interceptors += CallServerInterceptor(forWebSocket)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> chain = RealInterceptorChain(</span><br><span class="line">        call = <span class="keyword">this</span>,interceptors = interceptors,index = <span class="number">0</span></span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">val</span> response = chain.proceed(originalRequest)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，构建了一个<code>OkHttp</code>拦截器的责任链<br>责任链，顾名思义，就是用来处理相关事务责任的一条执行链，执行链上有多个节点，每个节点都有机会（条件匹配）处理请求事务，如果某个节点处理完了就可以根据实际业务需求传递给下一个节点继续处理或者返回处理完毕。<br>如上所示责任链添加的顺序及作用如下表所示：       </p>
+<p>拦截器                         | 作用                                                                                                                                 |<br>| ————————— | ———————————————————————————————————————————- |<br>| 应用拦截器                       | 拿到的是原始请求，可以添加一些自定义header、通用参数、参数加密、网关接入等等。                                                                                         |<br>| RetryAndFollowUpInterceptor | 处理错误重试和重定向                                                                                                                         |<br>| BridgeInterceptor           | 应用层和网络层的桥接拦截器，主要工作是为请求添加cookie、添加固定的header，比如Host、Content-Length、Content-Type、User-Agent等等，然后保存响应结果的cookie，如果响应使用gzip压缩过，则还需要进行解压。 |<br>| CacheInterceptor            | 缓存拦截器，如果命中缓存则不会发起网络请求。                                                                                                             |<br>| ConnectInterceptor          | 连接拦截器，内部会维护一个连接池，负责连接复用、创建连接（三次握手等等）、释放连接以及创建连接上的socket流。                                                                          |<br>| networkInterceptors（网络拦截器）  | 用户自定义拦截器，通常用于监控网络层的数据传输。                                                                                                           |<br>| CallServerInterceptor       | 请求拦截器，在前置准备工作完成后，真正发起了网络请求。                                                                                                        |</p>
+<p>我们的网络请求就是这样经过责任链一级一级的递推下去，最终会执行到<code>CallServerInterceptor</code>的<code>intercept</code>方法，此方法会将网络响应的结果封装成一个<code>Response</code>对象并<code>return</code>。之后沿着责任链一级一级的回溯，最终就回到<code>getResponseWithInterceptorChain</code>方法的返回,如下图所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/newImage/master/blog4/p13.png" alt>     </p>
+<h2 id="4-应用拦截器和网络拦截器有什么区别"><a href="#4-应用拦截器和网络拦截器有什么区别" class="headerlink" title="4. 应用拦截器和网络拦截器有什么区别?"></a>4. 应用拦截器和网络拦截器有什么区别?</h2><p>从整个责任链路来看，应用拦截器是最先执行的拦截器，也就是用户自己设置<code>request</code>属性后的原始请求，而网络拦截器位于<code>ConnectInterceptor</code>和<code>CallServerInterceptor</code>之间，此时网络链路已经准备好，只等待发送请求数据。它们主要有以下区别     </p>
+<ol>
+<li>首先，应用拦截器在<code>RetryAndFollowUpInterceptor</code>和<code>CacheInterceptor</code>之前，所以一旦发生错误重试或者网络重定向，网络拦截器可能执行多次，因为相当于进行了二次请求，但是应用拦截器永远只会触发一次。另外如果在<code>CacheInterceptor</code>中命中了缓存就不需要走网络请求了，因此会存在短路网络拦截器的情况。</li>
+<li>其次，除了<code>CallServerInterceptor</code>之外，每个拦截器都应该至少调用一次<code>realChain.proceed</code>方法。实际上在应用拦截器这层可以多次调用<code>proceed</code>方法（本地异常重试）或者不调用<code>proceed</code>方法（中断），但是网络拦截器这层连接已经准备好，可且仅可调用一次<code>proceed</code>方法。      </li>
+<li>最后，从使用场景看，应用拦截器因为只会调用一次，通常用于统计客户端的网络请求发起情况；而网络拦截器一次调用代表了一定会发起一次网络通信，因此通常可用于统计网络链路上传输的数据。</li>
+</ol>
+<h2 id="5-OKHttp如何复用TCP连接"><a href="#5-OKHttp如何复用TCP连接" class="headerlink" title="5. OKHttp如何复用TCP连接?"></a>5. <code>OKHttp</code>如何复用<code>TCP</code>连接?</h2><p><code>ConnectInterceptor</code>的主要工作就是负责建立<code>TCP</code>连接，建立<code>TCP</code>连接需要经历三次握手四次挥手等操作，如果每个<code>HTTP</code>请求都要新建一个<code>TCP</code>消耗资源比较多<br>而<code>Http1.1</code>已经支持<code>keep-alive</code>,即多个<code>Http</code>请求复用一个<code>TCP</code>连接，<code>OKHttp</code>也做了相应的优化，下面我们来看下<code>OKHttp</code>是怎么复用<code>TCP</code>连接的    </p>
+<p><code>ConnectInterceptor</code>中查找连接的代码会最终会调用到<code>ExchangeFinder.findConnection</code>方法，具体如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"># ExchangeFinder</span><br><span class="line"><span class="comment">//为承载新的数据流 寻找 连接。寻找顺序是 已分配的连接、连接池、新建连接</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> RealConnection <span class="title">findConnection</span><span class="params">(<span class="keyword">int</span> connectTimeout, <span class="keyword">int</span> readTimeout, <span class="keyword">int</span> writeTimeout,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> pingIntervalMillis, <span class="keyword">boolean</span> connectionRetryEnabled)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">  <span class="keyword">synchronized</span> (connectionPool) &#123;</span><br><span class="line">    <span class="comment">// 1.尝试使用 已给数据流分配的连接.（例如重定向请求时，可以复用上次请求的连接）</span></span><br><span class="line">    releasedConnection = transmitter.connection;</span><br><span class="line">    result = transmitter.connection;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="comment">// 2. 没有已分配的可用连接，就尝试从连接池获取。（连接池稍后详细讲解）</span></span><br><span class="line">      <span class="keyword">if</span> (connectionPool.transmitterAcquirePooledConnection(address, transmitter, <span class="keyword">null</span>, <span class="keyword">false</span>)) &#123;</span><br><span class="line">        result = transmitter.connection;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">synchronized</span> (connectionPool) &#123;</span><br><span class="line">    <span class="keyword">if</span> (newRouteSelection) &#123;</span><br><span class="line">      <span class="comment">//3. 现在有了IP地址，再次尝试从连接池获取。可能会因为连接合并而匹配。（这里传入了routes，上面的传的null）</span></span><br><span class="line">      routes = routeSelection.getAll();</span><br><span class="line">      <span class="keyword">if</span> (connectionPool.transmitterAcquirePooledConnection(address, transmitter, routes, <span class="keyword">false</span>)) &#123;</span><br><span class="line">        foundPooledConnection = <span class="keyword">true</span>;</span><br><span class="line">        result = transmitter.connection;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 4.第二次没成功，就把新建的连接，进行TCP + TLS 握手，与服务端建立连接. 是阻塞操作</span></span><br><span class="line">  result.connect(connectTimeout, readTimeout, writeTimeout, pingIntervalMillis,</span><br><span class="line">      connectionRetryEnabled, call, eventListener);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">synchronized</span> (connectionPool) &#123;</span><br><span class="line">    <span class="comment">// 5. 最后一次尝试从连接池获取，注意最后一个参数为true，即要求 多路复用（http2.0）</span></span><br><span class="line">    <span class="comment">//意思是，如果本次是http2.0，那么为了保证 多路复用性，（因为上面的握手操作不是线程安全）会再次确认连接池中此时是否已有同样连接</span></span><br><span class="line">    <span class="keyword">if</span> (connectionPool.transmitterAcquirePooledConnection(address, transmitter, routes, <span class="keyword">true</span>)) &#123;</span><br><span class="line">      <span class="comment">// 如果获取到，就关闭我们创建里的连接，返回获取的连接</span></span><br><span class="line">      result = transmitter.connection;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">//最后一次尝试也没有的话，就把刚刚新建的连接存入连接池</span></span><br><span class="line">      connectionPool.put(result);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面精简了部分代码，可以看出，连接拦截器使用了5种方法查找连接    </p>
+<ol>
+<li>首先会尝试使用 已给请求分配的连接。（已分配连接的情况例如重定向时的再次请求，说明上次已经有了连接）     </li>
+<li>若没有 已分配的可用连接，就尝试从连接池中 匹配获取。因为此时没有路由信息，所以匹配条件：<code>address</code>一致——<code>host</code>、<code>port</code>、代理等一致，且匹配的连接可以接受新的请求。     </li>
+<li>若从连接池没有获取到，则传入<code>routes</code>再次尝试获取，这主要是针对<code>Http2.0</code>的一个操作,<code>Http2.0</code>可以复用<code>square.com</code>与<code>square.ca</code>的连接    </li>
+<li>若第二次也没有获取到，就创建<code>RealConnection</code>实例，进行<code>TCP + TLS</code>握手，与服务端建立连接。    </li>
+<li>此时为了确保<code>Http2.0</code>连接的多路复用性，会第三次从连接池匹配。因为新建立的连接的握手过程是非线程安全的，所以此时可能连接池新存入了相同的连接。         </li>
+<li>第三次若匹配到，就使用已有连接，释放刚刚新建的连接；若未匹配到，则把新连接存入连接池并返回。      </li>
+</ol>
+<p>以上就是连接拦截器尝试复用连接的操作，流程图如下：<br><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/6/14/172b2ffdbdb88963~tplv-t2oaga2asx-watermark.awebp" alt></p>
+<h2 id="6-OKHttp空闲连接如何清除"><a href="#6-OKHttp空闲连接如何清除" class="headerlink" title="6. OKHttp空闲连接如何清除?"></a>6. <code>OKHttp</code>空闲连接如何清除?</h2><p>上面说到我们会建立一个<code>TCP</code>连接池，但如果没有任务了，空闲的连接也应该及时清除，<code>OKHttp</code>是如何做到的呢?<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"> # RealConnectionPool</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">val</span> cleanupQueue: TaskQueue = taskRunner.newQueue()</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">val</span> cleanupTask = <span class="keyword">object</span> : Task(<span class="string">"<span class="variable">$okHttpName</span> ConnectionPool"</span>) &#123;</span><br><span class="line">   <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">runOnce</span><span class="params">()</span></span>: <span class="built_in">Long</span> = cleanup(System.nanoTime())</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> long cleanup(long now) &#123;</span><br><span class="line">   int inUseConnectionCount = <span class="number">0</span>;<span class="comment">//正在使用的连接数</span></span><br><span class="line">   int idleConnectionCount = <span class="number">0</span>;<span class="comment">//空闲连接数</span></span><br><span class="line">   RealConnection longestIdleConnection = <span class="literal">null</span>;<span class="comment">//空闲时间最长的连接</span></span><br><span class="line">   long longestIdleDurationNs = <span class="built_in">Long</span>.MIN_VALUE;<span class="comment">//最长的空闲时间</span></span><br><span class="line"></span><br><span class="line">   <span class="comment">//遍历连接：找到待清理的连接, 找到下一次要清理的时间（还未到最大空闲时间）</span></span><br><span class="line">   synchronized (<span class="keyword">this</span>) &#123;</span><br><span class="line">     <span class="keyword">for</span> (Iterator&lt;RealConnection&gt; i = connections.iterator(); i.hasNext(); ) &#123;</span><br><span class="line">       RealConnection connection = i.next();</span><br><span class="line"></span><br><span class="line">       <span class="comment">//若连接正在使用，continue，正在使用连接数+1</span></span><br><span class="line">       <span class="keyword">if</span> (pruneAndGetAllocationCount(connection, now) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">         inUseConnectionCount++;</span><br><span class="line">         <span class="keyword">continue</span>;</span><br><span class="line">       &#125;</span><br><span class="line">	<span class="comment">//空闲连接数+1</span></span><br><span class="line">       idleConnectionCount++;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// 赋值最长的空闲时间和对应连接</span></span><br><span class="line">       long idleDurationNs = now - connection.idleAtNanos;</span><br><span class="line">       <span class="keyword">if</span> (idleDurationNs &gt; longestIdleDurationNs) &#123;</span><br><span class="line">         longestIdleDurationNs = idleDurationNs;</span><br><span class="line">         longestIdleConnection = connection;</span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">  <span class="comment">//若最长的空闲时间大于5分钟 或 空闲数 大于5，就移除并关闭这个连接</span></span><br><span class="line">     <span class="keyword">if</span> (longestIdleDurationNs &gt;= <span class="keyword">this</span>.keepAliveDurationNs</span><br><span class="line">         || idleConnectionCount &gt; <span class="keyword">this</span>.maxIdleConnections) &#123;</span><br><span class="line">       connections.remove(longestIdleConnection);</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (idleConnectionCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">       <span class="comment">// else，就返回 还剩多久到达5分钟，然后wait这个时间再来清理</span></span><br><span class="line">       <span class="keyword">return</span> keepAliveDurationNs - longestIdleDurationNs;</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (inUseConnectionCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">       <span class="comment">//连接没有空闲的，就5分钟后再尝试清理.</span></span><br><span class="line">       <span class="keyword">return</span> keepAliveDurationNs;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="comment">// 没有连接，不清理</span></span><br><span class="line">       cleanupRunning = <span class="literal">false</span>;</span><br><span class="line">       <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line"><span class="comment">//关闭移除的连接</span></span><br><span class="line">   closeQuietly(longestIdleConnection.socket());</span><br><span class="line"></span><br><span class="line">   <span class="comment">//关闭移除后 立刻 进行下一次的 尝试清理</span></span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<p>思路还是很清晰的：      </p>
+<ol>
+<li>在将连接加入连接池时就会启动定时任务       </li>
+<li>有空闲连接的话，如果最长的空闲时间大于5分钟 或 空闲数 大于5，就移除关闭这个最长空闲连接；如果 空闲数 不大于5 且 最长的空闲时间不大于5分钟，就返回到5分钟的剩余时间，然后等待这个时间再来清理。</li>
+<li>没有空闲连接就等5分钟后再尝试清理。</li>
+<li>没有连接不清理。</li>
+</ol>
+<p>流程如下图所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p7.png" alt>    </p>
+<h2 id="7-OKHttp有哪些优点"><a href="#7-OKHttp有哪些优点" class="headerlink" title="7. OKHttp有哪些优点?"></a>7. <code>OKHttp</code>有哪些优点?</h2><ol>
+<li>使用简单，在设计时使用了外观模式，将整个系统的复杂性给隐藏起来，将子系统接口通过一个客户端<code>OkHttpClient</code>统一暴露出来。     </li>
+<li>扩展性强，可以通过自定义应用拦截器与网络拦截器，完成用户各种自定义的需求            </li>
+<li>功能强大，支持<code>Spdy</code>、<code>Http1.X</code>、<code>Http2</code>、以及<code>WebSocket</code>等多种协议        </li>
+<li>通过连接池复用底层<code>TCP</code>(<code>Socket</code>)，减少请求延时</li>
+<li>无缝的支持<code>GZIP</code>减少数据流量        </li>
+<li>支持数据缓存,减少重复的网络请求</li>
+<li>支持请求失败自动重试主机的其他<code>ip</code>，自动重定向</li>
+</ol>
+<h2 id="8-OKHttp框架中用到了哪些设计模式"><a href="#8-OKHttp框架中用到了哪些设计模式" class="headerlink" title="8. OKHttp框架中用到了哪些设计模式?"></a>8. <code>OKHttp</code>框架中用到了哪些设计模式?</h2><ol>
+<li>构建者模式：<code>OkHttpClient</code>与<code>Request</code>的构建都用到了构建者模式   </li>
+<li>外观模式： <code>OkHttp</code>使用了外观模式,将整个系统的复杂性给隐藏起来，将子系统接口通过一个客户端<code>OkHttpClient</code>统一暴露出来。    </li>
+<li>责任链模式: <code>OKHttp</code>的核心就是责任链模式，通过5个默认拦截器构成的责任链完成请求的配置    </li>
+<li>享元模式: 享元模式的核心即池中复用,<code>OKHttp</code>复用<code>TCP</code>连接时用到了连接池，同时在异步请求中也用到了线程池     </li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要梳理了<code>OKHttp</code>原理相关知识点，并回答了以下问题:    </p>
+<ol>
+<li><code>OKHttp</code>请求的整体流程是怎样的?    </li>
+<li><code>OKHttp</code>分发器是怎样工作的?     </li>
+<li><code>OKHttp</code>拦截器是如何工作的?    </li>
+<li>应用拦截器和网络拦截器有什么区别?      </li>
+<li><code>OKHttp</code>如何复用<code>TCP</code>连接?    </li>
+<li><code>OKHttp</code>空闲连接如何清除?     </li>
+<li><code>OKHttp</code>有哪些优点?    </li>
+<li><code>OKHttp</code>框架中用到了哪些设计模式?     </li>
+</ol>
+<p>如果对您有所帮助，欢迎点赞，谢谢~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6844904087788453896#heading-5" target="_blank" rel="noopener">面试官：听说你熟悉OkHttp原理？</a><br><a href="https://juejin.cn/post/7015532404785807397" target="_blank" rel="noopener">OkHttp源码剖析（二） 设计模式下的okhttp</a><br><a href="https://juejin.cn/post/6844904191123685389#heading-5" target="_blank" rel="noopener">你想要的系列：网络请求框架OkHttp3全解系列 - （四）拦截器详解2：连接、请求服务（重点）</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/10/compose-refresh-layout.html" rel="next" title="【开源项目】Compose 版 SmartRefreshLayout,了解一下~">
+                <i class="fa fa-chevron-left"></i> 【开源项目】Compose 版 SmartRefreshLayout,了解一下~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/10/is-compose-view.html" rel="prev" title="【辨析】Compose 完全脱离 View 系统了吗?">
+                【辨析】Compose 完全脱离 View 系统了吗? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-OKHttp请求整体流程介绍"><span class="nav-number">2.</span> <span class="nav-text">1. OKHttp请求整体流程介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-OKHttp分发器是怎样工作的"><span class="nav-number">3.</span> <span class="nav-text">2. OKHttp分发器是怎样工作的?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-OKHttp拦截器是怎样工作的"><span class="nav-number">4.</span> <span class="nav-text">3. OKHttp拦截器是怎样工作的?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-应用拦截器和网络拦截器有什么区别"><span class="nav-number">5.</span> <span class="nav-text">4. 应用拦截器和网络拦截器有什么区别?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-OKHttp如何复用TCP连接"><span class="nav-number">6.</span> <span class="nav-text">5. OKHttp如何复用TCP连接?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-OKHttp空闲连接如何清除"><span class="nav-number">7.</span> <span class="nav-text">6. OKHttp空闲连接如何清除?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-OKHttp有哪些优点"><span class="nav-number">8.</span> <span class="nav-text">7. OKHttp有哪些优点?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-OKHttp框架中用到了哪些设计模式"><span class="nav-number">9.</span> <span class="nav-text">8. OKHttp框架中用到了哪些设计模式?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">10.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">10.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

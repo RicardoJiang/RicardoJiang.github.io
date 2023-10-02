@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言大家肯定也都或多或少的写过一些Groovy代码，但由于不支持代码提示及编译时检查，使用Groovy开发的体验并不太好Android Gradle插件4.0之后支持在Gradle构建配置中使用Kotlin 脚本 (KTS)，用于替代 Groovy（过去在 Gradle 配置文件中使用的编程语言）。KTS 比 Groovy 更适合用于编写 Gradle 脚本，因为采用 Kotlin 编写的代码可读">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="相比 Groovy 脚本, KTS 性能到底怎么样？">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/02/kts-performance-evaluate.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言大家肯定也都或多或少的写过一些Groovy代码，但由于不支持代码提示及编译时检查，使用Groovy开发的体验并不太好Android Gradle插件4.0之后支持在Gradle构建配置中使用Kotlin 脚本 (KTS)，用于替代 Groovy（过去在 Gradle 配置文件中使用的编程语言）。KTS 比 Groovy 更适合用于编写 Gradle 脚本，因为采用 Kotlin 编写的代码可读">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.247Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="相比 Groovy 脚本, KTS 性能到底怎么样？">
+<meta name="twitter:description" content="前言大家肯定也都或多或少的写过一些Groovy代码，但由于不支持代码提示及编译时检查，使用Groovy开发的体验并不太好Android Gradle插件4.0之后支持在Gradle构建配置中使用Kotlin 脚本 (KTS)，用于替代 Groovy（过去在 Gradle 配置文件中使用的编程语言）。KTS 比 Groovy 更适合用于编写 Gradle 脚本，因为采用 Kotlin 编写的代码可读">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/02/kts-performance-evaluate.html">
+
+
+
+
+
+  <title>相比 Groovy 脚本, KTS 性能到底怎么样？ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/02/kts-performance-evaluate.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">相比 Groovy 脚本, KTS 性能到底怎么样？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-02-24T08:25:38+08:00">
+                2022-02-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大家肯定也都或多或少的写过一些<code>Groovy</code>代码，但由于不支持代码提示及编译时检查，使用<code>Groovy</code>开发的体验并不太好<br><code>Android Gradle</code>插件<code>4.0</code>之后支持在<code>Gradle</code>构建配置中使用<code>Kotlin</code> 脚本 (<code>KTS</code>)，用于替代 <code>Groovy</code>（过去在 <code>Gradle</code> 配置文件中使用的编程语言）。<br><code>KTS</code> 比 <code>Groovy</code> 更适合用于编写 <code>Gradle</code> 脚本，因为采用 <code>Kotlin</code> 编写的代码可读性更高，并且 <code>Kotlin</code> 提供了更好的编译时检查和 <code>IDE</code> 支持。      </p>
+<p>但是文档中也提到了，虽然与 <code>Groovy</code> 相比，<code>KTS</code> 当前能更好地在 <code>Android Studio</code> 的代码编辑器中集成，但采用 <code>KTS</code> 的构建速度往往比采用 <code>Groovy</code> 慢，因此在迁移到 <code>KTS</code> 时应考虑构建性能。       </p>
+<p>那么我们今天就来看下相比<code>Groovy</code>，<code>KTS</code>性能到底怎么样？为大家决定是否迁移到<code>KTS</code>提供一定的参考       </p>
+<h2 id="KTS性能分析"><a href="#KTS性能分析" class="headerlink" title="KTS性能分析"></a><code>KTS</code>性能分析</h2><h3 id="性能分析工具"><a href="#性能分析工具" class="headerlink" title="性能分析工具"></a>性能分析工具</h3><p>要分析<code>KTS</code>的性能，我们首先需要稳定的测量编译的时间，编译速度可能受<code>build cache</code>等多种因素的影响，所以很难测量<code>kts</code>插件对性能的影响到底有多大     </p>
+<p>我们可以使用<a href="https://github.com/gradle/gradle-profiler" target="_blank" rel="noopener"><code>Gradle</code> 性能剖析器</a>来准确测量性能，这是一款用于收集 <code>Gradle</code> 构建的性能分析和基准化分析信息的工具。借助 <code>Gradle</code>性能剖析器，您可以创建构建场景并多次运行这些场景，以防止结果出现过大差异，并确保结果的可重现性。         </p>
+<p>基准化分析的部分项目设置配置包括：      </p>
+<ul>
+<li>插件版本</li>
+<li><code>Gradle</code> 版本</li>
+<li><code>JVM</code> 设置（堆大小、永久代大小、垃圾回收等）</li>
+<li><code>Gradle</code> 工作器数量 (<code>org.gradle.workers.max</code>)</li>
+<li>按插件选项进一步优化性能</li>
+</ul>
+<p>比如我们需要对<code>clean build</code>进行基准化分析，您可以创建一个<code>gradle-profiler</code>执行的场景：<br><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># &lt;root-project&gt;/scenarios.txt</span></span><br><span class="line"><span class="section">clean_build</span> &#123;</span><br><span class="line">    <span class="attribute">tasks</span> = [<span class="string">":app:assembleDebug"</span>]</span><br><span class="line">    cleanup-tasks = [<span class="string">"clean"</span>]</span><br><span class="line">&#125;</span><br><span class="line">```      </span><br><span class="line">如需运行此场景，请使用以下命令：</span><br></pre></td></tr></table></figure></p>
+<p>gradle-profiler –benchmark –project-dir <root-project> –scenario-file scenarios.txt<br><code>`</code></root-project></p>
+<p>通过以上命令，就可以多次运行<code>clean build</code>，并生成<code>clean build</code>性能报告。除了<code>clan build</code>，<code>gradle-profiler</code>还可以针对增量编译，不同的 <code>Gradle</code> 插件版本，以及不同的<code>内存/CPU</code> 等执行性能分析。<br>通过<code>gradle-profile</code>命令，可以创建构建场景并多次运行，可以防止结果出现过大差异，并确保结果的可重现性，以帮助我们更好地分析性能。<br>关于<code>gradle-profile</code>的具体使用，可以参考文档：<a href="https://developer.android.google.cn/studio/build/profile-your-build?hl=zh-cn#gradle-profiler" target="_blank" rel="noopener">分析构建性能</a>           </p>
+<h3 id="Gradle-6-8-版本性能分析"><a href="#Gradle-6-8-版本性能分析" class="headerlink" title="Gradle 6.8 版本性能分析"></a><code>Gradle 6.8</code> 版本性能分析</h3><p>针对<code>Gradle 6.8</code>版本，我们从以下4个用例来分析<code>KTS</code>性能    </p>
+<ul>
+<li>首次运行(即清除所有<code>build cache</code>)</li>
+<li><code>buildSrc abi</code> 更改(支持的<code>abi</code>发生变化，可以理解为大多数缓存失效，大部分代码需要重新编译)</li>
+<li><code>buildSrc</code> 非 <code>abi</code> 更改(即<code>buildSrc</code>中的普通修改)</li>
+<li>无改动</li>
+</ul>
+<p>以下数据来自在<code>Gradle CI</code>上运行的性能测试。这些测试运行在一个包含大量<code>subProject</code>的大型项目中，并且它们在 <code>Groovy</code> 和 <code>Kotlin DSL</code> 上运行以进行比较。<br>| Use case                      | Groovy  | Kotlin  | Differences               |<br>| —————————– | ——- | ——- | ————————- |<br>| <strong>First use</strong>                 | 🟢 33.5s | 🔴 76.2s | Groovy DSL is 2.2x faster |<br>| <strong><code>buildSrc</code> abi change</strong>     | 🟢 13.2s | 🔴 42.3s | Groovy DSL is 3.2x faster |<br>| <strong><code>buildSrc</code> non-abi change</strong> | 🔴 13s   | 🟢 5.2s  | Kotlin DSL is 2.5x faster |<br>| <strong>Nothing changes</strong>           | 🔵 1.7s  | 🔵 1.8s  | Similar performance       |</p>
+<p>可以看出，<code>Groovy</code>脚本在性能上还是有一定优势    </p>
+<ol>
+<li>在首次运行时，<code>Groovy DSL</code>比<code>KTS</code>快<code>2.2</code>倍     </li>
+<li>在<code>buildSrc abi</code>更改时，<code>Groovy DSL</code>比<code>KTS</code>快<code>3.2</code>倍    </li>
+<li>在<code>buildSrc</code>非<code>abi</code>更改时，<code>KTS</code>比<code>Groovy</code>快<code>2.5</code>倍    </li>
+<li>在代码没有发生更改时，两者性能类似    </li>
+</ol>
+<p>可以看出，<code>KTS</code>只有在<code>buildSrc</code>非<code>abi</code>更改时有性能优势，这是因为<code>buildSrc</code>中的<code>groovy</code>的更改会导致整个项目过时，导致项目重新编译<br>而<code>buildSrc</code>中的<code>kts</code>修改可以跳过未受影响的构建脚本文件的编译，因此当修改<code>buildsrc</code>时，<code>kts</code>编译会远比<code>groovy</code>插件要快              </p>
+<p>以上数据来源于：<a href="https://builds.gradle.org/buildConfiguration/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger?branch=master&amp;buildTypeTab=overview&amp;mode=builds" target="_blank" rel="noopener">https://builds.gradle.org/buildConfiguration/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger?branch=master&amp;buildTypeTab=overview&amp;mode=builds</a>，可以使用访客模式登录查看       </p>
+<h3 id="Gradle-7-4-版本性能分析"><a href="#Gradle-7-4-版本性能分析" class="headerlink" title="Gradle 7.4 版本性能分析"></a><code>Gradle 7.4</code> 版本性能分析</h3><p>针对<code>Gradle 7.4</code>版本，我们通过以下3个用例来分析<code>KTS</code>性能    </p>
+<ul>
+<li>首次运行(即清除所有<code>build cache</code>)</li>
+<li><code>buildSrc abi</code> 更改(支持的<code>abi</code>发生变化，可以理解为大多数缓存失效，大部分代码需要重新编译)</li>
+<li><code>buildSrc</code> 非 <code>abi</code> 更改(即<code>buildSrc</code>中的普通修改)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Use Case</th>
+<th>Groovy</th>
+<th>Kotlin</th>
+<th>Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>First use</td>
+<td>🟢 <a href="https://builds.gradle.org/repository/download/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger/49307028:id/performance-test-results.zip!/report/index.html?redirectSupported=false#scenario70" target="_blank" rel="noopener">38.855s</a></td>
+<td>🔴 <a href="https://builds.gradle.org/repository/download/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger/49307028:id/performance-test-results.zip!/report/index.html?redirectSupported=false#scenario65" target="_blank" rel="noopener">63.54s</a></td>
+<td>Groovy DSL is 1.6x faster</td>
+</tr>
+<tr>
+<td><code>buildSrc</code> abi change</td>
+<td>🟢 <a href="https://builds.gradle.org/repository/download/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger/49307028:id/performance-test-results.zip!/report/index.html?redirectSupported=false#scenario72" target="_blank" rel="noopener">25.307</a></td>
+<td>🔴 <a href="https://builds.gradle.org/repository/download/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger/49307028:id/performance-test-results.zip!/report/index.html?redirectSupported=false#scenario76" target="_blank" rel="noopener">35.014s</a></td>
+<td>Groovy DSL is 1.4x faster</td>
+</tr>
+<tr>
+<td><code>buildSrc</code> non-abi change</td>
+<td>🔴 <a href="https://builds.gradle.org/repository/download/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger/49307028:id/performance-test-results.zip!/report/index.html?redirectSupported=false#scenario6" target="_blank" rel="noopener">24.526s</a></td>
+<td>🟢 <a href="https://builds.gradle.org/repository/download/Gradle_Master_Check_PerformanceTestSlowLinux_Trigger/49307028:id/performance-test-results.zip!/report/index.html?redirectSupported=false#scenario38" target="_blank" rel="noopener">4.732s</a></td>
+<td>Kotlin DSL is 5x faster</td>
+</tr>
+</tbody>
+</table>
+<p>可以看出，针对<code>Gradle 7.4</code>版本，<code>KTS</code>的编译性能有一定改善，性能差距减少到了<code>1.5</code>倍左右   </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总得来说，<code>KTS</code>在可读性，易用性，编译时检查与<code>IDE</code>支持等方面比起<code>Groovy</code>都有巨大的优势，但是在性能方面存在一定劣势，具体如下：       </p>
+<ul>
+<li>针对<code>Gradle 6.8</code>版本，如果缓存大部分失效或者没有缓存，<code>Groovy DSL</code>比<code>KTS</code>快<code>2</code>到<code>3</code>倍</li>
+<li><code>Gradle 7.4</code>版本<code>KTS</code>性能有一定改善，如果缓存大部分失效或者没有缓存，<code>Groovy DSL</code>比<code>KTS</code>快<code>1.5</code>倍左右。      </li>
+<li>当<code>buildSrc</code>中发生非<code>abi</code>更改时，<code>kts</code>脚本编译比<code>Groovy DSL</code>快<code>4</code>到<code>5</code>倍，这是因为<code>buildSrc</code>中的<code>kts</code>可以跳过未受影响的构建脚本的编译，而<code>groovy</code>暂不支持</li>
+<li>当项目没有发生更改时，<code>KTS</code>与<code>Groovy DSL</code>的编译速度相差不大       </li>
+</ul>
+<p>由上可知，<code>KTS</code>目前的优缺点都非常明显，在易用性上非常突出，在性能方面有一定劣势，<code>Gradle</code>官方也一直在优化中，读者可以根据自己的项目情况决定是否将构建配置从 <code>Groovy</code> 迁移到 <code>KTS</code></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://github.com/gradle/gradle/issues/15886" target="_blank" rel="noopener">The Kotlin and Groovy DSLs should have similar performance characteristics</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/02/gradle-new-seven.html" rel="next" title="Gradle 7.0都有哪些新特性?">
+                <i class="fa fa-chevron-left"></i> Gradle 7.0都有哪些新特性?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/03/js-single-thread.html" rel="prev" title="单线程的 JavaScript 是怎么实现异步的?">
+                单线程的 JavaScript 是怎么实现异步的? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KTS性能分析"><span class="nav-number">2.</span> <span class="nav-text">KTS性能分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#性能分析工具"><span class="nav-number">2.1.</span> <span class="nav-text">性能分析工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gradle-6-8-版本性能分析"><span class="nav-number">2.2.</span> <span class="nav-text">Gradle 6.8 版本性能分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gradle-7-4-版本性能分析"><span class="nav-number">2.3.</span> <span class="nav-text">Gradle 7.4 版本性能分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">3.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

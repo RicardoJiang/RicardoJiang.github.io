@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="性能优化,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言启动速度优化是 android 开发中的常见需求，除了一些常规的手段之外，也有一些黑科技手段，我们来看一下这些黑科技手段是否有效，以及如何实现 本文主要是对Android 性能优化小册相关内容的学习实践，感兴趣的同学可以点击查看 线程优先级设置线程优先级设置的概念很容易理解，优先级越高的线程越容易获取 CPU 时间片，那么为了保证 app 的流畅运行，那么我们就应该将核心线程的优先级提高，而将">
+<meta name="keywords" content="性能优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="启动优化中的一些黑科技，了解一下~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2023/04/android-startup-optimize.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言启动速度优化是 android 开发中的常见需求，除了一些常规的手段之外，也有一些黑科技手段，我们来看一下这些黑科技手段是否有效，以及如何实现 本文主要是对Android 性能优化小册相关内容的学习实践，感兴趣的同学可以点击查看 线程优先级设置线程优先级设置的概念很容易理解，优先级越高的线程越容易获取 CPU 时间片，那么为了保证 app 的流畅运行，那么我们就应该将核心线程的优先级提高，而将">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p1.jpg">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p2.jpg">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p3.png">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p4.png">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p5.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.249Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="启动优化中的一些黑科技，了解一下~">
+<meta name="twitter:description" content="前言启动速度优化是 android 开发中的常见需求，除了一些常规的手段之外，也有一些黑科技手段，我们来看一下这些黑科技手段是否有效，以及如何实现 本文主要是对Android 性能优化小册相关内容的学习实践，感兴趣的同学可以点击查看 线程优先级设置线程优先级设置的概念很容易理解，优先级越高的线程越容易获取 CPU 时间片，那么为了保证 app 的流畅运行，那么我们就应该将核心线程的优先级提高，而将">
+<meta name="twitter:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2023/04/android-startup-optimize.html">
+
+
+
+
+
+  <title>启动优化中的一些黑科技，了解一下~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2023/04/android-startup-optimize.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">启动优化中的一些黑科技，了解一下~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-04-03T21:38:52+08:00">
+                2023-04-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>启动速度优化是 android 开发中的常见需求，除了一些常规的手段之外，也有一些黑科技手段，我们来看一下这些黑科技手段是否有效，以及如何实现</p>
+<p>本文主要是对<a href="https://juejin.cn/book/7153836660768292878" target="_blank" rel="noopener">Android 性能优化小册</a>相关内容的学习实践，感兴趣的同学可以点击查看</p>
+<h2 id="线程优先级设置"><a href="#线程优先级设置" class="headerlink" title="线程优先级设置"></a>线程优先级设置</h2><p>线程优先级设置的概念很容易理解，优先级越高的线程越容易获取 CPU 时间片，那么为了保证 app 的流畅运行，那么我们就应该将核心线程的优先级提高，而将其他线程的优先级调低</p>
+<p>对于 app 来说，核心线程就是主线程 + RenderThread，那么我们是否有必要手动设置线程优先级呢？</p>
+<p>我们可以通过以下命令获取当前的线程优先级</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">adb <span class="built_in">shell</span> </span><br><span class="line">ps -A | grep 包名 <span class="comment">// 根据包名找到Pid</span></span><br><span class="line">top -H -p PID    <span class="comment">// 查看线程优先级命令</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p1.jpg" alt></p>
+<p>运行结果如上图所示，要看懂上面的图我们要先了解一点背景知识</p>
+<ul>
+<li><code>PR</code>: 优先级 (priority)，值越小优先级越高，会受<code>NI</code>的值的影响</li>
+<li><code>NI</code>: 即 Nice 值，我们可以通过<code>Process.setThreadPriority</code>设置，同样是值越小优先级越高</li>
+</ul>
+<p>其实我们只需要知道它们都是值越小优先级越高就好了，可以看出主线程与 RenderThread 的优先级都挺高的，仅次于 Binder 线程</p>
+<p>我看到一些启动优化的文章谈到线程优先级设置，但测试结果似乎是没有必要？难道是版本问题？有了解的同学可以在评论区说下</p>
+<h2 id="核心线程绑定大核"><a href="#核心线程绑定大核" class="headerlink" title="核心线程绑定大核"></a>核心线程绑定大核</h2><h3 id="绑定大核是否有必要"><a href="#绑定大核是否有必要" class="headerlink" title="绑定大核是否有必要?"></a>绑定大核是否有必要?</h3><p>核心线程绑定大核的思路也很容易理解，现在的 CPU 都是多核的，大核的频率比小核要高不少，如果我们的核心线程固定运行在大核上，那么应用性能自然会有所提升</p>
+<p>就拿我手上的小米10来说，使用的是骁龙865的 CPU，由一颗A77超大核+三颗A77大核+四颗A55小核心组成，我们可以通过<code>/sys/devices/system/cpu/</code>目录下的文件获取各个核的频率，如下所示</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu0<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">1804800</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu1<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">1804800</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu2<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">1804800</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu3<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">1804800</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu4<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">2419200</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu5<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">2419200</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu6<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">2419200</span></span><br><span class="line"><span class="symbol">cas:</span><span class="meta-keyword">/sys/</span>devices<span class="meta-keyword">/system/</span>cpu $ cat cpu7<span class="meta-keyword">/cpufreq/</span>cpuinfo_max_freq</span><br><span class="line"><span class="number">2841600</span></span><br></pre></td></tr></table></figure>
+<p>可以看出，cpu0 到 cpu3 是4个小核， cpu4 到 cpu6 是3个大核，cpu7 是超大核，它们之间的频率还是相差挺大的</p>
+<p>同时通过 systrace 工具可以发现，主线程基本都运行在 cpu7 这个超大核上，而 RenderThread 会在 cpu4 到 cpu6 间切换，有时甚至会调度到小核上</p>
+<p>因此可以看出还是有必要把 RenderThread 绑定到一个大核上的，绑定可以更好的利用缓存以及减少线程的上下文切换</p>
+<h3 id="绑定大核实现"><a href="#绑定大核实现" class="headerlink" title="绑定大核实现"></a>绑定大核实现</h3><p>绑定大核是通过函数<code>sched_setaffinity</code>实现的</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">"C"</span> JNIEXPORT <span class="keyword">void</span> JNICALL</span><br><span class="line">Java_com_zj_android_startup_optimize_StartupNativeLib_bindCore(</span><br><span class="line">        JNIEnv *env,</span><br><span class="line">        jobject <span class="comment">/* this */</span>, jint thread_id, jint core) &#123;</span><br><span class="line">    <span class="keyword">cpu_set_t</span> mask;     <span class="comment">//CPU核的集合</span></span><br><span class="line">    CPU_ZERO(&amp;mask);     <span class="comment">//将mask置空</span></span><br><span class="line">    CPU_SET(core, &amp;mask);    <span class="comment">//将需要绑定的cpu核设置给mask，核为序列0,1,2,3……</span></span><br><span class="line">    <span class="keyword">if</span> (sched_setaffinity(thread_id, <span class="keyword">sizeof</span>(mask), &amp;mask) == <span class="number">-1</span>) &#123;     <span class="comment">//将线程绑核</span></span><br><span class="line">        LOG(<span class="string">"bind thread %d to core %d fail"</span>, thread_id, core);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LOG(<span class="string">"bind thread %d to core %d success"</span>, thread_id, core);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，<code>sched_setaffinity</code>共有 3 个参数</p>
+<ul>
+<li>参数 1 是线程的 id，如果为 0 则表示主线程</li>
+<li>参数 2 表示 cpu 序列掩码的长度</li>
+<li>参数 3 则表示需要绑定的 cpu 序列的掩码</li>
+</ul>
+<p>以上是线程绑定大核的核心代码，可以看到我们还需要获取 RenderThread 的 id ，以及 cpu 大核的序列</p>
+<p>应用中线程的信息记录在 /proc/pid/task 的文件中，通过解析 task 文件就可以获取当前进程的所有线程，而 cpu 大核序列也可以通过解析 <code>/sys/devices/system/cpu</code> 目录实现</p>
+<p>具体代码就不在这里粘贴了，完整代码可见文末链接</p>
+<h2 id="GC-抑制"><a href="#GC-抑制" class="headerlink" title="GC 抑制"></a>GC 抑制</h2><h3 id="GC-抑制是否有必要"><a href="#GC-抑制是否有必要" class="headerlink" title="GC 抑制是否有必要?"></a>GC 抑制是否有必要?</h3><p>我们知道 Java 的拉圾回收机制，在 Android 5.0 之后，ART 取代了 Dalvik，ART 虚拟机在垃圾回收的时候虽然没有像 Dalvik 一样 stop the world，但在启动阶段如果发生垃圾回收，GC 线程同样抢占了不少系统资源</p>
+<p>Google 也注意到启动阶段 GC 对启动速度的影响，并在 Android 10 之后做了一定的优化，详情可见如下提交：<a href="https://cs.android.com/android/_/android/platform/art/+/a98a28262f645d100e2dee9587e7822d35ade6f9" target="_blank" rel="noopener">https://cs.android.com/android/_/android/platform/art/+/a98a28262f645d100e2dee9587e7822d35ade6f9</a></p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p2.jpg" alt></p>
+<p>可以看出，基本思路是在 2s 内提高后台 GC 的阈值，减少启动阶段的 GC 次数，根据 Google 的测试，抑制 GC 后效果如下</p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p3.png" alt></p>
+<p>可以看出，GC 次数明显减少，启动速度也有一定的提升。那么我们是不是可以使用一些手段让 Android 10 以下也能实现这个效果呢?</p>
+<p>同时我们也可以通过以下代码获取 gc 的次数与耗时，方便统计 gc 对启动耗时的影响，以评估是否有必要做 GC 抑制</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Debug.getRuntimeStat(<span class="string">"art.gc.gc-count"</span>) <span class="comment">// gc 次数</span></span><br><span class="line">Debug.getRuntimeStat(<span class="string">"art.gc.gc-time"</span>)  <span class="comment">// gc 耗时</span></span><br><span class="line">Debug.getRuntimeStat(<span class="string">"art.gc.blocking-gc-count"</span>) <span class="comment">// 阻塞 gc 次数</span></span><br><span class="line">Debug.getRuntimeStat(<span class="string">"art.gc.blocking-gc-time"</span>) <span class="comment">// 阻塞 gc 耗时</span></span><br></pre></td></tr></table></figure>
+<h3 id="GC-抑制实现"><a href="#GC-抑制实现" class="headerlink" title="GC 抑制实现"></a>GC 抑制实现</h3><h4 id="HeapTaskDaemon-执行流程"><a href="#HeapTaskDaemon-执行流程" class="headerlink" title="HeapTaskDaemon 执行流程"></a>HeapTaskDaemon 执行流程</h4><p>GC 主要是通过 HeapTaskDaemon 线程实现的，这是一个守护线程，在 Zygote 线程启动后这个线程也就启动了，启动后主要做了以下工作</p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p4.png" alt></p>
+<ol>
+<li>从<code>HeapTaskDaemon.runInternal()</code>方法开始一步步调用到 native 层的 <code>task_processor.RunAllTasks()</code> 方法</li>
+<li>当<code>TaskProcessor</code>中的<code>tasks</code>为空时，会休眠等待，否则会取出第一个<code>HeapTask</code>并执行其<code>Run</code>方法</li>
+</ol>
+<p>而<code>HeapTask</code>的<code>Run</code>方法是一个虚函数，需要子类来实现</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HeapTask</span> :</span> <span class="keyword">public</span> SelfDeletingTask &#123;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SelfDeletingTask</span> :</span> <span class="keyword">public</span> <span class="built_in">Task</span> &#123;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Task</span> :</span> <span class="keyword">public</span> Closure &#123;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Closure</span> &#123;</span></span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">virtual</span> ~Closure() &#123; &#125;</span><br><span class="line">  <span class="comment">// 定义 Run 虚函数</span></span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Run</span><span class="params">(Thread* self)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>HeapTask</code>就是垃圾回收的任务，有多个子类，比如最常见的 ConcurrentGCTask 就是其子类，在 Java 内存达到阈值时就会执行这个 Task，用于执行并发 GC</p>
+<h4 id="方案设计"><a href="#方案设计" class="headerlink" title="方案设计"></a>方案设计</h4><p>在了解了 HeapTaskDaemon 的执行流程之后，我们想到，如果启动时在<code>ConcurrentGCTask</code>的<code>Run</code>方法执行前休眠一段时间，不就可以实现 GC 抑制了吗？</p>
+<p>而<code>Run</code>方法正好是虚函数，虚函数与 Java 中的抽象函数类似，留给子类去扩展实现多态</p>
+<p>虚函数和外部库函数一样都没法直接执行，需要在表中去查找函数的真实地址，那么我们是不是可以使用类似 PLT Hook的思路，使用自定义函数的地址替换原有函数地址，实现 Hook 呢？</p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/april/p5.png" alt></p>
+<p>答案是肯定的，如上图所示，一个类中如果存在虚函数，那么编译器就会为这个类生成一张虚函数表，并且将虚函数表的地址放在对象实例的首地址的内存中。同一个类的不同实例，共用一张虚函数表的。</p>
+<p>因此我们的主要思路如下：</p>
+<ol>
+<li>启动时将虚函数表中的 Run 函数地址替换为自定义函数地址</li>
+<li>在自定义函数内部休眠一段时间，抑制 GC</li>
+<li>休眠完成后将虚函数表中的函数地址替换回来，避免影响后续执行</li>
+</ol>
+<h4 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h4><p>很显然要想实现 Hook，我们首先需要获取<code>ConcurrentGCTask</code>对象地址与其<code>Run</code>方法地址</p>
+<p>那么我们可以如何获取方法地址呢？</p>
+<p>dlopen 函数和 dlsym 可以用于打开动态链接库中的函数，通过函数的符号返回函数地址</p>
+<p>因此我们需要做下面两件事   </p>
+<ol>
+<li>获取函数符号</li>
+<li>根据函数符号获取函数地址</li>
+</ol>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">adb pull /<span class="keyword">system</span>/lib64/libart.so<span class="comment"> // Android 10 以前系统，Android 10 之后换了位置</span></span><br><span class="line">aarch64-linux-android-readelf -s <span class="comment">--wide libart.so</span></span><br></pre></td></tr></table></figure>
+<p>通过以上方式可以导出 so 中的符号，查找到结果如下</p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">_ZTVN3art2gc4Heap16ConcurrentGCTaskE</span>   <span class="comment">// ConcurrentGCTask</span></span><br><span class="line"><span class="variable">_ZN3art2gc4Heap16ConcurrentGCTask3RunEPNS_6ThreadE</span> <span class="comment">// Run 方法</span></span><br></pre></td></tr></table></figure>
+<p>可以看出，符号是原来的名字做了一定的变换，这是 c++ 的 name mangling 机制，mangling 的目的就是为了给重载的函数不同的签名，具体的规则可以自行查阅，这里就不赘述了</p>
+<p>还有需要注意的一点是，Android 7.0 以上对 dlsym 的调用有限制，同时从 aarch64-linux-android-readelf 的结果可以看出， <code>ConcurrentGCTask</code> 在 .dynsym 段，而 <code>Run</code> 方法在 .symtab 段，而 dlsym 只能搜索 .dynsym 段，而无法搜索 .symtab 段，因此我们这里使用<code>enhanced_dlsym</code>开源库，既支持 Android 7.0 以上调用，也可以查找 .stymtab 段</p>
+<p>好了，前置知识讲完了，下面来看下代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delayGC</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">//以RTLD_NOW模式打开动态库libart.so，拿到句柄，RTLD_NOW即解析出每个未定义变量的地址</span></span><br><span class="line">    <span class="keyword">void</span> *handle = enhanced_dlopen(<span class="string">"/system/lib64/libart.so"</span>, RTLD_NOW);</span><br><span class="line">    <span class="comment">//通过符号拿到ConcurrentGCTask对象地址</span></span><br><span class="line">    <span class="keyword">void</span> *taskAddress = enhanced_dlsym(handle, <span class="string">"_ZTVN3art2gc4Heap16ConcurrentGCTaskE"</span>);</span><br><span class="line">    <span class="comment">//通过符号拿到run方法</span></span><br><span class="line">    <span class="keyword">void</span> *runAddress = enhanced_dlsym(handle, <span class="string">"_ZN3art2gc4Heap16ConcurrentGCTask3RunEPNS_6ThreadE"</span>);</span><br><span class="line">    <span class="comment">//由于 ConcurrentGCTask 只有五个虚函数，所以我们只需要查询前五个地址即可。</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="comment">//对象头地址中的内容存放的就是是虚函数表的地址，所以这里是指针的指针，即是虚函数表地址，拿到虚函数表地址后，转换成数组，并遍历获取值</span></span><br><span class="line">        <span class="keyword">void</span> *vfunc = ((<span class="keyword">void</span> **) taskAddress)[i];</span><br><span class="line">        <span class="comment">// 如果虚函数表中的值是前面拿到的 Run 函数的地址，那么就找到了Run函数在虚函数表中的地址</span></span><br><span class="line">        <span class="keyword">if</span> (vfunc == runAddress) &#123;</span><br><span class="line">            <span class="comment">//这里需要注意的是，这里 +i 操作拿到的是地址，而不是值，因为这里的值是 Run 函数的真实地址</span></span><br><span class="line">            mSlot = (<span class="keyword">void</span> **) taskAddress + i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 保存原有函数</span></span><br><span class="line">    originFun = *mSlot;</span><br><span class="line">    <span class="comment">// 将虚函数表中的值替换成我们hook函数的地址</span></span><br><span class="line">    replaceFunc(mSlot, (<span class="keyword">void</span> *) &amp;hookRun);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//我们的 hook 函数</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">hookRun</span><span class="params">(<span class="keyword">void</span> *thread)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//休眠3秒</span></span><br><span class="line">    sleep(<span class="number">3</span>);</span><br><span class="line">    <span class="comment">//将虚函数表中的值还原成原函数，避免每次执行run函数时都会执行hook的方法</span></span><br><span class="line">    replaceFunc(mSlot, originFun);</span><br><span class="line">    <span class="comment">//执行原来的Run方法</span></span><br><span class="line">    ((<span class="keyword">void</span> (*)(<span class="keyword">void</span> *)) originFun)(thread);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>核心代码就是上面这些，主要做了这么几件事： </p>
+<ol>
+<li>通过符号获取<code>Run</code>方法地址</li>
+<li>遍历虚函数表，找到虚函数表中存放<code>Run</code>方法真实地址的位置</li>
+<li>保存原函数地址，并将虚函数表中的值替换成我们 hook 的函数地址</li>
+<li>在 hook 函数中休眠一段时间，休眠结束后还原虚函数表，避免影响后续任务</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在性能优化中除了一些常规手段外，也经常有一些黑科技手段，本文主要介绍了启动优化中的线程优先级设置，核心线程绑定大核，GC 抑制等手段，<br>讲解了一下这些黑科技手段是否有效，以及具体是怎么实现的，希望对你有所帮助</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>本文主要是对<a href="https://juejin.cn/book/7153836660768292878" target="_blank" rel="noopener">Android 性能优化小册</a>相关内容的学习实践，感兴趣的同学可以点击查看</p>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><p>本文所有源码可见：<a href="https://github.com/RicardoJiang/android-performance" target="_blank" rel="noopener">https://github.com/RicardoJiang/android-performance</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2023/03/android-stability-optimize.html" rel="next" title="【稳定性优化】安全气囊如何实现？">
+                <i class="fa fa-chevron-left"></i> 【稳定性优化】安全气囊如何实现？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2023/04/android-jank-optimize.html" rel="prev" title="【卡顿优化】卡顿问题如何监控？">
+                【卡顿优化】卡顿问题如何监控？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程优先级设置"><span class="nav-number">2.</span> <span class="nav-text">线程优先级设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心线程绑定大核"><span class="nav-number">3.</span> <span class="nav-text">核心线程绑定大核</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#绑定大核是否有必要"><span class="nav-number">3.1.</span> <span class="nav-text">绑定大核是否有必要?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#绑定大核实现"><span class="nav-number">3.2.</span> <span class="nav-text">绑定大核实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GC-抑制"><span class="nav-number">4.</span> <span class="nav-text">GC 抑制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GC-抑制是否有必要"><span class="nav-number">4.1.</span> <span class="nav-text">GC 抑制是否有必要?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC-抑制实现"><span class="nav-number">4.2.</span> <span class="nav-text">GC 抑制实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HeapTaskDaemon-执行流程"><span class="nav-number">4.2.1.</span> <span class="nav-text">HeapTaskDaemon 执行流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方案设计"><span class="nav-number">4.2.2.</span> <span class="nav-text">方案设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#具体实现"><span class="nav-number">4.2.3.</span> <span class="nav-text">具体实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码"><span class="nav-number">5.2.</span> <span class="nav-text">源码</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

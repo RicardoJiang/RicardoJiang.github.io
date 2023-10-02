@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="性能优化,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言ANR 即 Applicatipon No Response，程序无响应。Android 系统设计了 ANR 机制，其目的是监控与其交互的组件（Activity 等）和用户交互（InputEvent）的超时情况。这样能够判断应用进程（主线程）是否存在卡死或响应过慢的问题 相比 Crash，ANR 问题存在原因复杂，不易定位的特点，本文主要包括以下内容  ANR 工作流程 如何监控 ANR？ 如">
+<meta name="keywords" content="性能优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【 Android 性能优化】ANR 问题如何监控？">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2023/05/android-anr-monitor.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言ANR 即 Applicatipon No Response，程序无响应。Android 系统设计了 ANR 机制，其目的是监控与其交互的组件（Activity 等）和用户交互（InputEvent）的超时情况。这样能够判断应用进程（主线程）是否存在卡死或响应过慢的问题 相比 Crash，ANR 问题存在原因复杂，不易定位的特点，本文主要包括以下内容  ANR 工作流程 如何监控 ANR？ 如">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/17f8d15a473244799be01927e5c0c785~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/may/p1.png">
+<meta property="og:image" content="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/may/p1.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1becc120e1014ee6a340dfbd2bfa6c2c~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.249Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【 Android 性能优化】ANR 问题如何监控？">
+<meta name="twitter:description" content="前言ANR 即 Applicatipon No Response，程序无响应。Android 系统设计了 ANR 机制，其目的是监控与其交互的组件（Activity 等）和用户交互（InputEvent）的超时情况。这样能够判断应用进程（主线程）是否存在卡死或响应过慢的问题 相比 Crash，ANR 问题存在原因复杂，不易定位的特点，本文主要包括以下内容  ANR 工作流程 如何监控 ANR？ 如">
+<meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/17f8d15a473244799be01927e5c0c785~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2023/05/android-anr-monitor.html">
+
+
+
+
+
+  <title>【 Android 性能优化】ANR 问题如何监控？ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2023/05/android-anr-monitor.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【 Android 性能优化】ANR 问题如何监控？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-05-03T16:07:32+08:00">
+                2023-05-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>ANR 即 Applicatipon No Response，程序无响应。Android 系统设计了 ANR 机制，其目的是监控与其交互的组件（Activity 等）和用户交互（InputEvent）的超时情况。这样能够判断应用进程（主线程）是否存在卡死或响应过慢的问题</p>
+<p>相比 Crash，ANR 问题存在原因复杂，不易定位的特点，本文主要包括以下内容</p>
+<ol>
+<li>ANR 工作流程</li>
+<li>如何监控 ANR？</li>
+<li>如何定位 ANR 原因？</li>
+</ol>
+<h2 id="ANR-工作流程"><a href="#ANR-工作流程" class="headerlink" title="ANR 工作流程"></a>ANR 工作流程</h2><p>ANR 可能触发的时机有多种，通常可以分为以下几方面：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/17f8d15a473244799be01927e5c0c785~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp" alt></p>
+<p>图片来源：<a href="https://juejin.cn/post/6940061649348853796#heading-6" target="_blank" rel="noopener">今日头条 ANR 优化实践系列 - 设计原理及影响因素</a></p>
+<p>其基本原理其实 WatchDog 的思想，如果发出的事件，在一定时间内没有消费，则触发 ANR。具体源码就不在这里跟了，想详细了解的同学可查看：<a href="https://mp.weixin.qq.com/s/fWoXprt2TFL1tTapt7esYg" target="_blank" rel="noopener">微信Android客户端的ANR监控方案</a></p>
+<p>这里说一下总体流程，如下图所示：</p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/may/p1.png" alt></p>
+<ol>
+<li>发生 ANR 后，系统会采集许多进程数据，进行堆栈转储，以生成 ANR Trace文件。其中，第一个被采集的进程必定是发生 ANR 的进程。</li>
+<li>系统会向这些应用进程发送 SIGQUIT 信号，这些应用进程收到信号后开始进行堆栈转储</li>
+<li>应用进程 Dump 堆栈成功后通过 Socket 与系统进程通信写 Trace 文件</li>
+<li>在 Trace 文件写入完成后，如果发生 ANR 的进程是前台进程则弹出 Dialog，否则则直接杀死进程</li>
+</ol>
+<h2 id="如何监控-ANR？"><a href="#如何监控-ANR？" class="headerlink" title="如何监控 ANR？"></a>如何监控 ANR？</h2><p>在了解了 ANR 的工作流程之后，我们该如何监控 ANR 的发生呢？</p>
+<h3 id="ANR-WatchDog-检测思路"><a href="#ANR-WatchDog-检测思路" class="headerlink" title="ANR WatchDog 检测思路"></a>ANR WatchDog 检测思路</h3><p>既然 ANR 的原因是输入在定时间内没有响应，那么我们很自然地想到，向主线程发送一个任务，如果一段时间内没有被执行的话，就认为发生了 ANR</p>
+<p>这个思路主要有以下几个问题</p>
+<ol>
+<li>不准确，超时条件不一定会导致 ANR，例如，5 秒超时只是在 TouchEvent 未被消耗时发生 ANR 的条件之一，而其他条件则不一定是 5 秒。</li>
+<li>漏检测：如果超时时间定为 5 秒，去检测 TouchEvent 的 ANR 存在一定的漏检测的概率（周期不同步）。</li>
+</ol>
+<h3 id="ANR-信号监听思路"><a href="#ANR-信号监听思路" class="headerlink" title="ANR 信号监听思路"></a>ANR 信号监听思路</h3><p>在上面介绍 ANR 总体流程时，我们注意到当 ANR 发生时会发送 SIGQUIT 信号，那么我们通过监听这一信号不就可以实现 ANR 监控了吗？事实上 <a href="https://github.com/iqiyi/xCrash" target="_blank" rel="noopener">XCrash</a> 与 <a href="https://github.com/Tencent/matrix" target="_blank" rel="noopener">Matrix</a> 都是通过这种方式实现 ANR 监控的</p>
+<p>在这里需要注意，默认情况下进程通过<code>SignalCatcher</code>监听<code>SIGQUIT</code>信号，进行堆栈转储生成 ANR Trace 文件。因此当我们监听<code>SIGQUIT</code>信号后，需要重新向<code>SignalCatcher</code>发送<code>SIGQUIT</code></p>
+<p>如果缺少重新向 SignalCatcher 发送 SIGQUIT 信号的步骤，Android System 管理服务（AMS）将一直等待 ANR 进程写入堆栈信息。直到超过20秒的超时时间，AMS 才会被迫中断，并继续后续流程。这将导致 ANR 弹窗的显示非常缓慢（因为超时时间为20秒），同时在 /data/anr 目录下也无法生成完整的 ANR Trace 文件。</p>
+<h4 id="误报情况处理"><a href="#误报情况处理" class="headerlink" title="误报情况处理"></a>误报情况处理</h4><p>当监听到 SIGQUIT 信号时，不一定是发生了 ANR。</p>
+<p>Matrix 的文档中提到了两种误报的情况：</p>
+<ol>
+<li>比如可能是其它进程 ANR 了，发生 ANR 的进程不是唯一需要进行堆栈转储的进程。系统会收集许多其他进程进行堆栈转储，用于生成 ANR Trace 文件</li>
+<li>厂商或者是开发者自己发送的<code>SIGQUIT</code>信号，发送SIGQUIT信号其实是很容易的一件事情</li>
+</ol>
+<p>因此我们需要在监听到信号时再进行一次检查：在 ANR 弹窗前，会给发生 ANR 的进程标记一个 NOT_RESPONDING 的 flag，而这个 flag 我们可以通过 ActivityManager 来获取</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">checkErrorState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Application application = sApplication == <span class="keyword">null</span> ? Matrix.with().getApplication() : sApplication;</span><br><span class="line">        ActivityManager am = (ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE);</span><br><span class="line">        List&lt;ActivityManager.ProcessErrorStateInfo&gt; procs = am.getProcessesInErrorState();</span><br><span class="line">        <span class="keyword">if</span> (procs == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (ActivityManager.ProcessErrorStateInfo proc : procs) &#123;</span><br><span class="line">            <span class="keyword">if</span> (proc.pid != android.os.Process.myPid()) <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">if</span> (proc.condition != ActivityManager.ProcessErrorStateInfo.NOT_RESPONDING) <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t)&#123;</span><br><span class="line">        MatrixLog.e(TAG,<span class="string">"[checkErrorState] error : %s"</span>, t.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，我们可以在监听到信号时判断当前进程是否被标记为 NOT_RESPONDING 来判断当前进程是否发生了 ANR</p>
+<h4 id="漏报情况处理"><a href="#漏报情况处理" class="headerlink" title="漏报情况处理"></a>漏报情况处理</h4><p>当进程被标记为 NOT_RESPONDING 时一定发生了 ANR，但是当进程发生了 ANR 时，不一定会被标记为 NOT_RESPONDING</p>
+<p>Matrix 的文档中提到了两种漏报情况</p>
+<ol>
+<li>后台ANR（SilentAnr）: 后台 ANR 会直接杀死进程，不会走到标记状态的代码</li>
+<li>厂商定制逻辑: 相当一部分机型(比如 OPPO、VIVO 两家的高版本 Android )修改了 ANR 的逻辑，即使是前台 ANR 也会直接杀死进程</li>
+</ol>
+<p>Matrix 通过判断主线程在收到 SIGQUIT 信号时是否处于卡顿状态来判断当前是否发生 ANR，如下所示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isMainThreadStuck</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        MessageQueue mainQueue = Looper.getMainLooper().getQueue();</span><br><span class="line">        Field field = mainQueue.getClass().getDeclaredField(<span class="string">"mMessages"</span>);</span><br><span class="line">        field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">final</span> Message mMessage = (Message) field.get(mainQueue);</span><br><span class="line">        <span class="keyword">if</span> (mMessage != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">long</span> when = mMessage.getWhen();</span><br><span class="line">            <span class="keyword">if</span>(when == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">long</span> time = when - SystemClock.uptimeMillis();</span><br><span class="line">            <span class="keyword">long</span> timeThreshold = BACKGROUND_MSG_THRESHOLD;</span><br><span class="line">            <span class="keyword">if</span> (foreground) &#123;</span><br><span class="line">                timeThreshold = FOREGROUND_MSG_THRESHOLD;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> time &lt; timeThreshold;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>通过反射获取主线程<code>Looper</code>的<code>mMessage</code>对象，该消息的<code>when</code>变量，就表示该消息的入队时间</li>
+<li>将入队时间与当前时间进行比较，就可以获取该消息的等待时间</li>
+<li>当等待时间超过一定阈值的话，我们就认为主线程处于阻塞状态，结合 SIGQUIT 信号，判断为发生了 ANR</li>
+</ol>
+<h2 id="如何定位-ANR-原因？"><a href="#如何定位-ANR-原因？" class="headerlink" title="如何定位 ANR 原因？"></a>如何定位 ANR 原因？</h2><p>ANR 的影响因素有很多，我们可以把他们分为以下几类：</p>
+<ol>
+<li>系统资源不足，其它进程或线程存在严重资源抢占，如 IO，Mem，CPU</li>
+<li>线程间存在资源抢占，比如死锁等</li>
+<li>主线程繁忙，用户输入得不到及时响应</li>
+</ol>
+<p>在将 ANR 原因分为了以上几类之后，我们需要获取详细的日志信息，才能在发生 ANR 时及时定位原因</p>
+<h3 id="获取系统负载信息"><a href="#获取系统负载信息" class="headerlink" title="获取系统负载信息"></a>获取系统负载信息</h3><p>想要获取系统负载信息，我们在线下可以通过获取 /data/anr 目录下的 trace 文件来查看，但是在高版本手机上，我们通常没有权限获取这个目录下的文件，那么在线上我们该如何获取系统负载信息呢？</p>
+<p>应用层可通过 AcivityManager 获取 ProcessErrorStateInfo，如下所示：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">val</span> am = application.getSystemService(Context.ACTIVITY_SERVICE) <span class="keyword">as</span> ActivityManager</span><br><span class="line">    <span class="keyword">val</span> processesInErrorStates = am.processesInErrorState</span><br></pre></td></tr></table></figure>
+<p>通过<code>ProcessErrorStateInfo</code>我们可以获取<code>shortMessage</code>与<code>longMessage</code>，如下所示：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// shortMessage</span></span><br><span class="line">ANR Input dispatching timed out (<span class="number">8445</span>a92 com<span class="selector-class">.android</span>.test/com<span class="selector-class">.android</span><span class="selector-class">.test</span><span class="selector-class">.anr</span><span class="selector-class">.ANRActivity</span> (server) is not responding. Waited <span class="number">5000ms</span> <span class="keyword">for</span> MotionEvent(action=DOWN))</span><br></pre></td></tr></table></figure>
+<p><code>shortMessage</code>就是产生 ANR 的原因，比较简单</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">//</span> <span class="string">longMessage</span></span><br><span class="line"><span class="string">ANR</span> <span class="string">in</span> <span class="string">com.android.test</span> <span class="string">(com.android.test/.anr.ANRActivity)</span></span><br><span class="line"><span class="attr">PID:</span> <span class="number">23283</span></span><br><span class="line"><span class="attr">Reason:</span> <span class="string">Input</span> <span class="string">dispatching</span> <span class="string">timed</span> <span class="string">out</span> <span class="string">(8445a92</span> <span class="string">com.android.test/com.android.test.anr.ANRActivity</span> <span class="string">(server)</span> <span class="string">is</span> <span class="string">not</span> <span class="string">responding.</span> <span class="string">Waited</span> <span class="string">5000ms</span> <span class="string">for</span> <span class="string">MotionEvent(action=DOWN))</span></span><br><span class="line"><span class="attr">Parent:</span> <span class="string">com.android.test/.anr.ANRActivity</span></span><br><span class="line"><span class="attr">ErrorId:</span> <span class="string">91ceb0ce-0af6-496e-8c4f-781075c056db</span></span><br><span class="line"><span class="attr">Frozen:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">Load:</span> <span class="number">0.0</span> <span class="string">/</span> <span class="number">0.29</span> <span class="string">/</span> <span class="number">0.33</span></span><br><span class="line"><span class="string">-----</span> <span class="string">Output</span> <span class="string">from</span> <span class="string">/proc/pressure/memory</span> <span class="string">-----</span></span><br><span class="line"><span class="string">some</span> <span class="string">avg10=0.00</span> <span class="string">avg60=0.00</span> <span class="string">avg300=0.00</span> <span class="string">total=150136881</span></span><br><span class="line"><span class="string">full</span> <span class="string">avg10=0.00</span> <span class="string">avg60=0.00</span> <span class="string">avg300=0.00</span> <span class="string">total=51283028</span></span><br><span class="line"><span class="string">-----</span> <span class="string">End</span> <span class="string">output</span> <span class="string">from</span> <span class="string">/proc/pressure/memory</span> <span class="string">-----</span></span><br><span class="line"><span class="string">CPU</span> <span class="string">usage</span> <span class="string">from</span> <span class="string">153ms</span> <span class="string">to</span> <span class="string">605ms</span> <span class="string">later</span> <span class="string">(2023-05-04</span> <span class="number">22</span><span class="string">:38:19.034</span> <span class="string">to</span> <span class="number">2023</span><span class="number">-05</span><span class="number">-04</span> <span class="number">22</span><span class="string">:38:19.486):</span></span><br><span class="line">  <span class="number">79</span><span class="string">%</span> <span class="attr">1990/system_server:</span> <span class="number">35</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">43</span><span class="string">%</span> <span class="attr">kernel / faults:</span> <span class="number">1598</span> <span class="string">minor</span></span><br><span class="line">    <span class="number">43</span><span class="string">%</span> <span class="attr">23375/AnrConsumer:</span> <span class="number">8.1</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">35</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">21</span><span class="string">%</span> <span class="attr">2008/HeapTaskDaemon:</span> <span class="number">19</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">2.7</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">2.7</span><span class="string">%</span> <span class="attr">2919/InputDispatcher:</span> <span class="number">2.7</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">0</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">  <span class="number">32</span><span class="string">%</span> <span class="attr">23283/com.android.test:</span> <span class="number">16</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">16</span><span class="string">%</span> <span class="attr">kernel / faults:</span> <span class="number">7</span> <span class="string">minor</span></span><br><span class="line">    <span class="number">28</span><span class="string">%</span> <span class="attr">23315/RenderThread:</span> <span class="number">16</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">12</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">4</span><span class="string">%</span> <span class="attr">23306/binder:23283_3:</span> <span class="number">0</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">4</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">4</span><span class="string">%</span> <span class="attr">23354/binder:23283_5:</span> <span class="number">4</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">0</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">  <span class="number">17</span><span class="string">%</span> <span class="attr">1195/surfaceflinger:</span> <span class="number">17</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">0</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">10</span><span class="string">%</span> <span class="attr">1195/surfaceflinger:</span> <span class="number">10</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">0</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">2.5</span><span class="string">%</span> <span class="attr">1347/binder:1195_1:</span> <span class="number">2.5</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">0</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">2.5</span><span class="string">%</span> <span class="attr">1414/TimerDispatch:</span> <span class="number">2.5</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">0</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">  <span class="number">5</span><span class="string">%</span> <span class="attr">1071/vendor.qti.hardware.display.composer-service:</span> <span class="number">2.5</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">2.5</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">    <span class="number">2.5</span><span class="string">%</span> <span class="attr">1071/composer-servic:</span> <span class="number">0</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">2.5</span><span class="string">%</span> <span class="string">kernel</span></span><br><span class="line">  <span class="string">//...</span></span><br><span class="line"><span class="number">21</span><span class="string">%</span> <span class="attr">TOTAL:</span> <span class="number">10</span><span class="string">%</span> <span class="string">user</span> <span class="string">+</span> <span class="number">10</span><span class="string">%</span> <span class="string">kernel</span> <span class="string">+</span> <span class="number">0.8</span><span class="string">%</span> <span class="string">irq</span> <span class="string">+</span> <span class="number">0.2</span><span class="string">%</span> <span class="string">softirq</span></span><br></pre></td></tr></table></figure>
+<p><code>longMessage</code>则是系统在发生 ANR 之后的一段时间内的负载信息，包括 CPU，IO，内存等</p>
+<h3 id="获取进程内所有线程状态"><a href="#获取进程内所有线程状态" class="headerlink" title="获取进程内所有线程状态"></a>获取进程内所有线程状态</h3><p>发生 ANR 也可能是因为进程内的线程发生了资源抢占或者死锁，那么该如何获取进程内所有线程的状态，我们可以再看一下上面的这张图</p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/may/p1.png" alt></p>
+<p>Signal Catcher 的 Dump 发生在应用进程，并且通过 Socket Writer 来写 Trace的。如果我们能够在这个 write 方法上进行 Hook，就可以获取到系统记录下来的 ANR Trace 内容。这个内容非常全面，包括了所有线程的各种状态、锁和堆栈信息（包括 native 堆栈），对于排查问题非常有帮助，特别是一些与 native 问题、死锁等有关的问题。</p>
+<p>Matrix 就是通过这种方式来获取 ANR Trace 的，具体实现可见：<a href="https://mp.weixin.qq.com/s/fWoXprt2TFL1tTapt7esYg" target="_blank" rel="noopener">微信Android客户端的ANR监控方案</a></p>
+<h3 id="定位主线程问题"><a href="#定位主线程问题" class="headerlink" title="定位主线程问题"></a>定位主线程问题</h3><p>由主线程繁忙引起的 ANR 定位困难的原因在于：<strong>耗时可能由历史消息引起，发生 ANR 时正在执行的消息并不耗时</strong>。如下图所示：</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1becc120e1014ee6a340dfbd2bfa6c2c~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp" alt></p>
+<p>图片来源：<a href="https://juejin.cn/post/6940061649348853796#heading-15" target="_blank" rel="noopener">今日头条 ANR 优化实践系列 - 设计原理及影响因素</a></p>
+<p>如果在系统服务执行某个历史消息时，已经耗费了大量时间，但在这个消息执行完毕后，系统服务并没有达到触发 ANR 超时的临界点，之后的主线程继续调度其他消息时，如果此时系统判定响应超时，那么正在执行的业务场景将不幸被命中。此时，当前正在执行的业务逻辑并不复杂，但由于之前的某个消息过度耗时，导致系统未能及时响应后续事件。</p>
+<p>针对这类问题，一个解决方案是：记录主线程过去一段时间(比如 10s)内所有消息的调度历史，保存业务方需要的关键数据(比如消息耗时或者方法耗时)，在发生 ANR 时，上报监控阈值内的历史数据</p>
+<p>通过这种方式，在 ANR 发生时，可以回放过去一段时间的耗时方法，定位耗时原因</p>
+<p>头条和虾皮都基于这种思路开发了一些 ANR 监控工具，详情可见：<a href="https://juejin.cn/post/6942665216781975582" target="_blank" rel="noopener">今日头条 ANR 优化实践系列 - 监控工具与分析思路</a>与<a href="https://juejin.cn/post/7136008620658917407" target="_blank" rel="noopener">Android 卡顿与 ANR 的分析实践</a></p>
+<p>这些工具目前都没有开源，也有开发者基于头条的思路开源了一套实现，感兴趣的同学可以看看：<a href="https://juejin.cn/post/7031834640034103304" target="_blank" rel="noopener">app卡顿系列四 ：今日头条卡顿监控方案落地</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要是对 Matrix，今日头条等 ANR 监控方案的学习，介绍了系统 ANR 机制的工作流程，以及如何监控 ANR 问题，ANR 问题发生时如何定位具体原因等内容</p>
+<p>ANR 问题定位困难的原因常常在于信息不足，通过上面介绍的获取系统负载信息，获取进程内所有线程状态，定位主线程问题等方案，应该可以比较有效地还原现场，帮助定位 ANR 问题，希望对你有所帮助~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://mp.weixin.qq.com/s/fWoXprt2TFL1tTapt7esYg" target="_blank" rel="noopener">微信Android客户端的ANR监控方案</a><br><a href="https://juejin.cn/post/6942665216781975582" target="_blank" rel="noopener">今日头条 ANR 优化实践系列 - 监控工具与分析思路</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2023/04/android-jank-optimize.html" rel="next" title="【卡顿优化】卡顿问题如何监控？">
+                <i class="fa fa-chevron-left"></i> 【卡顿优化】卡顿问题如何监控？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2023/05/compose-dynamic-island.html" rel="prev" title="使用 Compose 在 iOS 上实现灵动岛效果">
+                使用 Compose 在 iOS 上实现灵动岛效果 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ANR-工作流程"><span class="nav-number">2.</span> <span class="nav-text">ANR 工作流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何监控-ANR？"><span class="nav-number">3.</span> <span class="nav-text">如何监控 ANR？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ANR-WatchDog-检测思路"><span class="nav-number">3.1.</span> <span class="nav-text">ANR WatchDog 检测思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ANR-信号监听思路"><span class="nav-number">3.2.</span> <span class="nav-text">ANR 信号监听思路</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#误报情况处理"><span class="nav-number">3.2.1.</span> <span class="nav-text">误报情况处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#漏报情况处理"><span class="nav-number">3.2.2.</span> <span class="nav-text">漏报情况处理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何定位-ANR-原因？"><span class="nav-number">4.</span> <span class="nav-text">如何定位 ANR 原因？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取系统负载信息"><span class="nav-number">4.1.</span> <span class="nav-text">获取系统负载信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取进程内所有线程状态"><span class="nav-number">4.2.</span> <span class="nav-text">获取进程内所有线程状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定位主线程问题"><span class="nav-number">4.3.</span> <span class="nav-text">定位主线程问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

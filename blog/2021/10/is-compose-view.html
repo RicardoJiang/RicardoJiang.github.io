@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="compose,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Compose正式发布1.0已经相当一段时间了，但相信很多同学对Compose还是有很多迷惑的地方Compose跟原生的View到底是什么关系？是跟Flutter一样完全基于Skia引擎渲染，还是说还是View的那老一套?相信很多同学都会有下面的疑问      下面我们就一起来看下下面这个问题 现象分析我们先看这样一个简单布局123456789101112131415161718class T">
+<meta name="keywords" content="compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【辨析】Compose 完全脱离 View 系统了吗?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/10/is-compose-view.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Compose正式发布1.0已经相当一段时间了，但相信很多同学对Compose还是有很多迷惑的地方Compose跟原生的View到底是什么关系？是跟Flutter一样完全基于Skia引擎渲染，还是说还是View的那老一套?相信很多同学都会有下面的疑问      下面我们就一起来看下下面这个问题 现象分析我们先看这样一个简单布局123456789101112131415161718class T">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p10.jpg">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p11.jpg">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p13.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1e512fa77b2744b68291b7b1847097c3~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0cc64a9871164d2e94f1f654c8490945~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.245Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【辨析】Compose 完全脱离 View 系统了吗?">
+<meta name="twitter:description" content="前言Compose正式发布1.0已经相当一段时间了，但相信很多同学对Compose还是有很多迷惑的地方Compose跟原生的View到底是什么关系？是跟Flutter一样完全基于Skia引擎渲染，还是说还是View的那老一套?相信很多同学都会有下面的疑问      下面我们就一起来看下下面这个问题 现象分析我们先看这样一个简单布局123456789101112131415161718class T">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p10.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/10/is-compose-view.html">
+
+
+
+
+
+  <title>【辨析】Compose 完全脱离 View 系统了吗? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/10/is-compose-view.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【辨析】Compose 完全脱离 View 系统了吗?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-10T21:54:21+08:00">
+                2021-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Compose</code>正式发布1.0已经相当一段时间了，但相信很多同学对<code>Compose</code>还是有很多迷惑的地方<br><code>Compose</code>跟原生的<code>View</code>到底是什么关系？是跟<code>Flutter</code>一样完全基于<code>Skia</code>引擎渲染，还是说还是<code>View</code>的那老一套?<br>相信很多同学都会有下面的疑问     </p>
+<p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p10.jpg" alt><br>下面我们就一起来看下下面这个问题</p>
+<h2 id="现象分析"><a href="#现象分析" class="headerlink" title="现象分析"></a>现象分析</h2><p>我们先看这样一个简单布局<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestActivity</span> : <span class="type">ComponentActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        setContent &#123;        	</span><br><span class="line">        	ComposeBody()              </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">ComposeBody</span><span class="params">()</span></span> &#123;</span><br><span class="line">    Column &#123;</span><br><span class="line">        Text(text = <span class="string">"这是一行测试数据"</span>, color = Color.Black, style = MaterialTheme.typography.h6)</span><br><span class="line">        Row() &#123;</span><br><span class="line">            Text(text = <span class="string">"测试数据1!"</span>, color = Color.Black, style = MaterialTheme.typography.h6)</span><br><span class="line">            Text(text = <span class="string">"测试数据2!"</span>, color = Color.Black, style = MaterialTheme.typography.h6)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，就是一个简单的布局，包含<code>Column</code>,<code>Row</code>与<code>Text</code><br>然后我们打开开发者选项中的<code>显示布局边界</code>，效果如下图所示：    </p>
+<p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p11.jpg" alt><br>我们可以看到<code>Compose</code>的组件显示了布局边界，我们知道，<code>Flutter</code>与<code>WebView H5</code>内的组件都是不会显示布局边界的，难道<code>Compose</code>的布局渲染其实还是<code>View</code>的那一套?      </p>
+<p>我们下面再在<code>onResume</code>时尝试遍历一下<code>View</code>的层级,看一下<code>Compose</code>到底会不会转化成<code>View</code><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onResume</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.onResume()</span><br><span class="line">    window.decorView.postDelayed(&#123;</span><br><span class="line">        (window.decorView <span class="keyword">as</span>? ViewGroup)?.let &#123; transverse(it, <span class="number">1</span>) &#125;</span><br><span class="line">    &#125;, <span class="number">2000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">transverse</span><span class="params">(view: <span class="type">View</span>, index: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    Log.e(<span class="string">"debug"</span>, <span class="string">"第<span class="subst">$&#123;index&#125;</span>层："</span> + view)</span><br><span class="line">    <span class="keyword">if</span> (view <span class="keyword">is</span> ViewGroup) &#123;</span><br><span class="line">        view.children.forEach &#123; transverse(it, index + <span class="number">1</span>) &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过以上方式打印页面的层级，输出结果如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">E/debug: 第1层：DecorView@c2f703f[RallyActivity]</span><br><span class="line">E/debug: 第2层：android.widget.LinearLayout&#123;4202d0c V.E...... ........ 0,0-1080,2340&#125;</span><br><span class="line">E/debug: 第3层：android.view.ViewStub&#123;2b50655 G.E...... ......I. 0,0-0,0 #10201b1 android:id/action_mode_bar_stub&#125;</span><br><span class="line">E/debug: 第3层：android.widget.FrameLayout&#123;9bfc86a V.E...... ........ 0,90-1080,2340 #1020002 android:id/content&#125;</span><br><span class="line">E/debug: 第4层：androidx.compose.ui.platform.ComposeView&#123;1b4d15b V.E...... ........ 0,0-1080,2250&#125;</span><br><span class="line">E/debug: 第5层：androidx.compose.ui.platform.AndroidComposeView&#123;a8ec543 VFED..... ........ 0,0-1080,2250&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，我们写的<code>Column</code>,<code>Row</code>,<code>Text</code>并没有出现在布局层级中，跟<code>Compose</code>相关的只有<code>ComposeView</code>与<code>AndroidComposeView</code>两个<code>View</code><br>而<code>ComposeView</code>与<code>AndroidComposeView</code>都是在<code>setContent</code>时添加进去的<code>Compose</code>的容器，我们后面再分析，这里先给出结论       </p>
+<blockquote>
+<p><code>Compose</code>在渲染时并不会转化成<code>View</code>，而是只有一个入口<code>View</code>，即<code>AndroidComposeView</code><br>我们声明的<code>Compose</code>布局在渲染时会转化成<code>NodeTree</code>,<code>AndroidComposeView</code>中会触发<code>NodeTree</code>的布局与绘制<br>总得来说，<code>Compose</code>会有一个<code>View</code>的入口，但它的布局与渲染还是在<code>LayoutNode</code>上完成的，基本脱离了<code>View</code>       </p>
+</blockquote>
+<p>总得来说，纯<code>Compose</code>页面的页面层级如下图所示：    </p>
+<p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p13.png" alt>   </p>
+<h2 id="原理分析"><a href="#原理分析" class="headerlink" title="原理分析"></a>原理分析</h2><h3 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h3><p>我们知道，在<code>View</code>系统中会有一棵<code>ViewTree</code>,通过一个树的数据结构来描述整个<code>UI</code>界面<br>在<code>Compose</code>中，我们写的代码在渲染时也会构建成一个<code>NodeTree</code>,每一个组件就是一个<code>ComposeNode</code>,作为<code>NodeTree</code>上的一个节点    </p>
+<p><code>Compose</code> 对 <code>NodeTree</code> 管理涉及 <code>Applier</code>、<code>Composition</code> 和 <code>ComposeNode</code>：<br><code>Composition</code> 作为起点，发起首次的 <code>composition</code>，通过 <code>Compose</code> 的执行，填充 <code>Slot Table</code>，并基于 <code>Table</code> 创建 <code>NodeTree</code>。渲染引擎基于 <code>Compose Nodes</code> 渲染 <code>UI</code>， 每当 <code>recomposition</code> 发生时，都会通过 <code>Applier</code> 对 <code>NodeTree</code> 进行更新。 因此</p>
+<blockquote>
+<p><code>Compose</code> 的执行过程就是创建 <code>Node</code> 并构建 <code>NodeTree</code> 的过程。 </p>
+</blockquote>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1e512fa77b2744b68291b7b1847097c3~tplv-k3u1fbpfcp-watermark.awebp" alt><br>为了了解<code>NodeTree</code>的构建过程，我们来介绍下面几个概念  </p>
+<h4 id="Applier：增删-NodeTree-的节点"><a href="#Applier：增删-NodeTree-的节点" class="headerlink" title="Applier：增删 NodeTree 的节点"></a><code>Applier</code>：增删 <code>NodeTree</code> 的节点</h4><p>简单来说,<code>Applier</code>的作用就是增删<code>NodeTree</code>的节点，每个<code>NodeTree</code>的运算都需要配套一个<code>Applier</code>。<br>同时,<code>Applier</code> 会提供回调，基于回调我们可以对 <code>NodeTree</code> 进行自定义修改：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Applier</span>&lt;<span class="type">N</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> current: N <span class="comment">// 当前处理的节点</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onBeginChanges</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onEndChanges</span><span class="params">()</span></span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">down</span><span class="params">(node: <span class="type">N</span>)</span></span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">up</span><span class="params">()</span></span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">insertTopDown</span><span class="params">(index: <span class="type">Int</span>, instance: <span class="type">N</span>)</span></span> <span class="comment">// 添加节点（自顶向下）</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">insertBottomUp</span><span class="params">(index: <span class="type">Int</span>, instance: <span class="type">N</span>)</span></span><span class="comment">// 添加节点（自底向上）</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">remove</span><span class="params">(index: <span class="type">Int</span>, count: <span class="type">Int</span>)</span></span> <span class="comment">//删除节点</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">move</span><span class="params">(from: <span class="type">Int</span>, to: <span class="type">Int</span>, count: <span class="type">Int</span>)</span></span> <span class="comment">// 移动节点</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">clear</span><span class="params">()</span></span> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，节点增删时会回调到<code>Applier</code>中，我们可以在回调的方法中自定义节点添加或删除时的逻辑，后面我们可以一起看下在<code>Android</code>平台<code>Compose</code>是怎样处理的    </p>
+<h4 id="Composition-Compose执行的起点"><a href="#Composition-Compose执行的起点" class="headerlink" title="Composition: Compose执行的起点"></a><code>Composition</code>: <code>Compose</code>执行的起点</h4><p><code>Composition</code>是<code>Compose</code>执行的起点,我们来看下如何创建一个<code>Composition</code><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> composition = Composition(</span><br><span class="line">    applier = NodeApplier(node = Node()),</span><br><span class="line">    parent = Recomposer(Dispatchers.Main)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">composition.setContent &#123;</span><br><span class="line">    <span class="comment">// Composable function calls</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示     </p>
+<ol>
+<li><code>Composition</code>中需要传入两个参数，<code>Applier</code>与<code>Recomposer</code>    </li>
+<li><code>Applier</code>上面已经介绍过了，<code>Recomposer</code>非常重要，他负责<code>Compose</code>的重组，当重组后，<code>Recomposer</code> 通过调用 <code>Applier</code> 完成 <code>NodeTree</code> 的变更     </li>
+<li><code>Composition#setContent</code> 为后续 <code>Compose</code> 的调用提供了容器   </li>
+</ol>
+<p>通过上面的介绍，我们了解了<code>NodeTree</code>构建的基本流程，下面我们一起来分析下<code>setContent</code>的源码    </p>
+<h3 id="setContent过程分析"><a href="#setContent过程分析" class="headerlink" title="setContent过程分析"></a><code>setContent</code>过程分析</h3><h4 id="setContent入口"><a href="#setContent入口" class="headerlink" title="setContent入口"></a><code>setContent</code>入口</h4><p><code>setContent</code>的源码其实比较简单，我们一起来看下:<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">fun</span> ComponentActivity.<span class="title">setContent</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    parent: <span class="type">CompositionContext</span>? = <span class="literal">null</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    content: @<span class="type">Composable</span> () -&gt; <span class="type">Unit</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">    <span class="comment">//判断ComposeView是否存在，如果存在则不创建</span></span><br><span class="line">    <span class="keyword">if</span> (existingComposeView != <span class="literal">null</span>) with(existingComposeView) &#123;</span><br><span class="line">        setContent(content)</span><br><span class="line">    &#125; <span class="keyword">else</span> ComposeView(<span class="keyword">this</span>).apply &#123;</span><br><span class="line">        <span class="comment">//将Compose content添加到ComposeView上</span></span><br><span class="line">        setContent(content)</span><br><span class="line">        <span class="comment">// 将ComposeView添加到DecorView上</span></span><br><span class="line">        setContentView(<span class="keyword">this</span>, DefaultActivityContentLayoutParams)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面就是<code>setContent</code>的入口，主要作用就是创建了一个<code>ComposeView</code>并添加到<code>DecorView</code>上      </p>
+<h4 id="Composition的创建"><a href="#Composition的创建" class="headerlink" title="Composition的创建"></a><code>Composition</code>的创建</h4><p>下面我们来看下<code>AndroidComposeView</code>与<code>Composition</code>是怎样创建的<br>通过<code>ComposeView#setContent</code>-&gt;<code>AbstractComposeView#createComposition</code>-&gt;<code>AbstractComposeView#ensureCompositionCreated</code>-&gt;<code>ViewGroup#setContent</code><br>最后会调用到<code>doSetContent</code>方法，这里就是<code>Compose</code>的入口：<code>Composition</code>创建的地方<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">doSetContent</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    owner: <span class="type">AndroidComposeView</span>, <span class="comment">//AndroidComposeView是owner</span></span></span></span><br><span class="line"><span class="function"><span class="params">    parent: <span class="type">CompositionContext</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    content: @<span class="type">Composable</span> () -&gt; <span class="type">Unit</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>: Composition &#123;</span><br><span class="line">    <span class="comment">//..</span></span><br><span class="line">    <span class="comment">//创建Composition,并传入Applier与Recomposer</span></span><br><span class="line">    <span class="keyword">val</span> original = Composition(UiApplier(owner.root), parent)</span><br><span class="line">    <span class="keyword">val</span> wrapped = owner.view.getTag(R.id.wrapped_composition_tag)</span><br><span class="line">        <span class="keyword">as</span>? WrappedComposition</span><br><span class="line">        ?: WrappedComposition(owner, original).also &#123;</span><br><span class="line">            owner.view.setTag(R.id.wrapped_composition_tag, it)</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">//将Compose内容添加到Composition中   </span></span><br><span class="line">    wrapped.setContent(content)</span><br><span class="line">    <span class="keyword">return</span> wrapped</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，主要就是创建一个<code>Composition</code>并传入<code>UIApplier</code>与<code>Recomposer</code>,并将<code>Compose content</code>传入<code>Composition</code>中    </p>
+<h4 id="UiApplier的实现"><a href="#UiApplier的实现" class="headerlink" title="UiApplier的实现"></a><code>UiApplier</code>的实现</h4><p>上面已经创建了<code>Composition</code>并传入了<code>UIApplier</code>，后续添加了<code>Node</code>都会回调到<code>UIApplier</code>中<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="class"><span class="keyword">class</span> <span class="title">UiApplier</span></span>(</span><br><span class="line">    root: LayoutNode</span><br><span class="line">) : AbstractApplier&lt;LayoutNode&gt;(root) &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">insertBottomUp</span><span class="params">(index: <span class="type">Int</span>, instance: <span class="type">LayoutNode</span>)</span></span> &#123;</span><br><span class="line">        current.insertAt(index, instance)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，在插入节点时，会调用<code>current.insertAt</code>方法，那么这个<code>current</code>到底是什么呢？<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">doSetContent</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    owner: <span class="type">AndroidComposeView</span>, <span class="comment">//AndroidComposeView是owner</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>: Composition &#123;</span><br><span class="line">    <span class="comment">//UiApplier传入的参数即为AndroidComposeView.root</span></span><br><span class="line">    <span class="keyword">val</span> original = Composition(UiApplier(owner.root), parent)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractApplier</span>&lt;<span class="type">T</span>&gt;</span>(<span class="keyword">val</span> root: T) : Applier&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> stack = mutableListOf&lt;T&gt;()</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">var</span> current: T = root</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出，<code>UiApplier</code>中传入的参数其实就是<code>AndroidComposeView</code>的<code>root</code>，即<code>current</code>就是<code>AndroidComposeView</code>的<code>root</code><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># AndroidComposeView</span><br><span class="line">   <span class="keyword">override</span> <span class="keyword">val</span> root = LayoutNode().also &#123;</span><br><span class="line">       it.measurePolicy = RootMeasurePolicy</span><br><span class="line">       <span class="comment">//...</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，<code>root</code>其实就是一个<code>LayoutNode</code>,通过上面我们知道，所有的节点都会通过<code>Applier</code>插入到<code>root</code>下    </p>
+<h4 id="布局与绘制入口"><a href="#布局与绘制入口" class="headerlink" title="布局与绘制入口"></a>布局与绘制入口</h4><p>上面我们已经在<code>AndroidComposeView</code>中拿到<code>NodeTree</code>的根结点了，那<code>Compose</code>的布局与测量到底是怎么触发的呢?<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># AndroidComposeView</span><br><span class="line">   <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">dispatchDraw</span><span class="params">(canvas: <span class="type">android</span>.<span class="type">graphics</span>.<span class="type">Canvas</span>)</span></span> &#123;</span><br><span class="line">   	<span class="comment">//Compose测量与布局入口</span></span><br><span class="line">       measureAndLayout()</span><br><span class="line">       </span><br><span class="line">       <span class="comment">//Compose绘制入口</span></span><br><span class="line">       canvasHolder.drawInto(canvas) &#123; root.draw(<span class="keyword">this</span>) &#125;</span><br><span class="line">       <span class="comment">//...</span></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">measureAndLayout</span><span class="params">()</span></span> &#123;</span><br><span class="line">       <span class="keyword">val</span> rootNodeResized = measureAndLayoutDelegate.measureAndLayout()</span><br><span class="line">       measureAndLayoutDelegate.dispatchOnPositionedCallbacks()</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，<code>AndroidComposeView</code>会通过<code>root</code>,向下遍历它的子节点进行测量布局与绘制，这里就是<code>LayoutNode</code>绘制的入口    </p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ol>
+<li><code>Compose</code>在构建<code>NodeTree</code>的过程中主要通过<code>Composition</code>,<code>Applier</code>,<code>Recomposer</code>构建,<code>Applier</code>会将所有节点添加到<code>AndroidComposeView</code>中的<code>root</code>节点下      </li>
+<li>在<code>setContent</code>的过程中，会创建<code>ComposeView</code>与<code>AndroidComposeView</code>,其中<code>AndroidComposeView</code>是<code>Compose</code>的入口     </li>
+<li><code>AndroidComposeView</code>在<code>dispatchDraw</code>中会通过<code>root</code>向下遍历子节点进行测量布局与绘制，这里是<code>LayoutNode</code>绘制的入口    </li>
+<li>在<code>Android</code>平台上，<code>Compose</code>的布局与绘制已基本脱离<code>View</code>体系，但仍然依赖于<code>Canvas</code>      </li>
+</ol>
+<h2 id="Compose与跨平台"><a href="#Compose与跨平台" class="headerlink" title="Compose与跨平台"></a><code>Compose</code>与跨平台</h2><p>上面说到，<code>Compose</code>的绘制仍然依赖于<code>Canvas</code>，但既然这样，<code>Compose</code>是怎么做到跨平台的呢?<br><strong>这主要是通过良好的分层设计</strong>    </p>
+<p><code>Compose</code> 在代码上自下而上依次分为6层：    </p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0cc64a9871164d2e94f1f654c8490945~tplv-k3u1fbpfcp-watermark.awebp" alt><br>其中<code>compose.runtime</code>和<code>compose.compiler</code>最为核心，它们是支撑声明式UI的基础。     </p>
+<p>而我们上面分析的<code>AndroidComposeView</code>这一部分，属于<code>compose.ui</code>部分，它主要负责<code>Android</code>设备相关的基础<code>UI</code>能力，例如 <code>layout</code>、<code>measure</code>、<code>drawing</code>、<code>input</code> 等<br>但这一部分是可以被替换的，<code>compose.runtime</code> 提供了 <code>NodeTree</code> 管理等基础能力，此部分与平台无关，在此基础上各平台只需实现<code>UI</code>的渲染就是一套完整的声明式<code>UI</code>框架       </p>
+<p>基于<code>compose.runtime</code>可以实现任意一套声明式<code>UI</code>框架,关于<code>compose.runtime</code>的详细介绍可参考<code>fundroid</code>大佬写的：<a href="https://juejin.cn/post/6976435919666544653" target="_blank" rel="noopener">Jetpack Compose Runtime : 声明式 UI 的基础
+</a></p>
+<h2 id="Button的特殊情况"><a href="#Button的特殊情况" class="headerlink" title="Button的特殊情况"></a><code>Button</code>的特殊情况</h2><p>上面我们介绍了在纯<code>Compose</code>项目下，<code>AndroidComposeView</code>不会有子<code>View</code>,而是遍历<code>LayoutnNode</code>来布局测量绘制<br>但如果我们在代码中加入一个<code>Button</code>，结果可能就不太一样了<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">ComposeBody</span><span class="params">()</span></span> &#123;</span><br><span class="line">    Column &#123;</span><br><span class="line">        Text(text = <span class="string">"这是一行测试数据"</span>, color = Color.Black, style = MaterialTheme.typography.h6)</span><br><span class="line">        Row() &#123;</span><br><span class="line">            Text(text = <span class="string">"测试数据1!"</span>, color = Color.Black, style = MaterialTheme.typography.h6)</span><br><span class="line">            Text(text = <span class="string">"测试数据2!"</span>, color = Color.Black, style = MaterialTheme.typography.h6)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Button(onClick = &#123;&#125;) &#123;</span><br><span class="line">            Text(text = <span class="string">"这是一个Button"</span>,color = Color.White)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后我们再看看页面的层级结构<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">E/debug: 第1层：DecorView@182e858[RallyActivity]</span><br><span class="line">E/debug: 第2层：android.widget.LinearLayout&#123;397edb1 V.E...... ........ 0,0-1080,2340&#125;</span><br><span class="line">E/debug: 第3层：android.widget.FrameLayout&#123;e2b0e17 V.E...... ........ 0,90-1080,2340 #1020002 android:id/content&#125;</span><br><span class="line">E/debug: 第4层：androidx.compose.ui.platform.ComposeView&#123;36a3204 V.E...... ........ 0,0-1080,2250&#125;</span><br><span class="line">E/debug: 第5层：androidx.compose.ui.platform.AndroidComposeView&#123;a8ec543 VFED..... ........ 0,0-1080,2250&#125;</span><br><span class="line">E/debug: 第6层：androidx.compose.material.ripple.RippleContainer&#123;28cb3ed V.E...... ......I. 0,0-0,0&#125;</span><br><span class="line">E/debug: 第7层：androidx.compose.material.ripple.RippleHostView&#123;b090222 V.ED..... ......I. 0,0-0,0&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，很明显，<code>AndroidComposeView</code>下多了两层子<code>View</code>，这是为什么呢?    </p>
+<p>我们一起来看下<code>RippleHostView</code>的注释   </p>
+<blockquote>
+<p>Empty View that hosts a RippleDrawable as its background. This is needed as RippleDrawables cannot currently be drawn directly to a android.graphics.RenderNode (b/184760109),<br>so instead we rely on View’s internal implementation to draw to the background android.graphics.RenderNode.<br>A RippleContainer is used to manage and assign RippleHostViews when needed - see RippleContainer.getRippleHostView.</p>
+</blockquote>
+<p>意思也很简单，<code>Compose</code>目前还不能直接绘制水波纹效果，因此需要将水波纹效果设置为<code>View</code>的背景，这里利用<code>View</code>做了一个中转<br>然后<code>RippleHostView</code>与<code>RippleContainer</code>自然会添加到<code>AndroidComposeView</code>中，如果我们在<code>Compose</code>中使用了<code>AndroidView</code>，效果也是一样的<br>但是这种情况并没有违背我们上面说的，纯<code>Compose</code>项目下，<code>AndroidComposeView</code>下没有子<code>View</code>,因为<code>Button</code>并不是纯<code>Compose</code>的    </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要分析回答了<code>Compose</code>到底有没有完全脱离<code>View</code>系统这个问题,总结如下：   </p>
+<ol>
+<li><code>Compose</code>在渲染时并不会转化成<code>View</code>，而是只有一个入口<code>View</code>，即<code>AndroidComposeView</code>,纯<code>Compose</code>项目下，<code>AndroidComposeView</code>没有子<code>View</code>         </li>
+<li>我们声明的<code>Compose</code>布局在渲染时会转化成<code>NodeTree</code>,<code>AndroidComposeView</code>中会触发<code>NodeTree</code>的布局与绘制,<code>AndroidComposeView#dispatchDraw</code>是绘制的入口        </li>
+<li>在<code>Android</code>平台上，<code>Compose</code>的布局与绘制已基本脱离<code>View</code>体系，但仍然依赖于<code>Canvas</code>        </li>
+<li>由于良好的分层体系，<code>Compose</code>可通过 <code>compose.runtime</code>和<code>compose.compiler</code>实现跨平台    </li>
+<li>在使用<code>Button</code>时，<code>AndroidComposeView</code>会有两层子<code>View</code>，这是因为<code>Button</code>中使用了<code>View</code>来实现水波纹效果    </li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6976435919666544653" target="_blank" rel="noopener">Jetpack Compose Runtime : 声明式 UI 的基础</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/compose/" rel="tag"># compose</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/10/okhttp-knowledge-sum.html" rel="next" title="【知识点】OkHttp 原理 8 连问">
+                <i class="fa fa-chevron-left"></i> 【知识点】OkHttp 原理 8 连问
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/10/mvvm-and-mvi.html" rel="prev" title="MVVM 进阶版：MVI 架构了解一下~">
+                MVVM 进阶版：MVI 架构了解一下~ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#现象分析"><span class="nav-number">2.</span> <span class="nav-text">现象分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理分析"><span class="nav-number">3.</span> <span class="nav-text">原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前置知识"><span class="nav-number">3.1.</span> <span class="nav-text">前置知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Applier：增删-NodeTree-的节点"><span class="nav-number">3.1.1.</span> <span class="nav-text">Applier：增删 NodeTree 的节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Composition-Compose执行的起点"><span class="nav-number">3.1.2.</span> <span class="nav-text">Composition: Compose执行的起点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setContent过程分析"><span class="nav-number">3.2.</span> <span class="nav-text">setContent过程分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#setContent入口"><span class="nav-number">3.2.1.</span> <span class="nav-text">setContent入口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Composition的创建"><span class="nav-number">3.2.2.</span> <span class="nav-text">Composition的创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UiApplier的实现"><span class="nav-number">3.2.3.</span> <span class="nav-text">UiApplier的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#布局与绘制入口"><span class="nav-number">3.2.4.</span> <span class="nav-text">布局与绘制入口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">3.3.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Compose与跨平台"><span class="nav-number">4.</span> <span class="nav-text">Compose与跨平台</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Button的特殊情况"><span class="nav-number">5.</span> <span class="nav-text">Button的特殊情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">6.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="compose,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Jetpack Compose的应用也逐渐广泛起来，由于声明式UI的特点，Compose在开发的易用性方面有较大优势，但相信很多人对于Compose的性能问题有一些疑问。这些问题有些是因为Compose还是个新生事物，不够成熟导致的，有些则是因为开发者的使用不当导致的。本文主要介绍如何编写和配置应用程序以获得最佳性能，并指出了一些要避免的问题。         正确配置应用如果您的Compos">
+<meta name="keywords" content="compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jetpack Compose 中常见的性能问题">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/05/compose-general-performance.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Jetpack Compose的应用也逐渐广泛起来，由于声明式UI的特点，Compose在开发的易用性方面有较大优势，但相信很多人对于Compose的性能问题有一些疑问。这些问题有些是因为Compose还是个新生事物，不够成熟导致的，有些则是因为开发者的使用不当导致的。本文主要介绍如何编写和配置应用程序以获得最佳性能，并指出了一些要避免的问题。         正确配置应用如果您的Compos">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/may/p1.jpg">
+<meta property="og:image" content="https://developer.android.com/images/jetpack/compose/phases-3-phases.svg">
+<meta property="og:image" content="https://developer.android.com/images/jetpack/compose/phases-state-read-draw.svg">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.248Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jetpack Compose 中常见的性能问题">
+<meta name="twitter:description" content="前言Jetpack Compose的应用也逐渐广泛起来，由于声明式UI的特点，Compose在开发的易用性方面有较大优势，但相信很多人对于Compose的性能问题有一些疑问。这些问题有些是因为Compose还是个新生事物，不够成熟导致的，有些则是因为开发者的使用不当导致的。本文主要介绍如何编写和配置应用程序以获得最佳性能，并指出了一些要避免的问题。         正确配置应用如果您的Compos">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/may/p1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/05/compose-general-performance.html">
+
+
+
+
+
+  <title>Jetpack Compose 中常见的性能问题 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/05/compose-general-performance.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Jetpack Compose 中常见的性能问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-05-13T08:47:29+08:00">
+                2022-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Jetpack Compose</code>的应用也逐渐广泛起来，由于声明式<code>UI</code>的特点，<code>Compose</code>在开发的易用性方面有较大优势，但相信很多人对于<code>Compose</code>的性能问题有一些疑问。<br>这些问题有些是因为<code>Compose</code>还是个新生事物，不够成熟导致的，有些则是因为开发者的使用不当导致的。<br>本文主要介绍如何编写和配置应用程序以获得最佳性能，并指出了一些要避免的问题。        </p>
+<h2 id="正确配置应用"><a href="#正确配置应用" class="headerlink" title="正确配置应用"></a>正确配置应用</h2><p>如果您的<code>Compose</code>应用性能不佳，则可能意味着存在配置问题。 首先应该检查以下配置项       </p>
+<h3 id="使用Release模式构建并且使用R8"><a href="#使用Release模式构建并且使用R8" class="headerlink" title="使用Release模式构建并且使用R8"></a>使用<code>Release</code>模式构建并且使用<code>R8</code></h3><p>如果您发现性能问题，请确保尝试在<code>Release</code>模式下运行您的应用。<code>Debug</code>模式对于发现许多问题很有用，但它会带来显着的性能成本，并且很难发现可能影响性能的其他代码的问题。<br>同时您还应该使用 <code>R8</code> 编译器从您的应用程序中删除不必要的代码。 默认情况下，在<code>Release</code>模式下构建会自动使用 <code>R8</code> 编译器。</p>
+<h3 id="使用baseline-profile"><a href="#使用baseline-profile" class="headerlink" title="使用baseline profile"></a>使用<code>baseline profile</code></h3><p><code>Compose</code> 作为一个单独的库分发，而不是作为 <code>Android</code> 平台的一部分。这种方法让我们可以经常更新 <code>Compose</code> 并支持较旧的 <code>Android</code> 版本。但是，将 <code>Compose</code> 作为库分发也会产生一定的成本。 <code>Android</code> 平台代码已编译并安装在设备上。另一方面，库需要在应用程序启动时加载，并在需要功能时及时解释(即<code>JIT</code>)。这可能会在启动时减慢应用程序的速度，并且每当它首次使用库功能时。</p>
+<p>您可以通过定义<code>baseline profile</code>来提高性能。这些配置文件定义了用户主流程所需的类和方法，并与您应用的 <code>APK</code> 一起分发。在应用程序安装期间，<code>ART</code> 会提前编译该关键代码(即<code>AOT</code>)，以便在应用程序启动时准备好使用。</p>
+<p>定义一个好的<code>baseline profile</code>并不总是那么容易，因此 <code>Compose</code> 默认附带一个。因此默认情况下你不需要做任何额外工作。<br>同时，如果您选择定义自己的配置文件，您可能会生成一个实际上不会提高应用程序性能的配置文件。您应该测试配置文件以验证它是否有帮助。一个很好的方法是为您的应用程序编写 <a href="https://developer.android.com/studio/profile/macrobenchmark-overview" target="_blank" rel="noopener">Macrobenchmark</a> 测试，并在您编写和修改<code>baseline profile</code>时检查测试结果。有关如何为 <code>Compose UI</code> 编写 <code>Macrobenchmark</code> 测试的示例，请参阅 <a href="https://github.com/android/performance-samples/tree/main/MacrobenchmarkSample" target="_blank" rel="noopener">Macrobenchmark Compose</a> 示例。</p>
+<p>总得来说，使用<code>baseline profile</code>即通过<code>AOT</code>取代<code>JIT</code>，加快<code>Compose</code>首次运行的速度。<br>在默认情况下<code>Compose</code>已经自带了一个默认的<code>baseline profile</code>，你不需要做什么额外工作就可以支持。<br>但如果你要自定义<code>baseline profile</code>的话，需要做好测试用例，验证自定义的配置是否有效。       </p>
+<p>自定义<code>baseline profile</code>比较麻烦，不过根据<code>Google I/O</code>上给出的数据，可以达到20%到30%的启动性能提升，大家可以根据情况决定是否使用<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/may/p1.jpg" alt>      </p>
+<h2 id="关于Compose的一些最佳实践"><a href="#关于Compose的一些最佳实践" class="headerlink" title="关于Compose的一些最佳实践"></a>关于<code>Compose</code>的一些最佳实践</h2><p>在编写<code>Compose</code>代码时你可能会碰到一些常见的错误。这些错误不影响运行，但会损害您的 <code>UI</code> 性能。本节列出了一些最佳实践来帮助您避免它们。      </p>
+<h3 id="使用remember减少计算"><a href="#使用remember减少计算" class="headerlink" title="使用remember减少计算"></a>使用<code>remember</code>减少计算</h3><p><code>Compose</code>函数可以非常频繁地运行，就像动画的每一帧一样频繁。 出于这个原因，你应该尽可能少地在<code>Compose</code>中做计算。<br>最常见的就是使用<code>remember</code>， 这样，计算只运行一次，并且可以在需要时获取结果。<br>例如，这里有一些代码显示排序的名称列表，其中排序操作比较耗时   </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">ContactList</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    contacts: <span class="type">List</span>&lt;<span class="type">Contact</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">    comparator: <span class="type">Comparator</span>&lt;<span class="type">Contact</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">    modifier: <span class="type">Modifier</span> = Modifier</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">    LazyColumn(modifier) &#123;</span><br><span class="line">        <span class="comment">// DON’T DO THIS</span></span><br><span class="line">        items(contacts.sortedWith(comparator)) &#123; contact -&gt;</span><br><span class="line">            <span class="comment">// ...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>问题在于，每次重组 <code>ContactsList</code> 时，整个联系人列表都会重新排序，即使列表没有更改。 如果用户滚动列表，只要出现新行，<code>Composable</code> 就会重新组合。<br>为了解决这个问题，在<code>LazyColumn</code> 之外对列表进行排序，并使用 <code>remember</code> 存储排序后的列表：      </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">ContactList</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    contacts: <span class="type">List</span>&lt;<span class="type">Contact</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">    comparator: <span class="type">Comparator</span>&lt;<span class="type">Contact</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">    modifier: <span class="type">Modifier</span> = Modifier</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> sortedContacts = remember(contacts, sortComparator) &#123;</span><br><span class="line">        contacts.sortedWith(sortComparator)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    LazyColumn(modifier) &#123;</span><br><span class="line">        items(sortedContacts) &#123;</span><br><span class="line">          <span class="comment">// ...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上，当第一次组成 <code>ContactList</code> 时，列表被排序一次。 如果联系人或比较器更改，则重新生成排序列表。 否则，可组合项可以继续使用缓存的排序列表。<br>当然：如果可能，最好将计算完全移到<code>Compose</code>之外，比如<code>ViewModel</code>       </p>
+<h3 id="Lazy-Layout使用Key"><a href="#Lazy-Layout使用Key" class="headerlink" title="Lazy Layout使用Key"></a><code>Lazy Layout</code>使用<code>Key</code></h3><p><code>Lazy Layout</code>使用智能重组，仅在必要时才会发生重组。 同时，我们可以帮助它做出最佳决策。<br>假设用户操作导致<code>item</code>在列表中移动。 例如，假设您显示按修改时间排序的笔记列表，最近修改的笔记在最上面。      </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">NotesList</span><span class="params">(notes: <span class="type">List</span>&lt;<span class="type">Note</span>&gt;)</span></span> &#123;</span><br><span class="line">    LazyColumn &#123;</span><br><span class="line">        items(</span><br><span class="line">            items = notes</span><br><span class="line">        ) &#123; note -&gt;</span><br><span class="line">            NoteRow(note)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不过，这段代码存在一定的问题。 假设底部的<code>note</code>发生了变化。 它现在是最近修改的<code>note</code>，所以它应该排在列表的顶部，而其他每个<code>note</code>都向下移动一个位置。</p>
+<p>这里的问题是，没有您的帮助，<code>Compose</code> 不会意识到未更改的项目只是在列表中移动。 相反，<code>Compose</code> 认为旧的“第 2 项”被删除并创建了一个新的，依此类推，第 3 项、第 4 项一直如此。 结果是，<code>Compose</code> 会重新组合列表中的每一项，即使其中只有一项实际发生了变化。</p>
+<p>解决方案是提供<code>item key</code>。 为每个<code>item</code>提供一个稳定的<code>key</code>可以让 <code>Compose</code> 避免不必要的重组。 在这种情况下，<code>Compose</code> 可以看到现在位于第 3 项和<code>item</code>过去位于第 2 的<code>item</code>相同。由于该项目的数据都没有更改，因此 <code>Compose</code> 不必重新组合它。       </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">NotesList</span><span class="params">(notes: <span class="type">List</span>&lt;<span class="type">Note</span>&gt;)</span></span> &#123;</span><br><span class="line">    LazyColumn &#123;</span><br><span class="line">        items(</span><br><span class="line">            items = notes,</span><br><span class="line">             key = &#123; note -&gt;</span><br><span class="line">                <span class="comment">// Return a stable, unique key for the note</span></span><br><span class="line">                note.id</span><br><span class="line">            &#125;</span><br><span class="line">        ) &#123; note -&gt;</span><br><span class="line">            NoteRow(note)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用-derivedStateOf-限制重组"><a href="#使用-derivedStateOf-限制重组" class="headerlink" title="使用 derivedStateOf 限制重组"></a>使用 <code>derivedStateOf</code> 限制重组</h3><p>在重组中使用状态的一个风险是，如果状态快速变化，你的 <code>UI</code> 可能会比你预期的发生更多的重组。<br>例如，假设您正在显示一个可滚动的列表。 您检查列表的状态以查看哪个<code>item</code>是列表中的第一个可见<code>item</code>：                   </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> listState = rememberLazyListState()</span><br><span class="line"></span><br><span class="line">LazyColumn(state = listState) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> showButton = listState.firstVisibleItemIndex &gt; <span class="number">0</span></span><br><span class="line"></span><br><span class="line">AnimatedVisibility(visible = showButton) &#123;</span><br><span class="line">    ScrollToTopButton()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的问题在于，如果用户滚动列表，<code>listState</code> 会随着用户拖动手指而不断变化。 这意味着该列表不断被重新组合，而<code>showButton</code>的结果也会被不断计算。<br>但是，您只有在<code>firstVisibleItemIndex</code>发生变化时才需要计算<code>showButton</code>。 所以，这里多了很多额外的计算，会影响您的<code>UI</code>性能     </p>
+<p>解决方案是使用<code>derivedStateOf</code>。 <code>derivedStateOf</code>告诉<code>Compose</code>只有当我们关心的状态发生变化时，才需要重组。<br>在这种情况下，当<code>firstVisibleItemIndex</code>发生变化时才需要重组。但如果用户还没有滚动到足以将新<code>item</code>带到顶部的程度，则不需要重新组合。     </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> listState = rememberLazyListState()</span><br><span class="line"></span><br><span class="line">LazyColumn(state = listState) &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> showButton <span class="keyword">by</span> remember &#123;</span><br><span class="line">    derivedStateOf &#123;</span><br><span class="line">        listState.firstVisibleItemIndex &gt; <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">AnimatedVisibility(visible = showButton) &#123;</span><br><span class="line">    ScrollToTopButton()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，如果把状态都放在<code>ViewModel</code>里，也就不用考虑这个了</p>
+<h3 id="尽可能延迟读取State"><a href="#尽可能延迟读取State" class="headerlink" title="尽可能延迟读取State"></a>尽可能延迟读取<code>State</code></h3><p>您应该尽可能推迟读取<code>State</code>。 延迟读取<code>State</code>有助于确保 <code>Compose</code> 在重组时重新运行尽可能少的代码。 例如，如果您的 <code>UI</code> 具有在<code>composable</code>树中高高提升的状态，并且您在子<code>composable</code>中读取状态，则可以将读取的状态包装在 <code>lambda</code> 函数中。 这样做会使读取仅在实际需要时发生。 </p>
+<p>我们来看一段<code>Jetsnack</code>在列表滚动时实现<code>Title</code>折叠展开的代码，为了达到这个效果，<code>Title composable</code>需要知道滚动偏移量，以便使用修饰符来偏移自己。 在进行优化之前，这是<code>Jetsnack</code>代码的简化版本：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">SnackDetail</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    Box(Modifier.fillMaxSize()) &#123; <span class="comment">// Recomposition Scope Start</span></span><br><span class="line">        <span class="keyword">val</span> scroll = rememberScrollState(<span class="number">0</span>)</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        Title(snack, scroll.value)</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125; <span class="comment">// Recomposition Scope End</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">Title</span><span class="params">(snack: <span class="type">Snack</span>, scroll: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">val</span> offset = with(LocalDensity.current) &#123; scroll.toDp() &#125;</span><br><span class="line"></span><br><span class="line">    Column(</span><br><span class="line">        modifier = Modifier</span><br><span class="line">            .offset(y = offset)</span><br><span class="line">    ) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当滚动状态发生变化时，<code>Compose</code> 会寻找最近的父重组作用域并使其无效。 在这种情况下，最近的父级是可组合的是<code>Box</code>。 因此 <code>Compose</code> 重组了 <code>Box</code>，并且还重组了 <code>Box</code> 内的任何可组合项。     如果您将代码重构为仅读取您需要的<code>State</code>，那么您可以减少需要重组的元素数量。     </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">SnackDetail</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">    Box(Modifier.fillMaxSize()) &#123; <span class="comment">// Recomposition Scope Start</span></span><br><span class="line">        <span class="keyword">val</span> scroll = rememberScrollState(<span class="number">0</span>)</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        Title(snack) &#123; scroll.value &#125;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125; <span class="comment">// Recomposition Scope End</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">Title</span><span class="params">(snack: <span class="type">Snack</span>, scrollProvider: () -&gt; <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">val</span> offset = with(LocalDensity.current) &#123; scrollProvider().toDp() &#125;</span><br><span class="line">    Column(</span><br><span class="line">        modifier = Modifier</span><br><span class="line">            .offset(y = offset)</span><br><span class="line">    ) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>滚动参数现在是一个 <code>lambda</code>。 这意味着 <code>Title</code> 仍然可以引用被提升的状态，但该值只能在 <code>Title</code> 内部读取，也就是实际需要的地方。 这样一来，当滚动值发生变化时，最近的重组范围现在是 <code>Title composable</code>，因此<code>Compose</code> 不再需要重组整个 <code>Box</code>。</p>
+<p>这是一个很好的改进，但我们还可以做得更好。 因为我们所做的只是更改可组合标题的偏移量，这可以在布局阶段完成，而不必经过组合阶段。</p>
+<h4 id="Compose的阶段"><a href="#Compose的阶段" class="headerlink" title="Compose的阶段"></a><code>Compose</code>的阶段</h4><p>与大多数其他界面工具包一样，<code>Compose</code> 会通过几个不同的“阶段”来渲染帧。如果我们观察一下 <code>Android View</code> 系统，就会发现它有 3 个主要阶段：测量、布局和绘制。<code>Compose</code> 和它非常相似，但开头多了一个叫做“组合”的重要阶段。</p>
+<p><code>Compose</code> 有 3 个主要阶段：</p>
+<ul>
+<li>组合：要显示什么样的界面。<code>Compose</code> 运行可组合函数并创建界面说明。</li>
+<li>布局：要放置界面的位置。该阶段包含两个步骤：测量和放置。对于布局树中的每个节点，布局元素都会根据 <code>2D</code> 坐标来测量并放置自己及其所有子元素。</li>
+<li>绘制：渲染的方式。界面元素会绘制到画布（通常是设备屏幕）中。</li>
+</ul>
+<p><img src="https://developer.android.com/images/jetpack/compose/phases-3-phases.svg" alt></p>
+<h4 id="优化状态读取"><a href="#优化状态读取" class="headerlink" title="优化状态读取"></a>优化状态读取</h4><p>知道了<code>Compose</code>的3个阶段，<code>Compose</code> 会执行局部状态读取跟踪，因此我们可以在适当阶段读取每个状态，从而尽可能降低需要执行的工作量<br>如果我们在布局阶段读取状态，就可以跳过组合阶段，如果我们在绘制阶段读取状态，就可以跳过组合和布局<br><img src="https://developer.android.com/images/jetpack/compose/phases-state-read-draw.svg" alt></p>
+<p>因此我们可以将<code>offset</code>的读取推迟到布局阶段，这样可以避免组合阶段重新执行<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">Title</span><span class="params">(snack: <span class="type">Snack</span>, scrollProvider: () -&gt; <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    Column(</span><br><span class="line">        modifier = Modifier</span><br><span class="line">            .offset &#123; IntOffset(y = scrollProvider()) &#125;</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>之前代码使用了<code>Modifier.offset(x: Dp, y: Dp)</code>，它以偏移量为参数。 通过切换到修饰符的 <code>lambda</code> 版本，您可以确保函数在布局阶段读取滚动状态。 因此，当滚动状态发生变化时，<code>Compose</code> 可以完全跳过组合阶段，直接进入布局阶段。 当您将频繁更改的状态变量传递给<code>modifier</code>时，应尽可能使用<code>modifier</code>的 <code>lambda</code> 版本。</p>
+<h4 id="绘制阶段读取状态的一个例子"><a href="#绘制阶段读取状态的一个例子" class="headerlink" title="绘制阶段读取状态的一个例子"></a>绘制阶段读取状态的一个例子</h4><p>上面我们看了一个在布局阶段读取状态的例子，下面来看一下绘制阶段读取状态的一个例子<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Here, assume animateColorBetween() is a function that swaps between</span></span><br><span class="line"><span class="comment">// two colors</span></span><br><span class="line"><span class="keyword">val</span> color <span class="keyword">by</span> animateColorBetween(Color.Cyan, Color.Magenta)</span><br><span class="line"></span><br><span class="line">Box(Modifier.fillMaxSize().background(color))</span><br></pre></td></tr></table></figure></p>
+<p>这里盒子的背景颜色在两种颜色之间快速切换。 因此，这种状态变化非常频繁。 然后可组合项在背景<code>modifier</code>中读取此状态。 结果，盒子必须在每一帧上重新组合，因为每一帧的颜色都在变化。</p>
+<p>为了改善这一点，我们可以使用基于 <code>lambda</code> 的<code>modifier</code>：在本例中为 <code>drawBehind</code>。这意味着仅在绘制阶段读取颜色状态。<br>因此，<code>Compose</code> 可以完全跳过组合和布局阶段，当颜色发生变化时，<code>Compose</code> 会直接进入绘制阶段。     </p>
+<h3 id="避免反向写入"><a href="#避免反向写入" class="headerlink" title="避免反向写入"></a>避免反向写入</h3><p><code>Compose</code> 有一个核心假设，即您永远不会写入已读取的状态。 当你这样做时，它被称为反向写入，它会导致重组在每一帧上发生，无休止。<br>以下代码显示了此类错误的示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@Composable</span><br><span class="line">fun BadComposable() &#123;</span><br><span class="line">    var count by remember &#123; mutableStateOf(0) &#125;</span><br><span class="line"></span><br><span class="line">    // Causes recomposition on click</span><br><span class="line">    Button(onClick = &#123; count++ &#125;, Modifier.wrapContentSize()) &#123;</span><br><span class="line">        Text(&quot;Recompose&quot;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Text(&quot;$count&quot;)</span><br><span class="line">    count++ // Backwards write, writing to state after it has been read</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码在读取了状态之后在可组合项末尾的更新了状态。 如果您运行此代码，您会看到在单击导致重组的按钮后，随着 <code>Compose</code> 重组此 <code>Composable</code>，计数器会在无限循环中迅速增加，看到读取的状态已过期，因此会安排另一个重组 .</p>
+<p>您可以通过从不在 <code>Composition</code> 中写入状态来完全避免向后写入。 如果可能，请始终响应事件来更新状态，并使用 <code>lambda</code> 表达式，就像前面的 <code>onClick</code> 示例一样。     </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍如何编写和配置<code>Compose</code>以获得最佳性能，并指出了一些要避免的问题。<br>想要了解更多的同学可参考<code>Google I/O</code>上相关的分享：<a href="https://io.google/2022/program/213421b6-9873-464f-9b36-38eeb232a854/intl/zh/" target="_blank" rel="noopener">Jetpack Compose 中常见的性能问题</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/compose/" rel="tag"># compose</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/05/android-crash-optimize.html" rel="next" title="【从入门到了解】Android稳定性优化深入解析">
+                <i class="fa fa-chevron-left"></i> 【从入门到了解】Android稳定性优化深入解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/05/use-base-profile.html" rel="prev" title="使用 Baseline Profiles 优化启动性能">
+                使用 Baseline Profiles 优化启动性能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正确配置应用"><span class="nav-number">2.</span> <span class="nav-text">正确配置应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Release模式构建并且使用R8"><span class="nav-number">2.1.</span> <span class="nav-text">使用Release模式构建并且使用R8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用baseline-profile"><span class="nav-number">2.2.</span> <span class="nav-text">使用baseline profile</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于Compose的一些最佳实践"><span class="nav-number">3.</span> <span class="nav-text">关于Compose的一些最佳实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用remember减少计算"><span class="nav-number">3.1.</span> <span class="nav-text">使用remember减少计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lazy-Layout使用Key"><span class="nav-number">3.2.</span> <span class="nav-text">Lazy Layout使用Key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-derivedStateOf-限制重组"><span class="nav-number">3.3.</span> <span class="nav-text">使用 derivedStateOf 限制重组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#尽可能延迟读取State"><span class="nav-number">3.4.</span> <span class="nav-text">尽可能延迟读取State</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Compose的阶段"><span class="nav-number">3.4.1.</span> <span class="nav-text">Compose的阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化状态读取"><span class="nav-number">3.4.2.</span> <span class="nav-text">优化状态读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#绘制阶段读取状态的一个例子"><span class="nav-number">3.4.3.</span> <span class="nav-text">绘制阶段读取状态的一个例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免反向写入"><span class="nav-number">3.5.</span> <span class="nav-text">避免反向写入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

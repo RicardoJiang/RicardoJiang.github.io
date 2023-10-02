@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编译技术,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言ASM字节码插桩技术在Android开发中有着广泛的应用，但相信很多人会不知道怎么上手，不知道该拿ASM来做点什么。        学习一门技术最好的方法就是动手实践，本文主要通过ASM插桩采集方法的入参，出参及耗时信息并打印，通过一个不大不小的例子快速上手ASM插桩开发。        技术目标我们先看下最终的效果 插桩前代码首先来看下插桩前代码，就是一个sum方法          123">
+<meta name="keywords" content="编译技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ASM 插桩采集方法入参，出参及耗时信息">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/06/asm-method-record.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言ASM字节码插桩技术在Android开发中有着广泛的应用，但相信很多人会不知道怎么上手，不知道该拿ASM来做点什么。        学习一门技术最好的方法就是动手实践，本文主要通过ASM插桩采集方法的入参，出参及耗时信息并打印，通过一个不大不小的例子快速上手ASM插桩开发。        技术目标我们先看下最终的效果 插桩前代码首先来看下插桩前代码，就是一个sum方法          123">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.248Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ASM 插桩采集方法入参，出参及耗时信息">
+<meta name="twitter:description" content="前言ASM字节码插桩技术在Android开发中有着广泛的应用，但相信很多人会不知道怎么上手，不知道该拿ASM来做点什么。        学习一门技术最好的方法就是动手实践，本文主要通过ASM插桩采集方法的入参，出参及耗时信息并打印，通过一个不大不小的例子快速上手ASM插桩开发。        技术目标我们先看下最终的效果 插桩前代码首先来看下插桩前代码，就是一个sum方法          123">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/06/asm-method-record.html">
+
+
+
+
+
+  <title>ASM 插桩采集方法入参，出参及耗时信息 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/06/asm-method-record.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ASM 插桩采集方法入参，出参及耗时信息</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-12T09:20:00+08:00">
+                2022-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>ASM</code>字节码插桩技术在<code>Android</code>开发中有着广泛的应用，但相信很多人会不知道怎么上手，不知道该拿<code>ASM</code>来做点什么。       </p>
+<p>学习一门技术最好的方法就是动手实践，本文主要通过<code>ASM</code>插桩采集方法的入参，出参及耗时信息并打印，通过一个不大不小的例子快速上手<code>ASM</code>插桩开发。       </p>
+<h2 id="技术目标"><a href="#技术目标" class="headerlink" title="技术目标"></a>技术目标</h2><p>我们先看下最终的效果</p>
+<h3 id="插桩前代码"><a href="#插桩前代码" class="headerlink" title="插桩前代码"></a>插桩前代码</h3><p>首先来看下插桩前代码，就是一个<code>sum</code>方法         </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">sum</span><span class="params">(i: <span class="type">Int</span>, j: <span class="type">Int</span>)</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> i + j</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="插桩后代码"><a href="#插桩后代码" class="headerlink" title="插桩后代码"></a>插桩后代码</h3><p>接下来看下插桩后的代码       </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">    ArrayList arrayList = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    arrayList.add(Integer.valueOf(i));</span><br><span class="line">    arrayList.add(Integer.valueOf(j));</span><br><span class="line">    MethodRecorder.onMethodEnter(<span class="string">"com.zj.android_asm.MainActivity"</span>, <span class="string">"sum"</span>, arrayList);</span><br><span class="line">    <span class="keyword">int</span> i2 = i + j;</span><br><span class="line">    MethodRecorder.onMethodExit(Integer.valueOf(i2), <span class="string">"com.zj.android_asm.MainActivity"</span>, <span class="string">"sum"</span>, <span class="string">"I,I"</span>, <span class="string">"I"</span>);</span><br><span class="line">    <span class="keyword">return</span> i2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，方法所有参数都被添加到了一个<code>arrayList</code>中，并且调用了<code>MethodRecorder.onMethodEnter</code>方法<br>而在结果返回之前，则会调用<code>MethodRecorder.onMethodExit</code>方法，并将返回值，参数类型，返回值类型等作为参数传递过支。     </p>
+<h3 id="日志输出"><a href="#日志输出" class="headerlink" title="日志输出"></a>日志输出</h3><p>在调用了<code>onMethodExit</code>之后，会计算出方法耗时并输出日志，如下所示<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">类名：<span class="selector-tag">com</span><span class="selector-class">.zj</span><span class="selector-class">.android_asm</span><span class="selector-class">.MainActivity</span> </span><br><span class="line">方法名：<span class="selector-tag">sum</span> </span><br><span class="line">参数类型：<span class="selector-attr">[I,I]</span> </span><br><span class="line">入参：<span class="selector-attr">[1,2]</span> </span><br><span class="line">返回类型：<span class="selector-tag">I</span> </span><br><span class="line">返回值：3 </span><br><span class="line">耗时：0 <span class="selector-tag">ms</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="技术实现"><a href="#技术实现" class="headerlink" title="技术实现"></a>技术实现</h2><p>上面我们介绍了最后要实现的效果，下面就来看下怎么一步一步实现，主要分为以下3步：    </p>
+<ol>
+<li>在方法开始时采集方法参数</li>
+<li>在方法结束时采集返回值</li>
+<li>调用帮助类计算耗时及打印结果</li>
+</ol>
+<h3 id="ASM采集方法参数"><a href="#ASM采集方法参数" class="headerlink" title="ASM采集方法参数"></a><code>ASM</code>采集方法参数</h3><p>采集方法参数的方法也很简单，主要就是读取出所有参数的值并存储在一个<code>List</code>中，主要问题在于我们需要用字节码来实现这些逻辑.   </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onMethodEnter</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 方法开始</span></span><br><span class="line">    <span class="keyword">if</span> (isNeedVisiMethod() &amp;&amp; descriptor != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">val</span> parametersIdentifier = MethodRecordUtil.newParameterArrayList(mv, <span class="keyword">this</span>)   <span class="comment">//1. new一个List</span></span><br><span class="line">        MethodRecordUtil.fillParameterArray(methodDesc, mv, parametersIdentifier, access) <span class="comment">//2. 填充列表</span></span><br><span class="line">		MethodRecordUtil.onMethodEnter(mv, className, name, parametersIdentifier) <span class="comment">//3. 调用帮助类</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">super</span>.onMethodEnter()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，采集方法参数也分为3步，接下来我来一步步看下代码    </p>
+<h4 id="ASM创建列表"><a href="#ASM创建列表" class="headerlink" title="ASM创建列表"></a><code>ASM</code>创建列表</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">newParameterArrayList</span><span class="params">(mv: <span class="type">MethodVisitor</span>, localVariablesSorter: <span class="type">LocalVariablesSorter</span>)</span></span>: <span class="built_in">Int</span> &#123;</span><br><span class="line">	<span class="comment">// new一个ArrayList</span></span><br><span class="line">    mv.visitTypeInsn(AdviceAdapter.NEW, <span class="string">"java/util/ArrayList"</span>)</span><br><span class="line">    mv.visitInsn(AdviceAdapter.DUP)</span><br><span class="line">    mv.visitMethodInsn(</span><br><span class="line">        AdviceAdapter.INVOKESPECIAL,</span><br><span class="line">        <span class="string">"java/util/ArrayList"</span>,</span><br><span class="line">        <span class="string">"&lt;init&gt;"</span>,</span><br><span class="line">        <span class="string">"()V"</span>,</span><br><span class="line">        <span class="literal">false</span></span><br><span class="line">    )</span><br><span class="line">    <span class="comment">// 存储new出来的List</span></span><br><span class="line">    <span class="keyword">val</span> parametersIdentifier = localVariablesSorter.newLocal(Type.getType(List::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>))</span></span><br><span class="line">    mv.visitVarInsn(AdviceAdapter.ASTORE, parametersIdentifier)</span><br><span class="line">    <span class="comment">// 返回parametersIdentifier，方便后续访问这个列表</span></span><br><span class="line">    <span class="keyword">return</span> parametersIdentifier</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>逻辑其实很简单，主要问题在于需要用<code>ASM</code>代码写，需要掌握一些字节码指令相关知识。不过我们也可以用<a href="https://plugins.jetbrains.com/plugin/5918-asm-bytecode-outline" target="_blank" rel="noopener">asm-bytecode-outline</a>来自动生成这段代码，这样难度可以降低不少。关于代码中各个指令的具体含义，可查阅<a href="https://blog.csdn.net/qq_33589510/article/details/105285250" target="_blank" rel="noopener">Java虚拟机(JVM)字节码指令表</a>       </p>
+<h4 id="ASM填充列表"><a href="#ASM填充列表" class="headerlink" title="ASM填充列表"></a><code>ASM</code>填充列表</h4><p>接下来要做的就是读出所有的参数并填充到上面创建的列表中<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">fillParameterArray</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    methodDesc: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    mv: <span class="type">MethodVisitor</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    parametersIdentifier: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    access: <span class="type">Int</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 判断是不是静态函数</span></span><br><span class="line">    <span class="keyword">val</span> isStatic = (access and Opcodes.ACC_STATIC) != <span class="number">0</span></span><br><span class="line">    <span class="comment">// 静态函数与普通函数的cursor不同</span></span><br><span class="line">    <span class="keyword">var</span> cursor = <span class="keyword">if</span> (isStatic) <span class="number">0</span> <span class="keyword">else</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">val</span> methodType = Type.getMethodType(methodDesc)</span><br><span class="line">    <span class="comment">// 获取参数列表</span></span><br><span class="line">    methodType.argumentTypes.forEach &#123;</span><br><span class="line">    	<span class="comment">// 读取列表</span></span><br><span class="line">        mv.visitVarInsn(AdviceAdapter.ALOAD, parametersIdentifier)</span><br><span class="line">        <span class="comment">// 根据不同类型获取不同的指令，比如int是iload, long是lload</span></span><br><span class="line">        <span class="keyword">val</span> opcode = it.getOpcode(Opcodes.ILOAD)</span><br><span class="line">        <span class="comment">// 通过指令与cursor读取参数的值</span></span><br><span class="line">        mv.visitVarInsn(opcode, cursor)</span><br><span class="line">        <span class="keyword">if</span> (it.sort &gt;= Type.BOOLEAN &amp;&amp; it.sort &lt;= Type.DOUBLE) &#123;</span><br><span class="line">        	<span class="comment">// 基本类型转换为包装类型</span></span><br><span class="line">            typeCastToObject(mv, it)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 更新cursor</span></span><br><span class="line">        cursor += it.size</span><br><span class="line">        <span class="comment">// 添加到列表中</span></span><br><span class="line">        mv.visitMethodInsn(</span><br><span class="line">            AdviceAdapter.INVOKEINTERFACE,</span><br><span class="line">            <span class="string">"java/util/List"</span>,</span><br><span class="line">            <span class="string">"add"</span>,</span><br><span class="line">            <span class="string">"(Ljava/lang/Object;)Z"</span>,</span><br><span class="line">            <span class="literal">true</span></span><br><span class="line">        )</span><br><span class="line">        mv.visitInsn(AdviceAdapter.POP)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>主要代码如上所示，代码中都有注释，主要需要注意以下几点:    </p>
+<ol>
+<li>静态函数与普通函数的初始<code>cursor</code>不同，因此需要区分开来    </li>
+<li>不同类型的参数加载的指令也不同，因此需要通过<code>Type.getOpcode</code>获取具体指令       </li>
+<li>为了将参数放在一个列表中，需要将基本类型转换为包装类型，比如<code>int</code>转换为<code>Integer</code>        </li>
+</ol>
+<h4 id="ASM调用帮助类"><a href="#ASM调用帮助类" class="headerlink" title="ASM调用帮助类"></a><code>ASM</code>调用帮助类</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">onMethodEnter</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    mv: <span class="type">MethodVisitor</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    className: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    name: <span class="type">String</span>?,</span></span></span><br><span class="line"><span class="function"><span class="params">    parametersIdentifier: <span class="type">Int</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">    mv.visitLdcInsn(className)</span><br><span class="line">    mv.visitLdcInsn(name)</span><br><span class="line">    mv.visitVarInsn(AdviceAdapter.ALOAD, parametersIdentifier)</span><br><span class="line">    mv.visitMethodInsn(</span><br><span class="line">        AdviceAdapter.INVOKESTATIC, <span class="string">"com/zj/android_asm/MethodRecorder"</span>, <span class="string">"onMethodEnter"</span>,</span><br><span class="line">        <span class="string">"(Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V"</span>, <span class="literal">false</span></span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个比较简单，主要就是通过<code>ASM</code>调用<code>MethodRecorder.onMethodEnter</code>方法</p>
+<h3 id="ASM采集返回值"><a href="#ASM采集返回值" class="headerlink" title="ASM采集返回值"></a><code>ASM</code>采集返回值</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onMethodExit</span><span class="params">(opcode: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 方法结束</span></span><br><span class="line">    <span class="keyword">if</span> (isNeedVisiMethod()) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((opcode <span class="keyword">in</span> IRETURN..RETURN) || opcode == ATHROW) &#123;</span><br><span class="line">            <span class="keyword">when</span> (opcode) &#123;</span><br><span class="line">            	<span class="comment">// 基本类型返回</span></span><br><span class="line">                <span class="keyword">in</span> IRETURN..DRETURN -&gt; &#123;</span><br><span class="line">                	<span class="comment">// 读取返回值</span></span><br><span class="line">                    MethodRecordUtil.loadReturnData(mv, methodDesc)</span><br><span class="line">                    MethodRecordUtil.onMethodExit(mv, className, name, methodDesc)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 对象返回</span></span><br><span class="line">                ARETURN -&gt; &#123;</span><br><span class="line">                	<span class="comment">// 读取返回值</span></span><br><span class="line">                    mv.visitInsn(DUP)</span><br><span class="line">                    MethodRecordUtil.onMethodExit(mv, className, name, methodDesc)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 空返回</span></span><br><span class="line">                RETURN -&gt; &#123;</span><br><span class="line">                    mv.visitLdcInsn(<span class="string">"void"</span>)</span><br><span class="line">                    MethodRecordUtil.onMethodExit(mv, className, name, methodDesc)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">super</span>.onMethodExit(opcode);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>采集返回值的逻辑也很简单，主要分为以下几步    </p>
+<ol>
+<li>判断当前指令，并且根据不同类型的返回添加不同的逻辑       </li>
+<li>通过<code>DUP</code>指令复制栈顶数值并将复制值压入栈顶，以读取返回值    </li>
+<li>读取方法参数类型与返回值类型，并调用<code>MethodRecorder.onMexthodExit</code>方法</li>
+</ol>
+<h3 id="帮助类实现"><a href="#帮助类实现" class="headerlink" title="帮助类实现"></a>帮助类实现</h3><p>由于<code>ASM</code>需要直接操作字节码，写起来终究不太方便，因此我们尽可能把代码转移到帮助类中，然后通过在<code>ASM</code>中调用帮助类来简化开发，帮助类的代码如下所示：   </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> MethodRecorder &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> mMethodRecordMap = HashMap&lt;String, MethodRecordItem&gt;()</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JvmStatic</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onMethodEnter</span><span class="params">(className: <span class="type">String</span>, methodName: <span class="type">String</span>, parameterList: <span class="type">List</span>&lt;<span class="type">Any</span>?&gt;?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> key = <span class="string">"<span class="subst">$&#123;className&#125;</span>,<span class="subst">$&#123;methodName&#125;</span>"</span></span><br><span class="line">        <span class="keyword">val</span> startTime = System.currentTimeMillis()</span><br><span class="line">        <span class="keyword">val</span> list = parameterList?.filterNotNull() ?: emptyList()</span><br><span class="line">        mMethodRecordMap[key] = MethodRecordItem(startTime, list)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@JvmStatic</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">onMethodExit</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        response: <span class="type">Any</span>? = <span class="literal">null</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        className: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        methodName: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        parameterTypes: <span class="type">String</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        returnType: <span class="type">String</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> key = <span class="string">"<span class="subst">$&#123;className&#125;</span>,<span class="subst">$&#123;methodName&#125;</span>"</span></span><br><span class="line">        mMethodRecordMap[key]?.let &#123;</span><br><span class="line">            <span class="keyword">val</span> parameters = it.parameterList.joinToString(<span class="string">","</span>)</span><br><span class="line">            <span class="keyword">val</span> duration = System.currentTimeMillis() - it.startTime</span><br><span class="line">            <span class="keyword">val</span> result = <span class="string">"类名：<span class="variable">$className</span> \n方法名：<span class="variable">$methodName</span> \n参数类型：[<span class="variable">$parameterTypes</span>] \n入参：[<span class="variable">$parameters</span>] \n返回类型：<span class="variable">$returnType</span> \n返回值：<span class="variable">$response</span> \n耗时：<span class="variable">$duration</span> ms \n"</span></span><br><span class="line">            Log.i(<span class="string">"methodRecord"</span>, result)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码其实也很简单，主要逻辑如下：   </p>
+<ol>
+<li>方法开始时调用<code>onMethodEnter</code>方法，传入参数列表，并记录下方法开始时间          </li>
+<li>方法结束时调用<code>onMethodExit</code>方法，传入返回值，计算方法耗时并打印结果</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过上述步骤，我们就把<code>ASM</code>插桩实现记录方法入参，返回值以及方法耗时的功能完成了，通过插桩可以在方法执行的时候输出我们需要的信息。而这些信息的价值就是可以很好的让我们做一些程序的全链路监控以及工程质量验证。  </p>
+<p>总得来说，逻辑上其实并不复杂，主要问题可能在于需要熟悉如何直接操作字节码，我们可以通过<a href="https://plugins.jetbrains.com/plugin/5918-asm-bytecode-outline" target="_blank" rel="noopener">asm-bytecode-outline</a>等工具自动生成代码来简化开发，同时也可以通过尽量把逻辑迁移到帮助类中的方式来减少直接操作字节码的工作。</p>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><p>本文所有源码可见：<a href="https://github.com/shenzhen2017/Android-ASM" target="_blank" rel="noopener">https://github.com/shenzhen2017/Android-ASM</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://blog.csdn.net/qq_33589510/article/details/105285250" target="_blank" rel="noopener">Java虚拟机(JVM)字节码指令表</a><br><a href="https://bugstack.cn/md/bytecode/asm/2020-04-05-%5BASM%E5%AD%97%E8%8A%82%E7%A0%81%E7%BC%96%E7%A8%8B%5DJavaAgent+ASM%E5%AD%97%E8%8A%82%E7%A0%81%E6%8F%92%E6%A1%A9%E9%87%87%E9%9B%86%E6%96%B9%E6%B3%95%E5%90%8D%E7%A7%B0%E4%BB%A5%E5%8F%8A%E5%85%A5%E5%8F%82%E5%92%8C%E5%87%BA%E5%8F%82%E7%BB%93%E6%9E%9C%E5%B9%B6%E8%AE%B0%E5%BD%95%E6%96%B9%E6%B3%95%E8%80%97%E6%97%B6.html#_4-%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9C" target="_blank" rel="noopener">ASM字节码编程 | JavaAgent+ASM字节码插桩采集方法名称以及入参和出参结果并记录方法耗时</a><br><a href="https://blog.51cto.com/lsieun/2955738" target="_blank" rel="noopener">Java ASM系列：（025）修改已有的方法（添加－进入和退出－打印方法参数和返回值）</a>            </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编译技术/" rel="tag"># 编译技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/06/gradle7-transform-learn.html" rel="next" title="Transform 被废弃，ASM 如何适配?">
+                <i class="fa fa-chevron-left"></i> Transform 被废弃，ASM 如何适配?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/06/how-apk-compile.html" rel="prev" title="Android Apk 编译打包流程，了解一下~">
+                Android Apk 编译打包流程，了解一下~ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术目标"><span class="nav-number">2.</span> <span class="nav-text">技术目标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#插桩前代码"><span class="nav-number">2.1.</span> <span class="nav-text">插桩前代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插桩后代码"><span class="nav-number">2.2.</span> <span class="nav-text">插桩后代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日志输出"><span class="nav-number">2.3.</span> <span class="nav-text">日志输出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术实现"><span class="nav-number">3.</span> <span class="nav-text">技术实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ASM采集方法参数"><span class="nav-number">3.1.</span> <span class="nav-text">ASM采集方法参数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ASM创建列表"><span class="nav-number">3.1.1.</span> <span class="nav-text">ASM创建列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ASM填充列表"><span class="nav-number">3.1.2.</span> <span class="nav-text">ASM填充列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ASM调用帮助类"><span class="nav-number">3.1.3.</span> <span class="nav-text">ASM调用帮助类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ASM采集返回值"><span class="nav-number">3.2.</span> <span class="nav-text">ASM采集返回值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#帮助类实现"><span class="nav-number">3.3.</span> <span class="nav-text">帮助类实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例代码"><span class="nav-number">4.1.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.2.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

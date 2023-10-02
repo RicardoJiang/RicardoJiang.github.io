@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="原标题: repeatOnLifecycle API design story原文地址: repeatOnLifecycle API design story原文作者：Manuel Vivo  前言众所周知，Google发布一个新的Library都要经历alpha,beta,rc,release等多个版本的迭代在这个漫长的迭代过程中，通常会有Bug的修复，代码与功能的增删等等，哪些代码应该该增加">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】Google 是怎么设计一个 API 的,了解一下~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/08/desin-api-story.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="原标题: repeatOnLifecycle API design story原文地址: repeatOnLifecycle API design story原文作者：Manuel Vivo  前言众所周知，Google发布一个新的Library都要经历alpha,beta,rc,release等多个版本的迭代在这个漫长的迭代过程中，通常会有Bug的修复，代码与功能的增删等等，哪些代码应该该增加">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p2.jpg">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p3.jpg">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.243Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】Google 是怎么设计一个 API 的,了解一下~">
+<meta name="twitter:description" content="原标题: repeatOnLifecycle API design story原文地址: repeatOnLifecycle API design story原文作者：Manuel Vivo  前言众所周知，Google发布一个新的Library都要经历alpha,beta,rc,release等多个版本的迭代在这个漫长的迭代过程中，通常会有Bug的修复，代码与功能的增删等等，哪些代码应该该增加">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p2.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/08/desin-api-story.html">
+
+
+
+
+
+  <title>【译】Google 是怎么设计一个 API 的,了解一下~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/08/desin-api-story.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【译】Google 是怎么设计一个 API 的,了解一下~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-05T08:58:27+08:00">
+                2021-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>原标题: repeatOnLifecycle API design story<br>原文地址: <a href="https://medium.com/androiddevelopers/repeatonlifecycle-api-design-story-8670d1a7d333" target="_blank" rel="noopener">repeatOnLifecycle API design story</a><br>原文作者：Manuel Vivo</p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>众所周知，<code>Google</code>发布一个新的<code>Library</code>都要经历<code>alpha</code>,<code>beta</code>,<code>rc</code>,<code>release</code>等多个版本的迭代<br>在这个漫长的迭代过程中，通常会有<code>Bug</code>的修复，代码与功能的增删等等，哪些代码应该该增加，哪些代码应该删除，这就是考验设计者的地方        </p>
+<p>本文主要讲述了<code>Google</code>在设计及迭代<code>repeatOnLifecycle API</code>过程中的设计与决策<br><code>repeatOnLifecycle</code>主要用于在<code>UI</code>中收集<code>flow</code>,关于它的用法可见：<a href="https://juejin.cn/post/6984258307293151239" target="_blank" rel="noopener">使用更为安全的方式收集 Android UI 数据流</a>    </p>
+<p>通过本文你将了解以下内容:   </p>
+<ol>
+<li><code>repeatOnLifecycle API</code>背后的设计决策     </li>
+<li>为什么<code>alpha</code>版本中添加的<code>addRepeatingJob API</code>会被移除?      </li>
+<li>为什么<code>flowWithLifecycle API</code>会被保留?    </li>
+<li>为什么<code>API</code>命名是重要且困难的     </li>
+<li>为什么只保留库中最基础的几个 <code>API</code>。      </li>
+</ol>
+<h2 id="译文"><a href="#译文" class="headerlink" title="译文"></a>译文</h2><h3 id="repeatOnLifecycle介绍"><a href="#repeatOnLifecycle介绍" class="headerlink" title="repeatOnLifecycle介绍"></a><code>repeatOnLifecycle</code>介绍</h3><p><code>Lifecycle.repeatOnLifecycle API</code>主要是为了在<code>UI</code>层进行更安全的<code>Flow</code>收集<br>比如<code>lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED)</code>,会在<code>onStart</code>时启动协程，在<code>onStop</code>时取消协程<br>然后在<code>Activity</code>重新回到<code>onStart</code>时重新启动一个协程        </p>
+<p>这种特性与<code>UI</code>生命周期的可重启性比较契合，让它成为仅当<code>UI</code>可见时才收集<code>flow</code>的完美默认<code>API</code>      </p>
+<ol>
+<li><code>repeatOnLifecycle</code> 是一个挂起函数,<code>repeatOnLifecycle</code> 会挂起调用协程              </li>
+<li>每次给定的生命周期达到目标状态或更高时,都会启动一个新的协程,运行传入的<code>block</code>      </li>
+<li>如果生命周期状态低于目标，则为块启动的协程将被取消。 </li>
+<li>最后，在生命周期被销毁之前，<code>repeatOnLifecycle</code> 函数本身不会恢复调用协程。        </li>
+</ol>
+<p>下面来看一下这个<code>API</code>的示例，关于它的用法更详细的介绍可见：<a href="https://juejin.cn/post/6984258307293151239" target="_blank" rel="noopener">使用更为安全的方式收集 Android UI 数据流</a><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 从lifecycleScope创建一个新的协程</span></span><br><span class="line">        <span class="comment">// 因为repeatOnLifecycle 是一个挂起函数</span></span><br><span class="line">        lifecycleScope.launch &#123;</span><br><span class="line">            <span class="comment">// 阻塞协程，直到生命周期到达DESTOYED</span></span><br><span class="line">			<span class="comment">// repeatOnLifecycle会在每次生命周期处于 STARTED 状态（或更高状态）时，启动一个新的协程运行传入的block</span></span><br><span class="line">			<span class="comment">// 并在 STOPPED 时取消协程。</span></span><br><span class="line">            repeatOnLifecycle(Lifecycle.State.STARTED) &#123;</span><br><span class="line">                <span class="comment">// 安全的collect flow当生命周期到达STARTED</span></span><br><span class="line">                <span class="comment">// 当生命周期到达STOPPED 时停止collect</span></span><br><span class="line">                someLocationProvider.locations.collect &#123;</span><br><span class="line">                    <span class="comment">// 收集到新的位置，更新UI</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 注意，当运行到这的时候，说明lifecycle已经是DESTROYED</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果你对<code>repeatOnLifecycle</code>是怎么实现的感兴趣，可以查看源码：<a href="https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:lifecycle/lifecycle-runtime-ktx/src/main/java/androidx/lifecycle/RepeatOnLifecycle.kt" target="_blank" rel="noopener">repeatOnLifecycle源码</a>   </p>
+<h3 id="为什么repeatOnLifecycle是挂起函数"><a href="#为什么repeatOnLifecycle是挂起函数" class="headerlink" title="为什么repeatOnLifecycle是挂起函数?"></a>为什么<code>repeatOnLifecycle</code>是挂起函数?</h3><p>针对<code>repeatOnLifecycle</code>可重启的特性，挂起函数是最佳选择       </p>
+<ol>
+<li>因为它保留了调用的上下文，即<code>CoroutineContext</code>      </li>
+<li>同时<code>repeatOnLifecycle</code>内部使用了<code>suspendCancellableCoroutine</code>,因此它支持取消，当取消协程时，<code>repeatOnLifecycle</code>与它的子协程都会被取消        </li>
+</ol>
+<p>此外，我们可以在<code>repeatOnLifecycle</code>之上扩展更多<code>API</code>，例如<code>Flow.flowWithLifecycle</code>流操作符。<br>更重要的是，如果您的项目需要，它还允许您在此<code>API</code>基础上扩展封装辅助函数.这就是我们尝试使用<code>LifecycleOwner.addRepeatingJob API</code>做的事情<br>我们在 <code>lifecycle-runtime-ktx:2.4.0-alpha01</code> 中添加了该 <code>API</code>，但是在<code>alpha02</code>中删除了该<code>API</code>。            </p>
+<h3 id="为什么移除addRepeatingJob-API"><a href="#为什么移除addRepeatingJob-API" class="headerlink" title="为什么移除addRepeatingJob API?"></a>为什么移除<code>addRepeatingJob API</code>?</h3><p><code>LifecycleOwner.addRepeatingJob API</code>在<code>alpha01</code>中添加，但是在<code>alpha02</code>中被移除了<br>为什么呢？我们先来看看实现<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">fun</span> LifecycleOwner.<span class="title">addRepeatingJob</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    state: <span class="type">Lifecycle</span>.<span class="type">State</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    coroutineContext: <span class="type">CoroutineContext</span> = EmptyCoroutineContext,</span></span></span><br><span class="line"><span class="function"><span class="params">    block: <span class="type">suspend</span> <span class="type">CoroutineScope</span>.() -&gt; <span class="type">Unit</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>: Job = lifecycleScope.launch(coroutineContext) &#123;</span><br><span class="line">    repeatOnLifecycle(state, block)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出代码很简单，本质上就是对<code>repeatOnLifecycle</code>的封装，传入<code>state</code>与<code>block</code>就能实现与<code>repeatOnLifecycle</code>同样的效果<br>之所以引入这个<code>API</code>是为了简化调用方式，一起看下代码:<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line"></span><br><span class="line">        lifecycleOwner.addRepeatingJob(Lifecycle.State.STARTED) &#123;</span><br><span class="line">            someLocationProvider.locations.collect &#123;</span><br><span class="line">                <span class="comment">//...</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>乍一看，您可能认为这段代码更简洁，需要的代码更少。 但是，如果您不密切注意，使用这个<code>API</code>会带来一些隐藏的陷阱          </p>
+<ul>
+<li>尽管<code>addRepeatingJob</code>需要传入一个挂起的<code>block</code>，但<code>addRepeatingJob</code>不是挂起函数。 因此，你不应该在协程中调用它！！！    </li>
+<li>再来看收益，您只节省了一行代码，代价是拥有了一个更容易出错的<code>API</code>。    </li>
+</ul>
+<p>第一点可能有些同学会奇怪，为什么不应该在协程中调用非挂起函数？<br>实际上是因为协程最核心的概念之一:<a href="https://elizarov.medium.com/structured-concurrency-722d765aa952" target="_blank" rel="noopener">结构化并发</a>          </p>
+<h4 id="什么是结构化并发？"><a href="#什么是结构化并发？" class="headerlink" title="什么是结构化并发？"></a>什么是结构化并发？</h4><p>要了解结构化并发，我们先来看看线程，线程的并发是非结构化的<br>可以想想这几个问题在线程中要怎么解决：<br>1.结束一个线程时，怎么同时结束这个线程中创建的子线程？<br>2.当某个子线程在执行时需要结束兄弟线程要做怎么做？<br>3.如何等待所有子线程都执行完了再结束父线程？               </p>
+<p>当然这些问题，都可以通过共享标记位等方式解决，但是这几个问题说明，线程间没有级联关系；<br>所有线程执行的上下文都是整个进程，多个线程的并发是相对整个进程的，而不是相对某一个父线程。<br>这就是线程并发的「非结构化」。    </p>
+<p><strong>但与此同时，业务的并发通常是结构化的</strong><br>通常，每个并发操作都是在处理一个任务单元，这个任务单元可能属于某个父任务单元，同时它也可能有子任务单元。<br>而每个任务单元都有自己的生命周期，子任务的生命周期理应继了父任务的生命周期。<br>这就是业务的「结构化」。   </p>
+<p>因此协程中引入结构化并发的概念，在结构化并发中，每个并发操作都有自己的作用域，并且：<br>1.在父作用域内新建作用域都属于它的子作用域；<br>2.父作用域和子作用域具有级联关系；<br>3.父作用域的生命周期持续到所有子作用域执行完；<br>4.当主动结束父作用域时，会级联结束它的各个子作用域。      </p>
+<p><code>Kotlin</code>的协程就是结构化的并发，它有 「协程作用域(<code>CoroutineScope</code>)」 的角色。<br>全局的 <code>GlobalScope</code> 是一个作用域，每个协程自身也是一个作用域。新建的协程对象和父协程保持着级联关系。      </p>
+<p>关于结构化并发的更多内容可见：<a href="https://www.jianshu.com/p/3dc8ba43c28b" target="_blank" rel="noopener">什么是 结构化并发 ？</a></p>
+<h4 id="addRepeatingJob的问题"><a href="#addRepeatingJob的问题" class="headerlink" title="addRepeatingJob的问题"></a><code>addRepeatingJob</code>的问题</h4><p><code>addRepeatingJob</code>不是挂起函数，因此默认情况下不支持结构化并发<br>由于<code>block</code>参数是一个挂起的<code>lambda</code>，您很容易将此<code>API</code>与协程相关联，您可以轻松编写如下危险代码：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> job = lifecycleScope.launch &#123;</span><br><span class="line"></span><br><span class="line">            doSomeSuspendInitWork()            </span><br><span class="line">            <span class="comment">// 危险的！ 此 API 没有保留调用上下文！</span></span><br><span class="line">			<span class="comment">// 当父协程被取消时它不会被取消！</span></span><br><span class="line">            addRepeatingJob(Lifecycle.State.STARTED) &#123;</span><br><span class="line">                someLocationProvider.locations.collect &#123;</span><br><span class="line">                    <span class="comment">// 更新ui</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果发生错误，取消上面启动的协程</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">/* ... */</span></span><br><span class="line">        &#125; <span class="keyword">catch</span>(t: Throwable) &#123;</span><br><span class="line">            job.cancel()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码有什么问题？ <code>addRepeatingJob</code> 是处理协程相关的东西，没有什么能阻止我在协程中调用它，对吧？         </p>
+<p>因为<code>addRepeatingJob</code>不是挂起函数，在内部实现中会调用<code>lifecycleScope</code>来启动一个新的协程<br>因此不会保留调用协程的上下文，也不支持结构化并发，即当调用<code>job.cancel()</code>时不会取消<code>addRepeatingJob</code>中创建的协程<br>这是非常不符合预期的，也很容易导致难以调试的不可预知的<code>BUG</code>    </p>
+<p>在<code>addRepeatingJob</code>内部隐式调用了<code>CoroutineScope</code>，导致这个<code>API</code>在某些情况下使用是不安全的。<br>用户如果要正确使用这个<code>API</code>，还需要了解一下额外的知识，这是不可接收的，这也是移除这个<code>API</code>的原因      </p>
+<p>而<code>repeatOnLifecycle</code>的主要好处在于它默认支持结构化并发，它还可以帮助您思考您希望重复工作在哪个生命周期内发生。 <code>API</code>一目了然，符合开发人员的期望      </p>
+<h3 id="为什么保留Flow-flowWithLifecycle"><a href="#为什么保留Flow-flowWithLifecycle" class="headerlink" title="为什么保留Flow.flowWithLifecycle?"></a>为什么保留<code>Flow.flowWithLifecycle</code>?</h3><p><code>Flow.flowWithLifecycle</code> 运算符构建在<code>repeatOnLifecycle</code>之上<br>并且仅在生命周期至少处于<code>minActiveState</code>时才发出上游流发送的元素,当生命周期低于<code>minActiveState</code>会取消上游流<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line"></span><br><span class="line">        lifecycleScope.launch &#123;</span><br><span class="line">            someLocationProvider.locations</span><br><span class="line">                .flowWithLifecycle(lifecycle, STARTED)</span><br><span class="line">                .collect &#123;</span><br><span class="line">                    <span class="comment">//更新UI</span></span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>尽管这个<code>API</code>也有一些隐式的需要注意的问题，但我们决定保留它，因为它作为一个<code>Flow</code>操作符很实用。<br>例如，它可以轻松地用于<code>Jetpack Compose</code>。尽管您可以通过使用<code>produceState</code> 和<code>repeatOnLifecycle API</code> 在<code>Compose</code> 中实现相同的功能,我们将此<code>API</code> 保留在库中，作为一个替代方案。     </p>
+<p><code>flowWithLifecycle</code>需要注意的问题是，添加<code>flowWithLifecycle</code>运算符的顺序很重要。<br>当生命周期低于<code>minActiveState</code>时，在<code>flowWithLifecycle</code>运算符之前添加的运算符将被取消。<br>但是，即使没有发送任何元素，在<code>flowWithLifecycle</code>之后添加的运行符也不会被取消。     </p>
+<p>因此，这个<code>API</code>命名参照了<code>Flow.flowOn(CoroutineContext)</code>运算符<br>因为此<code>API</code>更改了用于收集上游流的<code>CoroutineContext</code>，同时使下游不受影响，与<code>flowOn</code>类似。     </p>
+<h3 id="我们应该添加更多的API吗？"><a href="#我们应该添加更多的API吗？" class="headerlink" title="我们应该添加更多的API吗？"></a>我们应该添加更多的<code>API</code>吗？</h3><p>鉴于我们已经拥有了<code>Lifecycle.repeatOnLifecycle</code>、<code>LifecycleOwner.repeatOnLifecycle</code> 和 <code>Flow.flowWithLifecycle API</code>。<br>我们还应该添加任何其他<code>API</code>吗？      </p>
+<p>新<code>API</code>可能会带来与它们解决的问题一样多的混乱。支持不同用例的方式有多种，最好的方式取决于你的业务代码是怎样的.对您的项目有效的方法可能对其他人无效。     </p>
+<p>这就是为什么我们不想为所有可能的情况提供<code>API</code>，可用的 <code>API</code> 越多，开发人员就越不知道何时使用什么。<br>因此，我们决定只保留最底层的 <code>API</code>。有时，<strong>少即是多</strong>。      </p>
+<h3 id="API命名是重要且困难的"><a href="#API命名是重要且困难的" class="headerlink" title="API命名是重要且困难的"></a><code>API</code>命名是重要且困难的</h3><p><code>API</code>命名是重要的，命名应符合开发人员的期望并遵循<code>Kotlin</code>协程的约定。例如：      </p>
+<ul>
+<li>如果<code>API</code>中隐式地使用<code>CoroutineScope</code>启动新的协程，则必须在名称中反映出来，以避免错误的期望！在这种情况下，<code>launch</code> 应该以某种方式包含在命名中。      </li>
+<li><code>collect</code>是一个挂起函数。如果<code>API</code>不是挂起函数，则不要在<code>API</code>命名中加上<code>collect</code>。        </li>
+</ul>
+<p><code>LifecycleOwner.addRepeatingJob API</code>也很难命名。<code>API</code>内部使用<code>CoroutineScope</code>创建新的协程时，看起来它应该以<code>launch</code> 为前缀。<br>但是，我们想将此<code>API</code>与内部的协程分离开来，同时因为它添加了一个新的<code>Lifecycle Observer</code>，因此命名与其他<code>LifecycleOwner API</code>更加一致。       </p>
+<p>命名也受到现有的<code>LifecycleCoroutineScope.launchWhenX API</code>的影响。<br>因为<code>launchWhenStarted</code>和<code>repeatOnLifecycle(STARTED)</code>提供完全不同的功能（<code>launchWhenStarted</code>挂起协程的执行，而<code>repeatOnLifecycle</code>取消并重新启动一个新的协程）<br>如果新<code>API</code>的名称相似（例如，使用<code>launchWhenever</code>作为重新启动的<code>API</code>） ，开发人员可能会感到困惑，甚至在没有注意到的情况下混淆使用它们。    </p>
+<h3 id="一行代码实现flow收集"><a href="#一行代码实现flow收集" class="headerlink" title="一行代码实现flow收集"></a>一行代码实现<code>flow</code>收集</h3><p>目前的收集方法还是有些烦琐的，如果你是从<code>LiveData</code>迁移到<code>Flow</code>,你可能会觉得要是可以一行代码实现<code>collect</code>就好了<br>这样你就可以删除模板代码，并且使迁移变得简单     </p>
+<p>因此，您可以像<a href="https://twitter.com/ianhlake" target="_blank" rel="noopener">Ian Lake</a>刚开始使用<code>repeatOnLifecycle API</code> 时所做的那样。<br>他创建了一个名为<code>collectIn</code>的包装器，如下所示（为了遵循上面讨论的命名约定，我将其重命名为<code>launchAndCollectIn</code>）：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> Flow<span class="type">&lt;T&gt;</span>.<span class="title">launchAndCollectIn</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    owner: <span class="type">LifecycleOwner</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    minActiveState: <span class="type">Lifecycle</span>.<span class="type">State</span> = Lifecycle.State.STARTED,</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">crossinline</span> action: <span class="type">suspend</span> <span class="type">CoroutineScope</span>.(<span class="type">T</span>) -&gt; <span class="type">Unit</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> = owner.lifecycleScope.launch &#123;</span><br><span class="line">        owner.repeatOnLifecycle(minActiveState) &#123;</span><br><span class="line">            collect &#123;</span><br><span class="line">                action(it)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后你可以在<code>UI</code>中这样使用<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LocationActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState)</span><br><span class="line"></span><br><span class="line">        someLocationProvider.locations.launchAndCollectIn(<span class="keyword">this</span>, STARTED) &#123;</span><br><span class="line">            <span class="comment">// 更新UI</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个包装器在这个例子中看起来很好很简单，但遇到了我们之前提到的<code>LifecycleOwner.addRepeatingJob</code>相同的问题。它不支持结构化并发，在其他协程中使用可能很危险。<br>此外，原来的名称确实具有误导性：<code>collectIn</code>不是挂起函数！如前所述，开发人员预期<code>collect</code>会挂起。<br>也许，这个包装器的更好名称可能是<code>Flow.launchAndCollectIn</code> 以防止不良用法。   </p>
+<h3 id="你需要一个API包装器吗？"><a href="#你需要一个API包装器吗？" class="headerlink" title="你需要一个API包装器吗？"></a>你需要一个<code>API</code>包装器吗？</h3><p>如果您需要在<code>repeatOnLifecycle API</code>之上创建包装器来方便开发，请问问自己是否真的需要它，以及为什么需要它。<br>如果你确信需要，我建议你选择一个非常明确的<code>API</code>命名来清楚地定义包装器的行为，以避免误用。此外，要非常清楚地记录它，以便新手可以完全理解使用它的含义。      </p>
+<h2 id="阅读源码的小技巧"><a href="#阅读源码的小技巧" class="headerlink" title="阅读源码的小技巧"></a>阅读源码的小技巧</h2><p>当我们查看源码的时候，已经是<code>API</code>完成的状态了，其实我们可以查看<code>API</code>迭代开发过程的源码，看看在迭代过程中都发生了什么，这些都是开源的<br>比如<code>repeatOnLifecycle API</code>是在<code>lifecycle-runtime-ktx</code>库中，我们可以看下它的<code>git log</code>,<a href="https://android.googlesource.com/platform/frameworks/support/+log/refs/changes/92/1684192/10/lifecycle/lifecycle-runtime-ktx/src/main/java/androidx/lifecycle" target="_blank" rel="noopener">lifecycle-runtime-ktx库git历史</a>如下图所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p2.jpg" alt><br>从上面我们可以看出<code>repeatOnLifecycle</code>功能是怎样一步一步被引入并修改的    </p>
+<p>我们甚至可以看看代码的<code>review</code>过程，看看<code>reviewr</code>有提出什么意见,比如<a href="https://android-review.googlesource.com/c/platform/frameworks/support/+/1684192" target="_blank" rel="noopener">addRepeatingJob Review过程</a>如下图所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p3.jpg" alt>  </p>
+<p>通过查看功能引入的<code>git log</code>，我们可以学习<code>Google</code>是怎么一步一步引入一个新功能并迭代的，相信对我们学习或者开发<code>API</code>都有所帮助    </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要讲解了<code>repeatOnLifecycle API</code>在开发与迭代过程中的一些设计与思考，总结如下：   </p>
+<ol>
+<li><code>API</code>决策通常需要在复杂性、可读性以及<code>API</code>容易出错的程度方面进行一些权衡思考    </li>
+<li>之所以移除<code>addRepeatingJob API</code>是因为它不支持结构化并发，在协程中使用可能会带来不可预期的错误     </li>
+<li><code>API</code>命名是重要且困难的，命名应符合开发人员的期望并遵循原有<code>API</code>的规范    </li>
+<li>我们不可能为所有情况提供<code>API</code>, 可用的<code>API</code> 越多，开发人员反倒不知道何时使用什么,因此我们只需保留最底层的<code>API</code>，有时少就是多    </li>
+<li>我们可以通过查看新<code>API</code>引入的<code>git log</code>，来学习理解新<code>API</code>的引入与迭代过程        </li>
+</ol>
+<p>更文不易，如果本文对你有所帮助，欢迎点赞收藏~      </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/07/android-view-question.html" rel="next" title="从 XML 到 View 显示在屏幕上，都发生了什么?">
+                <i class="fa fa-chevron-left"></i> 从 XML 到 View 显示在屏幕上，都发生了什么?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/08/know-http-sum.html" rel="prev" title="【知识点】Http协议8连问">
+                【知识点】Http协议8连问 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#译文"><span class="nav-number">2.</span> <span class="nav-text">译文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#repeatOnLifecycle介绍"><span class="nav-number">2.1.</span> <span class="nav-text">repeatOnLifecycle介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么repeatOnLifecycle是挂起函数"><span class="nav-number">2.2.</span> <span class="nav-text">为什么repeatOnLifecycle是挂起函数?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么移除addRepeatingJob-API"><span class="nav-number">2.3.</span> <span class="nav-text">为什么移除addRepeatingJob API?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是结构化并发？"><span class="nav-number">2.3.1.</span> <span class="nav-text">什么是结构化并发？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#addRepeatingJob的问题"><span class="nav-number">2.3.2.</span> <span class="nav-text">addRepeatingJob的问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么保留Flow-flowWithLifecycle"><span class="nav-number">2.4.</span> <span class="nav-text">为什么保留Flow.flowWithLifecycle?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我们应该添加更多的API吗？"><span class="nav-number">2.5.</span> <span class="nav-text">我们应该添加更多的API吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API命名是重要且困难的"><span class="nav-number">2.6.</span> <span class="nav-text">API命名是重要且困难的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一行代码实现flow收集"><span class="nav-number">2.7.</span> <span class="nav-text">一行代码实现flow收集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#你需要一个API包装器吗？"><span class="nav-number">2.8.</span> <span class="nav-text">你需要一个API包装器吗？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#阅读源码的小技巧"><span class="nav-number">3.</span> <span class="nav-text">阅读源码的小技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

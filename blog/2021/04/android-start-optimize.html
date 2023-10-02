@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="性能优化,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言性能优化的方案不少，但能落地应用到项目中的却不多前段时间学习布局优化时，总结了不少布局优化的方案，但最后却无法在项目中应用：【从入门到放弃】android布局优化深入解析今天一如既往，不做标题党，给大家介绍一些可以实用的启动优化方案~ 对于android APP来说，启动时间是用户的第一体验，如果启动时间过长，很可能会流失用户，所以启动优化也是我们做性能优化的一个重要方向本文主要包括以下内容1">
+<meta name="keywords" content="性能优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【从入门到实用】android启动优化深入解析">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/04/android-start-optimize.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言性能优化的方案不少，但能落地应用到项目中的却不多前段时间学习布局优化时，总结了不少布局优化的方案，但最后却无法在项目中应用：【从入门到放弃】android布局优化深入解析今天一如既往，不做标题党，给大家介绍一些可以实用的启动优化方案~ 对于android APP来说，启动时间是用户的第一体验，如果启动时间过长，很可能会流失用户，所以启动优化也是我们做性能优化的一个重要方向本文主要包括以下内容1">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://developer.android.com/topic/performance/images/cold-launch.png?hl=zh-cn">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/19/16ca87e78817bbbb?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/19/16ca87e7b1bc5c28?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/8/19/16ca87e7f95fcdcd?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.242Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【从入门到实用】android启动优化深入解析">
+<meta name="twitter:description" content="前言性能优化的方案不少，但能落地应用到项目中的却不多前段时间学习布局优化时，总结了不少布局优化的方案，但最后却无法在项目中应用：【从入门到放弃】android布局优化深入解析今天一如既往，不做标题党，给大家介绍一些可以实用的启动优化方案~ 对于android APP来说，启动时间是用户的第一体验，如果启动时间过长，很可能会流失用户，所以启动优化也是我们做性能优化的一个重要方向本文主要包括以下内容1">
+<meta name="twitter:image" content="https://developer.android.com/topic/performance/images/cold-launch.png?hl=zh-cn">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/04/android-start-optimize.html">
+
+
+
+
+
+  <title>【从入门到实用】android启动优化深入解析 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/04/android-start-optimize.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【从入门到实用】android启动优化深入解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-22T07:50:46+08:00">
+                2021-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>性能优化的方案不少，但能落地应用到项目中的却不多<br>前段时间学习布局优化时，总结了不少布局优化的方案，但最后却无法在项目中应用：<a href="https://juejin.cn/post/6950791235413999652" target="_blank" rel="noopener">【从入门到放弃】android布局优化深入解析</a><br>今天一如既往，不做标题党，给大家介绍一些可以实用的启动优化方案~</p>
+<p>对于<code>android APP</code>来说，启动时间是用户的第一体验，如果启动时间过长，很可能会流失用户，所以启动优化也是我们做性能优化的一个重要方向<br>本文主要包括以下内容<br>1.启动优化有哪些优化方向？<br>2.如何精准测量启动时间？<br>3.有哪些实用的优化手段？    </p>
+<h2 id="启动优化有哪些优化方向？"><a href="#启动优化有哪些优化方向？" class="headerlink" title="启动优化有哪些优化方向？"></a>启动优化有哪些优化方向？</h2><p>应用有三种启动状态，每种状态都会影响应用向用户显示所需的时间：冷启动、温启动或热启动。在冷启动中，应用从头开始启动。在另外两种状态中，系统需要将后台运行的应用带入前台。<br>本文所说的启动优化都是指冷启动优化    </p>
+<p>要优化应用以实现快速启动，了解系统和应用层面的情况以及它们在各个状态中的互动方式很有帮助。   </p>
+<h3 id="冷启动"><a href="#冷启动" class="headerlink" title="冷启动"></a>冷启动</h3><p>冷启动是指应用从头开始启动：系统进程在冷启动后才创建应用进程。<br>发生冷启动的情况包括应用自设备启动后或系统终止应用后首次启动。<br>这种启动给最大限度地减少启动时间带来了最大的挑战，因为系统和应用要做的工作比在另外两种启动状态中更多。</p>
+<p>在冷启动开始时，系统有三个任务，它们是：<br>1.加载并启动应用。<br>2.在启动后立即显示应用的空白启动窗口。<br>3.创建应用进程。    </p>
+<p>系统一创建应用进程，应用进程就负责后续阶段：<br>1.创建应用对象。<br>2.启动主线程。<br>3.创建主 <code>Activity</code>。<br>4.填充视图。<br>5.布局屏幕。<br>6.执行初始绘制。    </p>
+<p>一旦应用进程完成第一次绘制，系统进程就会换掉当前显示的后台窗口，替换为主 <code>Activity</code>。此时，用户可以开始使用应用。<br><img src="https://developer.android.com/topic/performance/images/cold-launch.png?hl=zh-cn" alt><br>如上所示，<code>Application</code>与<code>Activity</code>的生命周期就是我们的优化方向<br>一般为<code>Application onCreate</code>方法与首个<code>Activity</code>加载耗时   </p>
+<h2 id="如何测量启动时间？"><a href="#如何测量启动时间？" class="headerlink" title="如何测量启动时间？"></a>如何测量启动时间？</h2><h3 id="最简单方法"><a href="#最简单方法" class="headerlink" title="最简单方法"></a>最简单方法</h3><p>通过查看<code>logcat</code>可以快速了解启动时间<br>在<code>Android Studio Logcat</code>中过滤关键字<code>Displayed</code>，可以看到对应的冷启动耗时日志。     </p>
+<h3 id="命令测量"><a href="#命令测量" class="headerlink" title="命令测量"></a>命令测量</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">for i in `seq 1 10`</span><br><span class="line">do</span><br><span class="line">  adb shell am force-stop com.xx.xx</span><br><span class="line">  sleep 2</span><br><span class="line">  adb shell am start-activity -W -n 包名/activity名称 | grep "TotalTime" | cut -d ' ' -f 2</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<p>有时候我们需要统计app的冷启动性能，单次结果往往不准确 还需要多次统计以后做平均值<br>如上，使用脚本启动10次首页<code>Activity</code>,可以比较准确的获取冷启动性能   </p>
+<p>命令测量方式线下使用方便，可以测试竞品<br>但是不能带到线上,不能精准控制测量时间<br>所以我们通常还需要手动埋点    </p>
+<h3 id="埋点测量"><a href="#埋点测量" class="headerlink" title="埋点测量"></a>埋点测量</h3><p>埋点测量关键点在于合适的开始与结束时间<br>我们一般使用<code>Application attachBaseContext</code>作为开始时间<br>而启动结束时间则有很多选择   </p>
+<h4 id="IdleHandler"><a href="#IdleHandler" class="headerlink" title="IdleHandler"></a>IdleHandler</h4><p><code>IdleHandler</code>在<code>MessageQueue</code>空闲时会回调,也就是所在线程任务已经执行完时，线程处于空闲状态时才会执行<code>Idle</code>列表中的任务。<br>正常情况下，当主线程程处于空闲状态时，可以认为冷启动已经完成，是一个比较不错的打点时机<br>但有个问题，如果<code>UI</code>线程的任务一直不执行完呢？如果有其他任务加入了<code>MessageQueue</code>但是页面已经可见了呢？<br><code>IdleHandler</code>具有一定的不可控特性，读者可根据项目特性判断是否使用   </p>
+<h4 id="onWindowFocusChanged"><a href="#onWindowFocusChanged" class="headerlink" title="onWindowFocusChanged"></a>onWindowFocusChanged</h4><p>当<code>Activity</code>回调<code>onWindowFocusChanged</code>时，我们可以认为<code>Activity</code>已经可见了，所以可以在此时打点<br>不过<code>onWindowFocusChanged</code> 方法只是 <code>Activity</code> 的首帧时间，是 <code>Activity</code> 首次进行绘制的时间，首帧时间和界面完整展示出来还有一段时间差，不能真正代表界面已经展现出来了。    </p>
+<p>但是<code>onWindowFocusChanged</code>方式与业务耦合少，侵入性低，使用起来比较方便<br>在我们的项目中回调时间与界面展示时间相差很少，可以作为一种可选方案，根据实际情况使用   </p>
+<h4 id="onPrewDrawListener"><a href="#onPrewDrawListener" class="headerlink" title="onPrewDrawListener"></a>onPrewDrawListener</h4><p>如上面所说，正确的计算启动耗时的时机是要等真实的数据展示出来，比如在列表第一项的展示时再计算启动耗时。<br>我们可以在给列表的第一项添加<code>onPreDrawListener</code>监听，这种方式比较准确<br>不过这种方式与业务代码强相关，侵入性较大。读者也可根据实际情况使用   </p>
+<h3 id="AOP测量方法耗时"><a href="#AOP测量方法耗时" class="headerlink" title="AOP测量方法耗时"></a>AOP测量方法耗时</h3><p>我们的<code>Application</code>中初始化了很多第三方库，有时我们需要统计每个方法的耗时，确定是哪个方法比较耗时，如果一个一个添加是很麻烦的<br>这种时候就可以使用<code>AOP</code>面向切面编程<br>如果想了解详情，请参阅<a href="https://juejin.cn/post/6844904093786308622#heading-34" target="_blank" rel="noopener">使用AOP测量方法耗时</a></p>
+<h3 id="TraceView与SystraceView使用"><a href="#TraceView与SystraceView使用" class="headerlink" title="TraceView与SystraceView使用"></a>TraceView与SystraceView使用</h3><h4 id="TraceView"><a href="#TraceView" class="headerlink" title="TraceView"></a>TraceView</h4><p><code>TraceView</code>可以跟踪 <code>App</code> 某段时间内所有调用过的方法，这是测量应用执行性能常用的方式之一.<br>通过它我们可以查出 <code>App</code> 启动时具体都调用了方法，都花了多长时间。<br>这个功能是 <code>Android</code> 系统提供的，我们可以通过在代码里手动调用 <code>android.os.Debug.startMethodTracing()</code> 和 <code>stopMethodTracing()</code> 方法来开始和结束 <code>Tracing</code>，然后系统会把 <code>Tracing</code> 的结果保存到手机的 <code>.trace</code> 文件里。</p>
+<p>此外，除了通过写代码来 <code>Trace</code>，我们也有更方便的方式。例如也可以通过 <code>Android Studio Profiler</code> 里的 <code>Method Tracer</code> 来 <code>Trace</code>。但是，针对 <code>App</code> 的冷启动，我们则通常会用 <code>Android</code> 系统自带的 <code>Am</code> 命令来跟踪，因为它能准确的在 <code>App</code> 启动的时候就开始 <code>Trace</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 启动指定 Activity，并同时进行采样跟踪,-P在app进入idle状态时profiler结束</span></span><br><span class="line">adb shell am start -n com.xxx.android/com.xxx.android.app.ui.activity.MainActivity -P /data/local/tmp/xxx-startup.trace --sampling 1000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 拉取 .trace 文件到本机当前目录</span></span><br><span class="line">adb pull /data/local/tmp/xx-startup.trace .</span><br></pre></td></tr></table></figure>
+<p>如上所示：-P参数表示在<code>app</code>进入<code>idle</code>状态时会自动结束，这样就不必手动打点了<br>在启动结束后，通过<code>adb pull</code>拉取<code>trace</code>文件后，直接拖到<code>android studio</code>中打开就可以查找耗时方法了<br><img src="https://user-gold-cdn.xitu.io/2019/8/19/16ca87e78817bbbb?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt>    </p>
+<p>更多关于<code>TraceView</code>定位启动优化问题的实例，读者可参阅:<br><a href="https://juejin.cn/post/6844903919580086280#heading-19" target="_blank" rel="noopener">TraceView使用</a><br><a href="https://www.jianshu.com/p/bcc3dddf0b36" target="_blank" rel="noopener">知乎 Android 客户端启动优化 - Retrofit 代理</a>   </p>
+<h4 id="Systrace"><a href="#Systrace" class="headerlink" title="Systrace"></a>Systrace</h4><p><code>TraceView</code> 虽然是找出耗时方法的利器，但是执行 <code>TraceView</code> 时的运行环境和用户最终运行的环境会有极大的差距，因为 <code>TraceView</code> 会严重拖慢 <code>App</code> 的执行速度。<br>即使使用采样跟踪，测量得到的结果和实际结果肯定还是有很大偏差，只能作为参考。<br>而且 <code>TraceView</code> 更偏向于追查应用的内因，对于运行环境等外因（锁、<code>GC</code>、资源匮乏等）的追查显得很无力。<br>所以，我们可以借助另一个 <code>Google</code> 官方极力推荐的工具 - 「<code>Systrace</code>」来跟踪 App 实际运行时的情况    </p>
+<p>运行<code>app</code>后，手动杀掉。然后<code>cd</code> 到<code>SDK</code> 目录下的 <code>platform-tools/systrace</code> 下，使用命令：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python systrace<span class="selector-class">.py</span> -t <span class="number">10</span> -o /Users/xxx/trace<span class="selector-class">.html</span> -<span class="selector-tag">a</span> com<span class="selector-class">.xx</span>.xxx</span><br></pre></td></tr></table></figure></p>
+<p>其中：<code>-t</code> 10是指跟踪10秒，<code>-o</code> 表示把文件输出到指定目录下，<code>-a</code> 是指定应用包名。<br>输入完这行命令后，可以看到开始跟踪的提示。看到 <code>Starting tracing</code>后，手动打开我们的应用。   </p>
+<p>等到运行结束后打开输出的<code>trace.html</code><br><img src="https://user-gold-cdn.xitu.io/2019/8/19/16ca87e7b1bc5c28?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt>    </p>
+<p>除了以上外，我们也可以通过<code>TraceCompact.beginSection</code>来指定关注的时间段<br>更多关于<code>Systrace</code>使用的实例，读者可以参阅:<br><a href="https://juejin.cn/post/6844903919580086280#heading-22" target="_blank" rel="noopener">systrace使用</a><br><a href="https://www.jianshu.com/p/bcc3dddf0b36" target="_blank" rel="noopener">知乎 Android 客户端启动优化 - Retrofit 代理-Systrace</a>  </p>
+<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>1.<code>TraceView</code>可以用来定位具体耗时的方法<br>2.<code>TraceView</code>运行时开销严重，导致整体性能变慢，可能会带偏优化方向<br>3.<code>Systrace</code>开销小，可以直观反映<code>Cpu</code>使用率，便于查找运行环境等外因(锁,<code>GC</code>)等引起的问题<br>4.<code>TraceView</code>与<code>Systrace</code>都可以埋点，指定关心的区域   </p>
+<h2 id="常规优化手段"><a href="#常规优化手段" class="headerlink" title="常规优化手段"></a>常规优化手段</h2><h3 id="1-Theme切换"><a href="#1-Theme切换" class="headerlink" title="1.Theme切换"></a>1.Theme切换</h3><p><code>Theme</code>设置可以说是启动优化的一个必备手段了<br>启动<code>Activity</code>的<code>windowBackground</code>主题属性预先设置一个启动图片（<code>layer-list</code>实现），在启动后，在<code>Activity</code>的<code>onCreate()</code>方法中的<code>super.onCreate()</code>前再<code>setTheme(R.style.AppTheme)</code>。</p>
+<p><strong>优点</strong><br>1.使用简单。<br>2.避免了启动白屏和点击启动图标不响应的情况。    </p>
+<p><strong>缺点</strong><br>治标不治本，表面上产生一种快的感觉。</p>
+<h3 id="2-异步方案"><a href="#2-异步方案" class="headerlink" title="2.异步方案"></a>2.异步方案</h3><p>我们通常会在<code>Application</code>的<code>onCreate</code>中初始化很多任务，比如第三方库初始化，而且是串行的<br>这些初始化任务的耗时通常还不小，所以一个优化思路就是并行的初始化<br>这样就将初始化耗时从加法变成了求最大值   </p>
+<p>核心思路：子线程分担主线程任务，并行减少时间</p>
+<h4 id="常规异步方案的问题"><a href="#常规异步方案的问题" class="headerlink" title="常规异步方案的问题"></a>常规异步方案的问题</h4><p>1.代码不够优雅<br>假如我们有 100 个初始化任务，那我们就需要提交 100 次任务。     </p>
+<p>2.无法限制在 <code>onCreate</code> 中完成<br>有的第三方库的初始化任务需要在 <code>Application</code> 的 <code>onCreate</code> 方法中执行完成，虽然可以用 <code>CountDownLatch</code> 实现等待，但是还是有点繁琐。    </p>
+<p>3.无法实现存在依赖关系<br>有的初始化任务之间存在依赖关系，比如极光推送需要设备<code>ID</code>，而 <code>initDeviceId()</code> 这个方法也是一个初始化任务。</p>
+<h2 id="异步启动器方案"><a href="#异步启动器方案" class="headerlink" title="异步启动器方案"></a>异步启动器方案</h2><p>上面介绍了常规异步方案的几个问题，我们可以通过启动器来解决<br>启动器的核心思想是充分利用多核 <code>CPU</code> ，自动梳理任务顺序。   </p>
+<p>1.第一步是我们要对代码进行任务化，任务化是一个简称，比如把启动逻辑抽象成一个任务。</p>
+<p>2.第二步是根据所有任务的依赖关系排序生成一个有向无环图，这个图是自动生成的，也就是对所有任务进行排序。<br>比如我们有个任务 <code>A</code> 和任务 <code>B</code>，任务 <code>B</code> 执行前需要任务 <code>A</code> 执行完，这样才能拿到特定的数据，比如上面提到的 <code>initDeviceId</code>。 </p>
+<p>3.第三步是多线程根据排序后的优先级依次执行，比如我们现在有三个任务 <code>A</code>、<code>B</code>、<code>C</code>。<br>假如任务 <code>B</code> 依赖于任务 <code>A</code>，这时候生成的有向无环图就是 <code>ACB</code>，<code>A</code> 和 <code>C</code> 可以提前执行，<code>B</code> 一定要排在 <code>A</code> 之后执行。    </p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/8/19/16ca87e7f95fcdcd?imageView2/0/w/1280/h/960/format/webp/ignore-error/1" alt>   </p>
+<p>启动器的大致流程如上所示，我们下面介绍几种开源的启动器方案，供读者参考    </p>
+<h3 id="JetPack-App-Startup"><a href="#JetPack-App-Startup" class="headerlink" title="JetPack App Startup"></a>JetPack App Startup</h3><p>1.<code>App Startup</code> 这个库提供了一个组件，可以在应用程序启动的时候初始化。<br>2.开发人员可以使用这个组件精简启动序列和显式地设置初始化的顺序。 　<br>3.我们不需要为每个组件定义单独的 <code>ContentProvider</code>,<code>App Startup</code> 允许您定义的所有组件化共享一个内容提供者。    </p>
+<p>这样可以极大地减少高应用程序的启动时间,但是<code>App Startup</code>只是支持将多个<code>ContentProvider</code>合并到一个<code>ContentProvider</code>中，并指定一定依赖顺序<br>它的推出的目的，是管理第三方库使用<code>ContentProvider</code>过多，导致启动速度变慢的问题<br>不支持异步与异步任务管理，所以并不符合我们的要求     </p>
+<h3 id="阿里-alpha"><a href="#阿里-alpha" class="headerlink" title="阿里-alpha"></a>阿里-alpha</h3><blockquote>
+<p><code>Alpha</code>是一个基于<code>PERT</code>图构建的<code>Android</code>异步启动框架，它简单，高效，功能完善。 在应用启动的时候，我们通常会有很多工作需要做，为了提高启动速度，我们会尽可能让这些工作并发进行。但这些工作之间可能存在前后依赖的关系，所以我们又需要想办法保证他们执行顺序的正确性。<code>Alpha</code>就是为此而设计的，使用者只需定义好自己的<code>task</code>，并描述它依赖的<code>task</code>，将它添加到<code>Project</code>中。框架会自动并发有序地执行这些<code>task</code>，并将执行的结果抛出来。 由于<code>Android</code>应用支持多进程，所以<code>Alpha</code>支持为不同进程配置不同的启动模式。</p>
+</blockquote>
+<p><code>alpha</code>已经基本满足我们的使用，不过它不支持任务是否需要等待，同时它的代码比较旧，感觉已经很久不维护了，所以最后决定使用<code>AnchorTask</code>框架    </p>
+<h3 id="AnchorTask"><a href="#AnchorTask" class="headerlink" title="AnchorTask"></a><code>AnchorTask</code></h3><p>AnchorTask与Alpha类似<br>1.支持多任务并发执行<br>2.支持任务间依赖与拓扑排序<br>3.支持任务监听与耗时统计<br>4.支持指定任务优先级<br>5.支持指定是否在主线程运行与是否等待   </p>
+<p>最主要的一点在于<code>AnchorTask</code>文档比较强大，从数据结构到拓扑排序，到设计到详细的说清楚了,有一系列文章，这也是我最后决定使用它的原因<br><a href="https://github.com/gdutxiaoxu/AnchorTask" target="_blank" rel="noopener">AnchorTask</a> by <a href="https://juejin.im/user/2207475076966584" target="_blank" rel="noopener">程序员徐公</a>    </p>
+<p>简单使用如下，可以通过链式调用灵活的配置任务与依赖：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> project =  AnchorProject.Builder().setContext(context).setLogLevel(LogUtils.LogLevel.DEBUG)</span><br><span class="line">                .setAnchorTaskCreator(ApplicationAnchorTaskCreator())</span><br><span class="line">                .addTask(TASK_NAME_ZERO)</span><br><span class="line">                .addTask(TASK_NAME_ONE)</span><br><span class="line">                .addTask(TASK_NAME_TWO)</span><br><span class="line">                .addTask(TASK_NAME_THREE).afterTask(</span><br><span class="line">                    TASK_NAME_ZERO,</span><br><span class="line">                    TASK_NAME_ONE</span><br><span class="line">                )</span><br><span class="line">                .addTask(TASK_NAME_FOUR).afterTask(</span><br><span class="line">                    TASK_NAME_ONE,</span><br><span class="line">                    TASK_NAME_TWO</span><br><span class="line">                )</span><br><span class="line">                .addTask(TASK_NAME_FIVE).afterTask(</span><br><span class="line">                    TASK_NAME_THREE,</span><br><span class="line">                    TASK_NAME_FOUR</span><br><span class="line">                )</span><br><span class="line">                .setThreadPoolExecutor(TaskExecutorManager.instance.cpuThreadPoolExecutor)</span><br><span class="line">                .build()</span><br><span class="line">project.start().await()</span><br></pre></td></tr></table></figure></p>
+<h2 id="延迟初始化方案"><a href="#延迟初始化方案" class="headerlink" title="延迟初始化方案"></a>延迟初始化方案</h2><h3 id="常规方案"><a href="#常规方案" class="headerlink" title="常规方案"></a>常规方案</h3><p>有些任务我们需要延迟加载，常规方法是通过<code>Handler.postDelayed</code>方法发送一个延迟消息，比如延迟到 100 毫秒后执行。    </p>
+<h4 id="常规方案的问题"><a href="#常规方案的问题" class="headerlink" title="常规方案的问题"></a>常规方案的问题</h4><p>这种方法有以下几个问题<br>1.时机不便控制,无法确定一个合适的延迟时间<br>2.代码不够优雅，维护成本高,如果有多个任务，需要添加多次<br>3.可能造成主线程卡顿，假如把任务延迟 200 毫秒后执行，而 200 后用户还在滑动列表，那还是会发生卡顿。     </p>
+<h3 id="更优方案"><a href="#更优方案" class="headerlink" title="更优方案"></a>更优方案</h3><p>核心思想：对延迟任务进行分批初始化<br>利用<code>IdleHandler</code>在当前消息队列空闲时执行的特性，实现一个延迟启动器<br><code>IdleHandler</code>在返回<code>true</code>时会继续监听，返回<code>false</code>结束监听<br>因此在任务全部完成后返回<code>false</code>即可,实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DelayInitDispatcher</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Queue&lt;Task&gt; mDelayTasks = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> MessageQueue.IdleHandler mIdleHandler = <span class="keyword">new</span> MessageQueue.IdleHandler() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">queueIdle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(mDelayTasks.size()&gt;<span class="number">0</span>)&#123;</span><br><span class="line">                Task task = mDelayTasks.poll();</span><br><span class="line">                <span class="keyword">new</span> DispatchRunnable(task).run();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> !mDelayTasks.isEmpty();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DelayInitDispatcher <span class="title">addTask</span><span class="params">(Task task)</span></span>&#123;</span><br><span class="line">        mDelayTasks.add(task);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Looper.myQueue().addIdleHandler(mIdleHandler);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用</span></span><br><span class="line">DelayInitDispatcher delayInitDispatcher = <span class="keyword">new</span> DelayInitDispatcher();</span><br><span class="line">delayInitDispatcher.addTask(<span class="keyword">new</span> DelayInitTaskA())</span><br><span class="line">        .addTask(<span class="keyword">new</span> DelayInitTaskB())</span><br><span class="line">        .start();</span><br></pre></td></tr></table></figure>
+<h2 id="极致懒加载与提前加载"><a href="#极致懒加载与提前加载" class="headerlink" title="极致懒加载与提前加载"></a>极致懒加载与提前加载</h2><h3 id="首页极致懒加载"><a href="#首页极致懒加载" class="headerlink" title="首页极致懒加载"></a>首页极致懒加载</h3><p>我们的首页通常有多个<code>tab</code>,而当我们启动时，只需要初始化一个<code>tab</code>即可<br>我们通常会利用<code>ViewPager</code>来实现简单的懒加载，比如只有当<code>Fragment</code>可见时才去进行网络请示   </p>
+<p>这样有一定效果，但是<code>View</code>的<code>inflate</code>,<code>measure</code>,<code>layout</code>也需要一定时间<br>更加极致的懒加载方案如下：<br>1.首屏加载时，只往<code>ViewPager</code>中塞入默认要展示的<code>tab</code>，剩余的<code>tab</code>用空的占位<code>Fragment</code>代替<br>2.占位<code>Fragment</code>中只有一个空白的<code>FrameLayout</code><br>3.当占位<code>Fragment</code>可见时，将真正要展示的<code>Fragment</code>添加到空白<code>FrameLayout</code>，进行真正的初始化   </p>
+<p>通过这种方案，可以做到在启动时，只<code>inflate</code>,<code>measure</code>,<code>layout</code>首页<code>Fragment</code>的<code>View</code>,其他<code>Tab</code>只有可见时才会填充<br>如果你的<code>Layout</code>比较复杂的话，通过这种方式可以较大的改善启动性能   </p>
+<h3 id="布局预加载"><a href="#布局预加载" class="headerlink" title="布局预加载"></a>布局预加载</h3><p>官方提供了一个类，可以来进行异步的<code>inflate</code>，但是有两个缺点：<br>1.每次都要现场<code>new</code>一个出来<br>2.异步加载的<code>view</code>只能通过<code>callback</code>回调才能获得，使用不方便（死穴）<br>3.如果在<code>Activity</code>中进行初始化，通过<code>callback</code>回调时，并没有减少加载时间，仍然需要等待    </p>
+<p>由于以上问题，一个思考方向就是，能不能提前在子线程<code>inflate</code>布局，然后在<code>Activity</code>中通过<code>id</code>取出来<br>核心思想如下<br>1.初始化时在子线程中<code>inflate</code>布局，存储在缓存中<br>2.<code>Activity</code>初始化时，先从缓存结果里面拿 <code>View</code>，拿到了<code>view</code>直接返回<br>3.没拿到<code>view</code>，但是子线程在<code>inflate</code>中，等待返回<br>4.如果还没开始<code>inflate</code>，由<code>UI</code>线程进行<code>inflate</code>     </p>
+<p><strong>这种方案的优点:</strong><br>可以大大减少 <code>View</code> 创建的时间，使用这种方案之后，获取 <code>View</code> 的时候基本在 10ms 之内的。</p>
+<p><strong>缺点</strong><br>1.由于 <code>View</code> 是提前创建的，并且会存在在一个 <code>map</code>，需要根据自己的业务场景将 <code>View</code> 从 <code>map</code> 中移除，不然会发生内存泄露<br>2.<code>View</code> 如果缓存起来，记得在合适的时候重置 <code>view</code> 的状态，不然有时候会发生奇奇怪怪的现象。     </p>
+<p>总得来说，优缺点都很明显，读者可根据实际情况(主要是项目中<code>inflate</code>的时间长不长，改用提前加载后收益明不明显？),根据实际情况决定是否使用<br>具体实现可参阅：<a href="https://juejin.cn/post/6844903924965572615#heading-10" target="_blank" rel="noopener">神奇的的预加载（预加载View，而不是data）</a>   </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要总结了启动优化的方向，与精准测量启动时间的方式<br>重点讲解了几种可以实用的启动优化方案：<br>1.异步启动器加快初始化速度<br>2.延迟加载器减少卡顿，代码更加优雅<br>3.首页极致懒加载，减少首页<code>inflate</code>,<code>measure</code>,<code>layout</code>时间<br>4.布局预加载方案大大减少<code>View</code>创建时间，读者可根据实际情况使用    </p>
+<p>这些方案都比较实用，读者可以尝试在项目中应用，看看有多少提升~    </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn" target="_blank" rel="noopener">应用启动时间</a><br><a href="https://juejin.cn/post/6953221575860568077" target="_blank" rel="noopener">几种获取android 界面性能数据的快捷方法</a><br><a href="https://juejin.cn/post/6844903879931330567" target="_blank" rel="noopener">【性能优化】Android冷启动优化</a><br><a href="https://www.jianshu.com/p/bcc3dddf0b36" target="_blank" rel="noopener">知乎 Android 客户端启动优化 - Retrofit 代理</a><br><a href="https://juejin.cn/post/6844903919580086280" target="_blank" rel="noopener">探索 Android 启动优化方法</a><br><a href="https://juejin.cn/post/6844904093786308622" target="_blank" rel="noopener">深入探索Android启动速度优化（上）</a>   </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/04/android-ui-monitor.html" rel="next" title="【从入门到放弃】android布局优化深入解析">
+                <i class="fa fa-chevron-left"></i> 【从入门到放弃】android布局优化深入解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/05/no-permission-float.html" rel="prev" title="【开源项目】不需要权限的悬浮窗方案了解一下~">
+                【开源项目】不需要权限的悬浮窗方案了解一下~ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动优化有哪些优化方向？"><span class="nav-number">2.</span> <span class="nav-text">启动优化有哪些优化方向？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#冷启动"><span class="nav-number">2.1.</span> <span class="nav-text">冷启动</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何测量启动时间？"><span class="nav-number">3.</span> <span class="nav-text">如何测量启动时间？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#最简单方法"><span class="nav-number">3.1.</span> <span class="nav-text">最简单方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令测量"><span class="nav-number">3.2.</span> <span class="nav-text">命令测量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#埋点测量"><span class="nav-number">3.3.</span> <span class="nav-text">埋点测量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IdleHandler"><span class="nav-number">3.3.1.</span> <span class="nav-text">IdleHandler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onWindowFocusChanged"><span class="nav-number">3.3.2.</span> <span class="nav-text">onWindowFocusChanged</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onPrewDrawListener"><span class="nav-number">3.3.3.</span> <span class="nav-text">onPrewDrawListener</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOP测量方法耗时"><span class="nav-number">3.4.</span> <span class="nav-text">AOP测量方法耗时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TraceView与SystraceView使用"><span class="nav-number">3.5.</span> <span class="nav-text">TraceView与SystraceView使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TraceView"><span class="nav-number">3.5.1.</span> <span class="nav-text">TraceView</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Systrace"><span class="nav-number">3.5.2.</span> <span class="nav-text">Systrace</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小结"><span class="nav-number">3.5.3.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常规优化手段"><span class="nav-number">4.</span> <span class="nav-text">常规优化手段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Theme切换"><span class="nav-number">4.1.</span> <span class="nav-text">1.Theme切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-异步方案"><span class="nav-number">4.2.</span> <span class="nav-text">2.异步方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#常规异步方案的问题"><span class="nav-number">4.2.1.</span> <span class="nav-text">常规异步方案的问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步启动器方案"><span class="nav-number">5.</span> <span class="nav-text">异步启动器方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JetPack-App-Startup"><span class="nav-number">5.1.</span> <span class="nav-text">JetPack App Startup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里-alpha"><span class="nav-number">5.2.</span> <span class="nav-text">阿里-alpha</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AnchorTask"><span class="nav-number">5.3.</span> <span class="nav-text">AnchorTask</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延迟初始化方案"><span class="nav-number">6.</span> <span class="nav-text">延迟初始化方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#常规方案"><span class="nav-number">6.1.</span> <span class="nav-text">常规方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#常规方案的问题"><span class="nav-number">6.1.1.</span> <span class="nav-text">常规方案的问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更优方案"><span class="nav-number">6.2.</span> <span class="nav-text">更优方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极致懒加载与提前加载"><span class="nav-number">7.</span> <span class="nav-text">极致懒加载与提前加载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#首页极致懒加载"><span class="nav-number">7.1.</span> <span class="nav-text">首页极致懒加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#布局预加载"><span class="nav-number">7.2.</span> <span class="nav-text">布局预加载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">8.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

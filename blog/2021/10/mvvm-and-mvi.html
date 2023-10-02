@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Android开发发展到今天已经相当成熟了，各种架构大家也都耳熟能详，如MVC,MVP,MVVM等，其中MVVM更是被官方推荐，成为Android开发中的显学。不过软件开发中没有银弹，MVVM架构也不是尽善尽美的，在使用过程中也会有一些不太方便之处，而MVI可以很好的解决一部分MVVM的痛点。本文主要包括以下内容      MVC,MVP,MVVM等经典架构介绍     MVI架构到底是什么?">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MVVM 进阶版：MVI 架构了解一下~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/10/mvvm-and-mvi.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Android开发发展到今天已经相当成熟了，各种架构大家也都耳熟能详，如MVC,MVP,MVVM等，其中MVVM更是被官方推荐，成为Android开发中的显学。不过软件开发中没有银弹，MVVM架构也不是尽善尽美的，在使用过程中也会有一些不太方便之处，而MVI可以很好的解决一部分MVVM的痛点。本文主要包括以下内容      MVC,MVP,MVVM等经典架构介绍     MVI架构到底是什么?">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/2/1645b73891134b78~tplv-t2oaga2asx-watermark.awebp">
+<meta property="og:image" content="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/2/1645b7389d014b6f~tplv-t2oaga2asx-watermark.awebp">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/993bec0ee3ad477a93f3b03c3b35732f~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/623a288804004cd5b89754d45592b431~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8485b8fe71dc44a088832bc63e1abb50~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2ecd46797c084f08b9efc8fb5246a5db~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p17.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/765d1d45817744728c78ceb1e2566b9a~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.245Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MVVM 进阶版：MVI 架构了解一下~">
+<meta name="twitter:description" content="前言Android开发发展到今天已经相当成熟了，各种架构大家也都耳熟能详，如MVC,MVP,MVVM等，其中MVVM更是被官方推荐，成为Android开发中的显学。不过软件开发中没有银弹，MVVM架构也不是尽善尽美的，在使用过程中也会有一些不太方便之处，而MVI可以很好的解决一部分MVVM的痛点。本文主要包括以下内容      MVC,MVP,MVVM等经典架构介绍     MVI架构到底是什么?">
+<meta name="twitter:image" content="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/2/1645b73891134b78~tplv-t2oaga2asx-watermark.awebp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/10/mvvm-and-mvi.html">
+
+
+
+
+
+  <title>MVVM 进阶版：MVI 架构了解一下~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/10/mvvm-and-mvi.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MVVM 进阶版：MVI 架构了解一下~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-10-17T20:33:00+08:00">
+                2021-10-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Android</code>开发发展到今天已经相当成熟了，各种架构大家也都耳熟能详，如<code>MVC</code>,<code>MVP</code>,<code>MVVM</code>等，其中<code>MVVM</code>更是被官方推荐，成为<code>Android</code>开发中的显学。<br>不过软件开发中没有银弹，<code>MVVM</code>架构也不是尽善尽美的，在使用过程中也会有一些不太方便之处，而<code>MVI</code>可以很好的解决一部分<code>MVVM</code>的痛点。<br>本文主要包括以下内容    </p>
+<ol>
+<li><code>MVC</code>,<code>MVP</code>,<code>MVVM</code>等经典架构介绍    </li>
+<li><code>MVI</code>架构到底是什么?    </li>
+<li><code>MVI</code>架构实战    </li>
+</ol>
+<blockquote>
+<p>需要重点指出的是,标题中说<code>MVI</code>架构是<code>MVVM</code>的进阶版是指<code>MVI</code>在<code>MVVM</code>非常相似，并在其基础上做了一定的改良，并不是说<code>MVI</code>架构一定比<code>MVVM</code>适合你的项目<br>各位同学可以在分析比较各个架构后，选择合适项目场景的架构   </p>
+</blockquote>
+<h2 id="经典架构介绍"><a href="#经典架构介绍" class="headerlink" title="经典架构介绍"></a>经典架构介绍</h2><h3 id="MVC架构介绍"><a href="#MVC架构介绍" class="headerlink" title="MVC架构介绍"></a><code>MVC</code>架构介绍</h3><p><code>MVC</code>是个古老的<code>Android</code>开发架构，随着<code>MVP</code>与<code>MVVM</code>的流行已经逐渐退出历史舞台，我们在这里做一个简单的介绍,其架构图如下所示：<br><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/2/1645b73891134b78~tplv-t2oaga2asx-watermark.awebp" alt><br><code>MVC</code>架构主要分为以下几部分     </p>
+<ol>
+<li>视图层（<code>View</code>）：对应于<code>xml</code>布局文件和<code>java</code>代码动态<code>view</code>部分           </li>
+<li>控制层（<code>Controller</code>）：主要负责业务逻辑，在<code>android</code>中由<code>Activity</code>承担，同时因为<code>XML</code>视图功能太弱，所以<code>Activity</code>既要负责视图的显示又要加入控制逻辑，承担的功能过多。       </li>
+<li>模型层（<code>Model</code>）：主要负责网络请求，数据库处理，<code>I/O</code>的操作，即页面的数据来源     </li>
+</ol>
+<p>由于<code>android</code>中<code>xml</code>布局的功能性太弱,<code>Activity</code>实际上负责了<code>View</code>层与<code>Controller</code>层两者的工作，所以在<code>android</code>中<code>mvc</code>更像是这种形式：<br><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/7/2/1645b7389d014b6f~tplv-t2oaga2asx-watermark.awebp" alt><br>因此<code>MVC</code>架构在<code>android</code>平台上的主要存在以下问题：   </p>
+<ol>
+<li><code>Activity</code>同时负责<code>View</code>与<code>Controller</code>层的工作，违背了单一职责原则    </li>
+<li><code>Model</code>层与<code>View</code>层存在耦合，存在互相依赖，违背了最小知识原则    </li>
+</ol>
+<h3 id="MVP架构介绍"><a href="#MVP架构介绍" class="headerlink" title="MVP架构介绍"></a><code>MVP</code>架构介绍</h3><p>由于<code>MVC</code>架构在<code>Android</code>平台上的一些缺陷，<code>MVP</code>也就应运而生了,其架构图如下所示<br><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/993bec0ee3ad477a93f3b03c3b35732f~tplv-k3u1fbpfcp-watermark.awebp" alt><br><code>MVP</code>架构主要分为以下几个部分       </p>
+<ol>
+<li><code>View</code>层：对应于<code>Activity</code>与<code>XML</code>,只负责显示<code>UI</code>,只与<code>Presenter</code>层交互，与<code>Model</code>层没有耦合      </li>
+<li><code>Presenter</code>层： 主要负责处理业务逻辑，通过接口回调<code>View</code>层     </li>
+<li><code>Model</code>层：主要负责网络请求，数据库处理等操作，这个没有什么变化    </li>
+</ol>
+<p>我们可以看到，<code>MVP</code>解决了<code>MVC</code>的两个问题，即<code>Activity</code>承担了两层职责与<code>View</code>层与<code>Model</code>层耦合的问题     </p>
+<p>但<code>MVP</code>架构同样有自己的问题    </p>
+<ol>
+<li><code>Presenter</code>层通过接口与<code>View</code>通信，实际上持有了<code>View</code>的引用    </li>
+<li>但是随着业务逻辑的增加，一个页面可能会非常复杂，这样就会造成<code>View</code>的接口会很庞大。      </li>
+</ol>
+<h3 id="MVVM架构介绍"><a href="#MVVM架构介绍" class="headerlink" title="MVVM架构介绍"></a><code>MVVM</code>架构介绍</h3><p><code>MVVM</code> 模式将 <code>Presenter</code> 改名为 <code>ViewModel</code>，基本上与 <code>MVP</code> 模式完全一致。<br>唯一的区别是，它采用双向数据绑定（<code>data-binding</code>）：<code>View</code>的变动，自动反映在 <code>ViewModel</code>，反之亦然<br><code>MVVM</code>架构图如下所示：<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/623a288804004cd5b89754d45592b431~tplv-k3u1fbpfcp-watermark.awebp" alt><br>可以看出<code>MVVM</code>与<code>MVP</code>的主要区别在于,你不用去主动去刷新<code>UI</code>了，只要<code>Model</code>数据变了，会自动反映到<code>UI</code>上。换句话说，<code>MVVM</code>更像是自动化的<code>MVP</code>。        </p>
+<p><code>MVVM</code>的双向数据绑定主要通过<code>DataBinding</code>实现，不过相信有很多人跟我一样，是不喜欢用<code>DataBinding</code>的，这样架构就变成了下面这样<br><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8485b8fe71dc44a088832bc63e1abb50~tplv-k3u1fbpfcp-watermark.awebp" alt>      </p>
+<ol>
+<li><code>View</code>观察<code>ViewModle</code>的数据变化并自我更新,这其实是单一数据源而不是双向数据绑定，所以其实<code>MVVM</code>的这一大特性我其实并没有用到     </li>
+<li><code>View</code>通过调用<code>ViewModel</code>提供的方法来与<code>ViewMdoel</code>交互      </li>
+</ol>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><ol>
+<li><code>MVC</code>架构的主要问题在于<code>Activity</code>承担了<code>View</code>与<code>Controller</code>两层的职责，同时<code>View</code>层与<code>Model</code>层存在耦合    </li>
+<li><code>MVP</code>引入<code>Presenter</code>层解决了<code>MVC</code>架构的两个问题，<code>View</code>只能与<code>Presenter</code>层交互，业务逻辑放在<code>Presenter</code>层    </li>
+<li><code>MVP</code>的问题在于随着业务逻辑的增加，<code>View</code>的接口会很庞大，<code>MVVM</code>架构通过双向数据绑定可以解决这个问题     </li>
+<li><code>MVVM</code>与<code>MVP</code>的主要区别在于,你不用去主动去刷新<code>UI</code>了，只要<code>Model</code>数据变了，会自动反映到<code>UI</code>上。换句话说，<code>MVVM</code>更像是自动化的<code>MVP</code>。      </li>
+<li><code>MVVM</code>的双向数据绑定主要通过<code>DataBinding</code>实现，但有很多人(比如我)不喜欢用<code>DataBinding</code>，而是<code>View</code>通过<code>LiveData</code>等观察<code>ViewModle</code>的数据变化并自我更新,这其实是单一数据源而不是双向数据绑定     </li>
+</ol>
+<h2 id="MVI架构到底是什么"><a href="#MVI架构到底是什么" class="headerlink" title="MVI架构到底是什么?"></a><code>MVI</code>架构到底是什么?</h2><h3 id="MVVM架构有什么不足"><a href="#MVVM架构有什么不足" class="headerlink" title="MVVM架构有什么不足?"></a><code>MVVM</code>架构有什么不足?</h3><p>要了解<code>MVI</code>架构，我们首先来了解下<code>MVVM</code>架构有什么不足<br>相信使用<code>MVVM</code>架构的同学都有如下经验，为了保证数据流的单向流动，<code>LiveData</code>向外暴露时需要转化成<code>immutable</code>的，这需要添加不少模板代码并且容易遗忘，如下所示<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestViewModel</span> : <span class="type">ViewModel</span></span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _pageState: MutableLiveData&lt;PageState&gt; = MutableLiveData()</span><br><span class="line">    <span class="keyword">val</span> pageState: LiveData&lt;PageState&gt; = _pageState</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _state1: MutableLiveData&lt;String&gt; = MutableLiveData()</span><br><span class="line">    <span class="keyword">val</span> state1: LiveData&lt;String&gt; = _state1</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，如果页面逻辑比较复杂，<code>ViewModel</code>中将会有许多全局变量的<code>LiveData</code>,并且每个<code>LiveData</code>都必须定义两遍，一个可变的，一个不可变的。这其实就是我通过<code>MVVM</code>架构写比较复杂页面时最难受的点。<br>其次就是<code>View</code>层通过调用<code>ViewModel</code>层的方法来交互的，<code>View</code>层与<code>ViewModel</code>的交互比较分散，不成体系    </p>
+<p>小结一下，在我的使用中，<code>MVVM</code>架构主要有以下不足     </p>
+<ol>
+<li>为保证对外暴露的<code>LiveData</code>是不可变的，需要添加不少模板代码并且容易遗忘    </li>
+<li><code>View</code>层与<code>ViewModel</code>层的交互比较分散零乱，不成体系    </li>
+</ol>
+<h3 id="MVI架构是什么"><a href="#MVI架构是什么" class="headerlink" title="MVI架构是什么?"></a><code>MVI</code>架构是什么?</h3><p><code>MVI</code> 与 <code>MVVM</code> 很相似，其借鉴了前端框架的思想，更加强调数据的单向流动和唯一数据源,架构图如下所示<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2ecd46797c084f08b9efc8fb5246a5db~tplv-k3u1fbpfcp-watermark.awebp" alt><br>其主要分为以下几部分   </p>
+<ol>
+<li><code>Model</code>: 与<code>MVVM</code>中的<code>Model</code>不同的是，<code>MVI</code>的<code>Model</code>主要指<code>UI</code>状态（<code>State</code>）。例如页面加载状态、控件位置等都是一种<code>UI</code>状态      </li>
+<li><code>View</code>: 与其他<code>MVX</code>中的<code>View</code>一致，可能是一个<code>Activity</code>或者任意<code>UI</code>承载单元。<code>MVI</code>中的<code>View</code>通过订阅<code>Intent</code>的变化实现界面刷新（注意：这里不是<code>Activity</code>的<code>Intent</code>）     </li>
+<li><code>Intent</code>: 此<code>Intent</code>不是<code>Activity</code>的<code>Intent</code>，用户的任何操作都被包装成<code>Intent</code>后发送给<code>Model</code>层进行数据请求    </li>
+</ol>
+<h3 id="单向数据流"><a href="#单向数据流" class="headerlink" title="单向数据流"></a>单向数据流</h3><p><code>MVI</code>强调数据的单向流动，主要分为以下几步：   </p>
+<ol>
+<li>用户操作以<code>Intent</code>的形式通知<code>Model</code>       </li>
+<li><code>Model</code>基于<code>Intent</code>更新<code>State</code>      </li>
+<li><code>View</code>接收到<code>State</code>变化刷新UI。         </li>
+</ol>
+<p>数据永远在一个环形结构中单向流动，不能反向流动：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/october/p17.png" alt>      </p>
+<p>上面简单的介绍了下<code>MVI</code>架构，下面我们一起来看下具体是怎么使用<code>MVI</code>架构的   </p>
+<h2 id="MVI架构实战"><a href="#MVI架构实战" class="headerlink" title="MVI架构实战"></a><code>MVI</code>架构实战</h2><h3 id="总体架构图"><a href="#总体架构图" class="headerlink" title="总体架构图"></a>总体架构图</h3><p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/765d1d45817744728c78ceb1e2566b9a~tplv-k3u1fbpfcp-watermark.awebp" alt><br>我们使用<code>ViewModel</code>来承载<code>MVI</code>的<code>Model</code>层，总体结构也与<code>MVVM</code>类似,主要区别在于<code>Model</code>与<code>View</code>层交互的部分    </p>
+<ol>
+<li><code>Model</code>层承载<code>UI</code>状态，并暴露出<code>ViewState</code>供<code>View</code>订阅，<code>ViewState</code>是个<code>data class</code>,包含所有页面状态       </li>
+<li><code>View</code>层通过<code>Action</code>更新<code>ViewState</code>，替代<code>MVVM</code>通过调用<code>ViewModel</code>方法交互的方式     </li>
+</ol>
+<h3 id="MVI实例介绍"><a href="#MVI实例介绍" class="headerlink" title="MVI实例介绍"></a><code>MVI</code>实例介绍</h3><h4 id="添加ViewState与ViewEvent"><a href="#添加ViewState与ViewEvent" class="headerlink" title="添加ViewState与ViewEvent"></a>添加<code>ViewState</code>与<code>ViewEvent</code></h4><p><code>ViewState</code>承载页面的所有状态，<code>ViewEvent</code>则是一次性事件，如<code>Toast</code>等,如下所示<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">MainViewState</span></span>(<span class="keyword">val</span> fetchStatus: FetchStatus, <span class="keyword">val</span> newsList: List&lt;NewsItem&gt;)  </span><br><span class="line"></span><br><span class="line"><span class="keyword">sealed</span> <span class="class"><span class="keyword">class</span> <span class="title">MainViewEvent</span> </span>&#123;</span><br><span class="line">    <span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">ShowSnackbar</span></span>(<span class="keyword">val</span> message: String) : MainViewEvent()</span><br><span class="line">    <span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">ShowToast</span></span>(<span class="keyword">val</span> message: String) : MainViewEvent()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>我们这里<code>ViewState</code>只定义了两个，一个是请求状态，一个是页面数据    </li>
+<li><code>ViewEvent</code>也很简单，一个简单的密封类，显示<code>Toast</code>与<code>Snackbar</code>   </li>
+</ol>
+<h4 id="ViewState更新"><a href="#ViewState更新" class="headerlink" title="ViewState更新"></a><code>ViewState</code>更新</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainViewModel</span> : <span class="type">ViewModel</span></span>() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _viewStates: MutableLiveData&lt;MainViewState&gt; = MutableLiveData()</span><br><span class="line">    <span class="keyword">val</span> viewStates = _viewStates.asLiveData()</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _viewEvents: SingleLiveEvent&lt;MainViewEvent&gt; = SingleLiveEvent()</span><br><span class="line">    <span class="keyword">val</span> viewEvents = _viewEvents.asLiveData()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">init</span> &#123;</span><br><span class="line">        emit(MainViewState(fetchStatus = FetchStatus.NotFetched, newsList = emptyList()))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">fabClicked</span><span class="params">()</span></span> &#123;</span><br><span class="line">        count++</span><br><span class="line">        emit(MainViewEvent.ShowToast(message = <span class="string">"Fab clicked count <span class="variable">$count</span>"</span>))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">emit</span><span class="params">(state: <span class="type">MainViewState</span>?)</span></span> &#123;</span><br><span class="line">        _viewStates.value = state</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">emit</span><span class="params">(event: <span class="type">MainViewEvent</span>?)</span></span> &#123;</span><br><span class="line">        _viewEvents.value = event</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示   </p>
+<ol>
+<li>我们只需定义<code>ViewState</code>与<code>ViewEvent</code>两个<code>State</code>,后续增加状态时在<code>data class</code>中添加即可，不需要再写模板代码    </li>
+<li><code>ViewEvents</code>是一次性的，通过<code>SingleLiveEvent</code>实现，当然你也可以用<code>Channel</code>当来实现     </li>
+<li>当状态更新时，通过<code>emit</code>来更新状态     </li>
+</ol>
+<h4 id="View监听ViewState"><a href="#View监听ViewState" class="headerlink" title="View监听ViewState"></a><code>View</code>监听<code>ViewState</code></h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">initViewModel</span><span class="params">()</span></span> &#123;</span><br><span class="line">    viewModel.viewStates.observe(<span class="keyword">this</span>) &#123;</span><br><span class="line">        renderViewState(it)</span><br><span class="line">    &#125;</span><br><span class="line">    viewModel.viewEvents.observe(<span class="keyword">this</span>) &#123;</span><br><span class="line">        renderViewEvent(it)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，<code>MVI</code> 使用 <code>ViewState</code> 对 <code>State</code> 集中管理，只需要订阅一个 <code>ViewState</code> 便可获取页面的所有状态，相对 <code>MVVM</code> 减少了不少模板代码。  </p>
+<h4 id="View通过Action更新State"><a href="#View通过Action更新State" class="headerlink" title="View通过Action更新State"></a><code>View</code>通过<code>Action</code>更新<code>State</code></h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">initView</span><span class="params">()</span></span> &#123;</span><br><span class="line">        fabStar.setOnClickListener &#123;</span><br><span class="line">            viewModel.dispatch(MainViewAction.FabClicked)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainViewModel</span> : <span class="type">ViewModel</span></span>() &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">dispatch</span><span class="params">(action: <span class="type">MainViewAction</span>)</span></span> =</span><br><span class="line">        reduce(viewStates.value, action)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">reduce</span><span class="params">(state: <span class="type">MainViewState</span>?, viewAction: <span class="type">MainViewAction</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">when</span> (viewAction) &#123;</span><br><span class="line">            <span class="keyword">is</span> MainViewAction.NewsItemClicked -&gt; newsItemClicked(viewAction.newsItem)</span><br><span class="line">            MainViewAction.FabClicked -&gt; fabClicked()</span><br><span class="line">            MainViewAction.OnSwipeRefresh -&gt; fetchNews(state)</span><br><span class="line">            MainViewAction.FetchNews -&gt; fetchNews(state)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示，<code>View</code>通过<code>Action</code>与<code>ViewModel</code>交互，通过 <code>Action</code> 通信，有利于 <code>View</code> 与 <code>ViewModel</code> 之间的进一步解耦，同时所有调用以 <code>Action</code> 的形式汇总到一处，也有利于对行为的集中分析和监控  </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了<code>MVC</code>,<code>MVP</code>,<code>MVVM</code>与<code>MVI</code>架构，目前<code>MVVM</code>是官方推荐的架构，但仍然有以下几个痛点     </p>
+<ol>
+<li><code>MVVM</code>与<code>MVP</code>的主要区别在于双向数据绑定，但由于很多人(比如我)并不喜欢使用<code>DataBindg</code>，其实并没有使用<code>MVVM</code>双向绑定的特性，而是单一数据源     </li>
+<li>当页面复杂时，需要定义很多<code>State</code>,并且需要定义可变与不可变两种,状态会以双倍的速度膨胀，模板代码较多且容易遗忘     </li>
+<li><code>View</code>与<code>ViewModel</code>通过<code>ViewModel</code>暴露的方法交互，比较零乱难以维护    </li>
+</ol>
+<p>而<code>MVI</code>可以比较好的解决以上痛点，它主要有以下优势    </p>
+<ol>
+<li>强调数据单向流动，很容易对状态变化进行跟踪和回溯   </li>
+<li>使用<code>ViewState</code>对<code>State</code>集中管理，只需要订阅一个 <code>ViewState</code> 便可获取页面的所有状态，相对 <code>MVVM</code> 减少了不少模板代码       </li>
+<li><code>ViewModel</code>通过<code>ViewState</code>与<code>Action</code>通信，通过浏览<code>ViewState</code> 和 <code>Aciton</code> 定义就可以理清 <code>ViewModel</code> 的职责，可以直接拿来作为接口文档使用。        </li>
+</ol>
+<p>当然<code>MVI</code>也有一些缺点，比如   </p>
+<ol>
+<li>所有的操作最终都会转换成<code>State</code>，所以当复杂页面的<code>State</code>容易膨胀     </li>
+<li><code>state</code>是不变的，因此每当<code>state</code>需要更新时都要创建新对象替代老对象，这会带来一定内存开销      </li>
+</ol>
+<p>软件开发中没有银弹，所有架构都不是完美的，有自己的适用场景,读者可根据自己的需求选择使用。<br>但通过以上的分析与介绍，我相信使用<code>MVI</code>架构代替没有使用<code>DataBinding</code>的<code>MVVM</code>是一个比较好的选择~       </p>
+<h3 id="Sample代码"><a href="#Sample代码" class="headerlink" title="Sample代码"></a><code>Sample</code>代码</h3><p><a href="https://github.com/shenzhen2017/android-architecture" target="_blank" rel="noopener">https://github.com/shenzhen2017/android-architecture</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6920427168749060110" target="_blank" rel="noopener">基于Android的MVI架构：从双向绑定到单向数据流</a><br><a href="https://juejin.cn/post/6969382803112722446" target="_blank" rel="noopener">Jetpack Compose 架构如何选？ MVP, MVVM, MVI</a><br><a href="https://juejin.cn/post/6998093259893407757" target="_blank" rel="noopener">站在思想层面看MVX架构</a><br><a href="https://proandroiddev.com/best-architecture-for-android-mvi-livedata-viewmodel-71a3a5ac7ee3" target="_blank" rel="noopener">Best Architecture For Android : MVI + LiveData + ViewModel = ❤️</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/10/is-compose-view.html" rel="next" title="【辨析】Compose 完全脱离 View 系统了吗?">
+                <i class="fa fa-chevron-left"></i> 【辨析】Compose 完全脱离 View 系统了吗?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/10/wan-android-compose.html" rel="prev" title="Compose + MVI + Navigation 快速实现 wanAndroid 客户端">
+                Compose + MVI + Navigation 快速实现 wanAndroid 客户端 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#经典架构介绍"><span class="nav-number">2.</span> <span class="nav-text">经典架构介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MVC架构介绍"><span class="nav-number">2.1.</span> <span class="nav-text">MVC架构介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVP架构介绍"><span class="nav-number">2.2.</span> <span class="nav-text">MVP架构介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVVM架构介绍"><span class="nav-number">2.3.</span> <span class="nav-text">MVVM架构介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">2.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MVI架构到底是什么"><span class="nav-number">3.</span> <span class="nav-text">MVI架构到底是什么?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MVVM架构有什么不足"><span class="nav-number">3.1.</span> <span class="nav-text">MVVM架构有什么不足?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVI架构是什么"><span class="nav-number">3.2.</span> <span class="nav-text">MVI架构是什么?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单向数据流"><span class="nav-number">3.3.</span> <span class="nav-text">单向数据流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MVI架构实战"><span class="nav-number">4.</span> <span class="nav-text">MVI架构实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#总体架构图"><span class="nav-number">4.1.</span> <span class="nav-text">总体架构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVI实例介绍"><span class="nav-number">4.2.</span> <span class="nav-text">MVI实例介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#添加ViewState与ViewEvent"><span class="nav-number">4.2.1.</span> <span class="nav-text">添加ViewState与ViewEvent</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ViewState更新"><span class="nav-number">4.2.2.</span> <span class="nav-text">ViewState更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#View监听ViewState"><span class="nav-number">4.2.3.</span> <span class="nav-text">View监听ViewState</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#View通过Action更新State"><span class="nav-number">4.2.4.</span> <span class="nav-text">View通过Action更新State</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Sample代码"><span class="nav-number">5.1.</span> <span class="nav-text">Sample代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.2.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Android的稳定性是Android性能的一个重要指标，它也是App质量构建体系中最基本和最关键的一环。如果应用经常崩溃率，或者关键功能不可用，那显然会对我们的留存产生重大影响。为了保障应用的稳定性，我们首先应该树立对稳定性的正确认识，本文主要包括以下内容：    稳定性优化的正确认识    Crash处理的一般步骤 Crash长效治理 业务高可用方案建设 稳定性优化常见面试题   稳定性优">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【从入门到了解】Android稳定性优化深入解析">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/05/android-crash-optimize.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Android的稳定性是Android性能的一个重要指标，它也是App质量构建体系中最基本和最关键的一环。如果应用经常崩溃率，或者关键功能不可用，那显然会对我们的留存产生重大影响。为了保障应用的稳定性，我们首先应该树立对稳定性的正确认识，本文主要包括以下内容：    稳定性优化的正确认识    Crash处理的一般步骤 Crash长效治理 业务高可用方案建设 稳定性优化常见面试题   稳定性优">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/may/p9.jpg">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.247Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【从入门到了解】Android稳定性优化深入解析">
+<meta name="twitter:description" content="前言Android的稳定性是Android性能的一个重要指标，它也是App质量构建体系中最基本和最关键的一环。如果应用经常崩溃率，或者关键功能不可用，那显然会对我们的留存产生重大影响。为了保障应用的稳定性，我们首先应该树立对稳定性的正确认识，本文主要包括以下内容：    稳定性优化的正确认识    Crash处理的一般步骤 Crash长效治理 业务高可用方案建设 稳定性优化常见面试题   稳定性优">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/may/p9.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/05/android-crash-optimize.html">
+
+
+
+
+
+  <title>【从入门到了解】Android稳定性优化深入解析 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/05/android-crash-optimize.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【从入门到了解】Android稳定性优化深入解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-05-04T22:45:19+08:00">
+                2022-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Android</code>的稳定性是<code>Android</code>性能的一个重要指标，它也是<strong>App质量构建体系中最基本和最关键的一环</strong>。如果应用经常崩溃率，或者关键功能不可用，那显然会对我们的留存产生重大影响。<br>为了保障应用的稳定性，我们首先应该树立对稳定性的正确认识，本文主要包括以下内容：  </p>
+<ol>
+<li>稳定性优化的正确认识   </li>
+<li><code>Crash</code>处理的一般步骤</li>
+<li><code>Crash</code>长效治理</li>
+<li>业务高可用方案建设</li>
+<li>稳定性优化常见面试题</li>
+</ol>
+<p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2022/may/p9.jpg" alt></p>
+<h2 id="稳定性优化的正确认识"><a href="#稳定性优化的正确认识" class="headerlink" title="稳定性优化的正确认识"></a>稳定性优化的正确认识</h2><h3 id="稳定性优化的关键指标"><a href="#稳定性优化的关键指标" class="headerlink" title="稳定性优化的关键指标"></a>稳定性优化的关键指标</h3><p>要做稳定性优化，首先一个问题就是，要做成什么效果？<code>Crash</code>率多少算优秀呢?在明确了目标之后，我们才能正确认识我们的工作到底有什么作用    </p>
+<p>要计算<code>Crash</code>率，我们首先应该明白稳定性优化的一些关键指标    </p>
+<h4 id="UV-Crash率与PV-Crash率"><a href="#UV-Crash率与PV-Crash率" class="headerlink" title="UV Crash率与PV Crash率"></a><code>UV Crash</code>率与<code>PV Crash</code>率</h4><p><code>PV（Page View）</code>即访问量， <code>UV（Unique Visitor）</code>即独立访客，0 - 24小时内的同一终端只计算一次</p>
+<ul>
+<li><code>UV Crash</code>率：针对用户使用量的统计，统计一段时间内所有用户发生崩溃的占比，用于评估<code>Crash</code>率的影响范围。 </li>
+<li><code>PV Crash</code>率：针对用户使用次数的统计，评估相关<code>Crash</code>影响的严重程度。</li>
+</ul>
+<p>大家可以根据自己的需要选择合适的指标，需要注意的是，需要确保一直使用同一种衡量方式。</p>
+<h4 id="Crash率评价"><a href="#Crash率评价" class="headerlink" title="Crash率评价"></a><code>Crash</code>率评价</h4><p>那么，我们<code>App</code>的<code>Crash</code>率降低多少才能算是一个正常水平或优秀的水平呢？    </p>
+<ul>
+<li><code>Java</code>与<code>Native</code>的总崩溃率必须在千分之二以下。</li>
+<li><code>Crash</code>率万分位为优秀</li>
+</ul>
+<p>注意，以上说的都是<code>UV</code>崩溃率</p>
+<h3 id="稳定性优化的维度"><a href="#稳定性优化的维度" class="headerlink" title="稳定性优化的维度"></a>稳定性优化的维度</h3><p>很多人都会认为稳定性优化就是降低<code>Crash</code>率，但如果你的<code>APP</code>没有崩溃，但是关键功能却不可用，这又怎么算是稳定的呢?<br>因此应用的稳定性可以分为三个纬度，如下所示：      </p>
+<ul>
+<li>1、<code>Crash</code>纬度：最重要的指标就是应用的<code>Crash</code>率。</li>
+<li>2、性能纬度：包括启动速度、内存、绘制等等优化方向，相对于<code>Crash</code>来说是次要的，但也是应用稳定性的一部分。</li>
+<li>3、业务高可用纬度：它是非常关键的一步，我们需要采用多种手段来保证我们<code>App</code>的主流程以及核心路径的稳定性。</li>
+</ul>
+<h2 id="Crash处理的一般步骤"><a href="#Crash处理的一般步骤" class="headerlink" title="Crash处理的一般步骤"></a><code>Crash</code>处理的一般步骤</h2><p>下面我们来看下应该如何处理<code>Crash</code>,即如果应用崩溃了，你应该如何去分析？<br>主要从崩溃现场和崩溃分析两个角度来分析    </p>
+<h3 id="崩溃现场"><a href="#崩溃现场" class="headerlink" title="崩溃现场"></a>崩溃现场</h3><p>崩溃现场是我们的“第一案发现场”，它保留着很多有价值的线索。在这里我们挖掘到的信息越多，下一步分析的方向就越清晰，而不是去靠盲目猜测。<br>接下来我们具体来看看在崩溃现场应该采集哪些信息。    </p>
+<h4 id="崩溃信息"><a href="#崩溃信息" class="headerlink" title="崩溃信息"></a>崩溃信息</h4><p>从崩溃的基本信息，我们可以对崩溃有初步的判断。       </p>
+<ul>
+<li>进程名、线程名。崩溃的进程是前台进程还是后台进程，崩溃是不是发生在 UI 线程。</li>
+<li>崩溃堆栈和类型。崩溃是属于 <code>Java</code> 崩溃、<code>Native</code> 崩溃，还是 <code>ANR</code>，对于不同类型的崩溃我们关注的点也不太一样。特别需要看崩溃堆栈的栈顶，看具体崩溃在系统的代码，还是我们自己的代码里面。</li>
+</ul>
+<h4 id="系统信息"><a href="#系统信息" class="headerlink" title="系统信息"></a>系统信息</h4><p>除了崩溃的信息之外，系统的信息有时候会带有一些关键的线索，对我们解决问题有非常大的帮助。      </p>
+<ul>
+<li><code>Logcat</code>输出。这里包括应用、系统的运行日志。有时从堆栈中看不出什么信息，反而可以从<code>Logcat</code>中获得意外收获</li>
+<li>机型、系统、厂商、<code>CPU</code>、<code>ABI</code>、<code>Linux</code> 版本等。我们会采集多达几十个维度，这对后面讲到寻找共性问题会很有帮助。</li>
+<li>设备状态：是否 <code>root</code>、是否是模拟器。一些问题是由 <code>Xposed</code> 或多开软件造成，对这部分问题我们要区别对待。</li>
+</ul>
+<h4 id="内存信息"><a href="#内存信息" class="headerlink" title="内存信息"></a>内存信息</h4><p><code>OOM</code>、<code>ANR</code>、虚拟内存耗尽等，很多崩溃都跟内存有直接关系。如果我们把用户的手机内存分为“2GB 以下”和“2GB 以上”两个桶，会发现“2GB 以下”用户的崩溃率是“2GB 以上”用户的几倍。</p>
+<ul>
+<li>系统剩余内存。关于系统内存状态，可以直接读取文件 <code>/proc/meminfo</code>。当系统可用内存很小（低于 <code>MemTotal</code> 的 10%）时，<code>OOM</code>、大量 <code>GC</code>、系统频繁自杀拉起等问题都非常容易出现。</li>
+<li>应用使用内存。包括 <code>Java</code> 内存、<code>RSS</code>（<code>Resident Set Size</code>）、<code>PSS</code>（<code>Proportional Set Size</code>），我们可以得出应用本身内存的占用大小和分布。     </li>
+<li>虚拟内存。虚拟内存可以通过 <code>/proc/self/status</code> 得到，通过 <code>/proc/self/maps</code> 文件可以得到具体的分布情况。有时候我们一般不太重视虚拟内存，但是很多类似 <code>OOM</code>、<code>tgkill</code> 等问题都是虚拟内存不足导致的。</li>
+</ul>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="symbol">Name:</span>     com.sample.name   <span class="comment">// 进程名</span></span><br><span class="line"><span class="symbol">FDSize:</span>   <span class="number">800</span>               <span class="comment">// 当前进程申请的文件句柄个数</span></span><br><span class="line"><span class="symbol">VmPeak:</span>   <span class="number">3004628</span> kB        <span class="comment">// 当前进程的虚拟内存峰值大小</span></span><br><span class="line"><span class="symbol">VmSize:</span>   <span class="number">2997032</span> kB        <span class="comment">// 当前进程的虚拟内存大小</span></span><br><span class="line"><span class="symbol">Threads:</span>  <span class="number">600</span>               <span class="comment">// 当前进程包含的线程个数</span></span><br></pre></td></tr></table></figure>
+<p>一般来说，对于 32 位进程，如果是 32 位的 <code>CPU</code>，虚拟内存达到 3GB 就可能会引起内存申请失败的问题。如果是 64 位的 <code>CPU</code>，虚拟内存一般在 3～4GB 之间。当然如果我们支持 64 位进程，虚拟内存就不会成为问题。因此我们的应用应该尽量适配64位</p>
+<h4 id="资源信息"><a href="#资源信息" class="headerlink" title="资源信息"></a>资源信息</h4><p>有的时候我们会发现应用堆内存和设备内存都非常充足，还是会出现内存分配失败的情况，这跟资源泄漏可能有比较大的关系。</p>
+<ul>
+<li>文件句柄 <code>fd</code>。一般单个进程允许打开的最大文件句柄个数为 <code>1024</code>。但是如果文件句柄超过 <code>800</code> 个就比较危险，需要将所有的 <code>fd</code> 以及对应的文件名输出到日志中，进一步排查是否出现了有文件或者线程的泄漏     </li>
+<li>线程数。一个线程可能就占 <code>2MB</code> 的虚拟内存，过多的线程会对虚拟内存和文件句柄带来压力。根据我的经验来说，如果线程数超过 400 个就比较危险。需要将所有的线程 <code>id</code> 以及对应的线程名输出到日志中，进一步排查是否出现了线程相关的问题。</li>
+</ul>
+<h4 id="应用信息"><a href="#应用信息" class="headerlink" title="应用信息"></a>应用信息</h4><p>除了系统，其实我们的应用更懂自己，可以留下很多相关的信息。</p>
+<ul>
+<li>崩溃场景。崩溃发生在哪个 <code>Activity</code> 或 <code>Fragment</code>，发生在哪个业务中。</li>
+<li>关键操作路径。不同于开发过程详细的打点日志，我们可以记录关键的用户操作路径，这对我们复现崩溃会有比较大的帮助。</li>
+<li>其他自定义信息。不同的应用关心的重点可能不太一样，比如网易云音乐会关注当前播放的音乐，QQ 浏览器会关注当前打开的网址或视频。此外例如运行时间、是否加载了补丁、是否是全新安装或升级等信息也非常重要。</li>
+</ul>
+<p>上面介绍了在崩溃现场应该采集的信息，当然开发一个这样的采集平台还是很复杂的，大多数情况我们只需要接入一些第三方的平台比如<code>bugly</code>和<code>Sentry</code>即可。但是通过上述介绍，我们可以知道在分析崩溃的时候应该重点关注哪些信息，同时如果平台能力有缺失，我们也可以添加自定义的上报</p>
+<h3 id="崩溃分析"><a href="#崩溃分析" class="headerlink" title="崩溃分析"></a>崩溃分析</h3><p>在崩溃现场上报了足够的信息之后，我们就可以开始分析崩溃了，下面我们介绍崩溃分析“三部曲”     </p>
+<h4 id="第一步：确定重点"><a href="#第一步：确定重点" class="headerlink" title="第一步：确定重点"></a>第一步：确定重点</h4><p>确认和分析重点，关键在于在日志中找到重要的信息，对问题有一个大致判断。一般来说，我建议在确定重点这一步可以关注以下几点。</p>
+<ol>
+<li><p><strong>确认严重程度与优先级</strong>。解决崩溃也要看性价比，我们优先解决 <code>Top</code> 崩溃或者对业务有重大影响，</p>
+</li>
+<li><p><strong>崩溃基本信息</strong>。确定崩溃的类型以及异常描述，对崩溃有大致的判断。一般来说，大部分的简单崩溃经过这一步已经可以得到结论。</p>
+</li>
+</ol>
+<ul>
+<li><code>Java</code> 崩溃。<code>Java</code> 崩溃类型比较明显，比如 <code>NullPointerException</code> 是空指针，<code>OutOfMemoryError</code> 是资源不足，这个时候需要去进一步查看日志中的 “内存信息”和“资源信息”。</li>
+<li><code>Native</code> 崩溃。需要观察 <code>signal</code>、<code>code</code>、<code>fault addr</code> 等内容，以及崩溃时 <code>Java</code> 的堆栈。关于各 <code>signal</code> 含义的介绍，你可以查看<a href="http://www.mkssoftware.com/docs/man5/siginfo_t.5.asp" target="_blank" rel="noopener">崩溃信号介绍</a>。比较常见的是有 <code>SIGSEGV</code> 和 <code>SIGABRT</code>，前者一般是由于空指针、非法指针造成，后者主要因为 <code>ANR</code> 和调用 <code>abort()</code> 退出所导致。</li>
+<li><code>ANR</code>。我的经验是，先看看主线程的堆栈，是否是因为锁等待导致。接着看看 <code>ANR</code> 日志中 <code>iowait</code>、<code>CPU</code>、<code>GC</code>、<code>system server</code> 等信息，进一步确定是 <code>I/O</code> 问题，或是 <code>CPU</code> 竞争问题，还是由于大量 <code>GC</code> 导致卡死</li>
+</ul>
+<ol start="3">
+<li><p><code>Logcat</code>。<code>Logcat</code> 一般会存在一些有价值的线索，日志级别是 <code>Warning</code>、<code>Error</code> 的需要特别注意。从 <code>Logcat</code> 中我们可以看到当时系统的一些行为跟手机的状态，例如出现 <code>ANR</code> 时，会有“am_anr”；<code>App</code> 被杀时，会有“am_kill”。不同的系统、厂商输出的日志有所差别，<strong>当从一条崩溃日志中无法看出问题的原因，或者得不到有用信息时，不要放弃，建议查看相同崩溃点下的更多崩溃日志</strong>。</p>
+</li>
+<li><p>各个资源情况。结合崩溃的基本信息，我们接着看看是不是跟 “内存信息” 有关，是不是跟“资源信息”有关。比如是物理内存不足、虚拟内存不足，还是文件句柄 <code>fd</code> 泄漏了。</p>
+</li>
+</ol>
+<p>无论是资源文件还是 <code>Logcat</code>，内存与线程相关的信息都需要特别注意，很多崩溃都是由于它们使用不当造成的。</p>
+<h4 id="第二步：查找共性"><a href="#第二步：查找共性" class="headerlink" title="第二步：查找共性"></a>第二步：查找共性</h4><p>如果使用了上面的方法还是不能有效定位问题，我们可以尝试查找这类崩溃有没有什么共性。找到了共性，也就可以进一步找到差异，离解决问题也就更进一步。</p>
+<p>机型、系统、<code>ROM</code>、厂商、<code>ABI</code>，这些采集到的系统信息都可以作为维度聚合，共性问题例如是不是因为安装了 <code>Xposed</code>，是不是只出现在 <code>x86</code> 的手机，是不是只有三星这款机型，是不是只在 <code>Android 5.0</code> 的系统上。应用信息也可以作为维度来聚合，比如正在打开的链接、正在播放的视频、国家、地区等。找到了共性，可以对你下一步复现问题有更明确的指引。</p>
+<h4 id="第三步：尝试复现"><a href="#第三步：尝试复现" class="headerlink" title="第三步：尝试复现"></a>第三步：尝试复现</h4><p>如果我们已经大概知道了崩溃的原因，为了进一步确认更多信息，就需要尝试复现崩溃。如果我们对崩溃完全没有头绪，也希望通过用户操作路径来尝试重现，然后再去分析崩溃原因。</p>
+<p>“只要能本地复现，我就能解”，相信这是很多开发跟测试说过的话。有这样的底气主要是因为在稳定的复现路径上面，我们可以采用增加日志或使用 <code>Debugger</code>、<code>GDB</code> 等各种各样的手段或工具做进一步分析。</p>
+<h3 id="系统崩溃解决"><a href="#系统崩溃解决" class="headerlink" title="系统崩溃解决"></a>系统崩溃解决</h3><p>有时有些崩溃并不是我们应用的问题，而是系统的问题，系统崩溃系统崩溃常常令我们感到非常无助，它可能是某个 <code>Android</code> 版本的 <code>bug</code>，也可能是某个厂商修改 <code>ROM</code> 导致。<br>这种情况下的崩溃堆栈可能完全没有我们自己的代码，很难直接定位问题。</p>
+<p>针对这种疑难问题，我们可以尝试通过以下方法解决。      </p>
+<ol>
+<li>查找可能的原因。通过上面的共性归类，我们先看看是某个系统版本的问题，还是某个厂商特定 <code>ROM</code> 的问题。虽然崩溃日志可能没有我们自己的代码，但通过操作路径和日志，我们可以找到一些怀疑的点。</li>
+<li>尝试规避。查看可疑的代码调用，是否使用了不恰当的 <code>API</code>，是否可以更换其他的实现方式规避。</li>
+<li><code>Hook</code> 解决。在了解了原因之后，最后可以通过<code>Hook</code>的方式修改系统代码的逻辑来处理</li>
+</ol>
+<p>比如我们发现线上出现一个 <code>Toast</code> 相关的系统崩溃，它只出现在 <code>Android 7.0</code> 的系统中，看起来是在 <code>Toast</code> 显示的时候窗口的 <code>token</code> 已经无效了。这有可能出现在 <code>Toast</code> 需要显示时，窗口已经销毁了。<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">android<span class="selector-class">.view</span>.WindowManager<span class="variable">$BadTokenException</span>: </span><br><span class="line">  at android<span class="selector-class">.view</span><span class="selector-class">.ViewRootImpl</span>.setView(ViewRootImpl.java)</span><br><span class="line">  at android<span class="selector-class">.view</span><span class="selector-class">.WindowManagerGlobal</span>.addView(WindowManagerGlobal.java)</span><br><span class="line">  at android<span class="selector-class">.view</span><span class="selector-class">.WindowManagerImpl</span>.addView(WindowManagerImpl.java4)</span><br><span class="line">  at android<span class="selector-class">.widget</span>.Toast<span class="variable">$TN</span>.handleShow(Toast.java)</span><br></pre></td></tr></table></figure></p>
+<p>为什么 <code>Android 8.0</code> 的系统不会有这个问题？在查看 <code>Android 8.0</code> 的源码后我们发现有以下修改：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  mWM.addView(mView, mParams);</span><br><span class="line">  trySendAccessibilityEvent();</span><br><span class="line">&#125; <span class="keyword">catch</span> (WindowManager.BadTokenException e) &#123;</span><br><span class="line">  <span class="comment">/* ignore */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因此我们可以参考 <code>Android 8.0</code> 的做法，直接 <code>catch</code> 住这个异常。这里的关键在于寻找 <code>Hook</code> 点，<code>Toast</code> 里面有一个变量叫 <code>mTN</code>，它的类型为 <code>handler</code>，我们只需要代理它就可以实现捕获。</p>
+<h2 id="Crash长效治理"><a href="#Crash长效治理" class="headerlink" title="Crash长效治理"></a><code>Crash</code>长效治理</h2><p>上面介绍了处理线上<code>Crash</code>的一般步骤，但是<code>Crash</code>治理真正重要的阶段在上线之前,我们需要从开发阶段开始，系统性的进行<code>Crash</code>长效治理</p>
+<h3 id="开发阶段"><a href="#开发阶段" class="headerlink" title="开发阶段"></a>开发阶段</h3><p><code>Crash</code>的长效治理需要从开发阶段抓起，从长远来说，更好的代码质量将带来更好的稳定性，我们可以从以下两个角度来提升代码质量</p>
+<ul>
+<li>统一编码规范、增强编码功底、技术评审、增强<code>CodeReview</code>机制</li>
+<li>架构优化，能力收敛(即将一些常见的操作进行封装)，统一容错：如在网络库utils中统一对返回信息进行预校验，如不合法就直接不走接下来的流程。</li>
+</ul>
+<h3 id="测试阶段"><a href="#测试阶段" class="headerlink" title="测试阶段"></a>测试阶段</h3><p>除了功能测试、自动化测试、回归测试、覆盖安装等常规测试流程之外，还需要针对特殊场景、机型等边界进行测试：如服务端返回异常数据、服务端宕机等情况</p>
+<h3 id="合码阶段"><a href="#合码阶段" class="headerlink" title="合码阶段"></a>合码阶段</h3><ul>
+<li>在我们的功能开发完毕，即将合并到主分支时，首先要进行编译检测、静态扫描，来发现可能存在的问题。     </li>
+<li>在扫描完成后也不能直接合入，因为多个分支可能会冲突，因此我们先进行一个预编译流程，即合入一个与主分支一样的分支、然后打包进行主流程自动化回归测试，流程通过后再合入主分支。当然这样做可能比较麻烦，但这些步骤应该都是自动化的</li>
+</ul>
+<h3 id="发布阶段"><a href="#发布阶段" class="headerlink" title="发布阶段"></a>发布阶段</h3><ul>
+<li>在发布阶段，我们应该进行多轮灰度，灰度量级应逐渐由小变大，用最小的代价提前暴露问题</li>
+<li>灰度发布同样应该分场景、多纬度全面覆盖，可以针对特别的版本，机型等进行专门的灰度，看下那些更有可能出现问题的用户是否出现问题</li>
+</ul>
+<h3 id="运维阶段"><a href="#运维阶段" class="headerlink" title="运维阶段"></a>运维阶段</h3><ul>
+<li>在上线之后，稳定性问题同样需要关注，因此特别依赖于<code>APM</code>的灵敏监控，发现问题及时报警</li>
+<li>如果出现了异常情况，也需要根据情况进行回滚或者降级策略</li>
+<li>如果不能回滚或降级的话，也可以采用热修复的方式来修复、如果热修复也失效的话，只能依赖于本地容灾方案来恢复</li>
+</ul>
+<h2 id="业务高可用方案建设"><a href="#业务高可用方案建设" class="headerlink" title="业务高可用方案建设"></a>业务高可用方案建设</h2><p>很多人认为稳定性优化就是降低<code>Crash</code>率，但其实稳定性优化还有一个重要的维度就是业务的高可用。<br>业务的不可用可能不会导致崩溃，但是会降低用户的体验，从而直接影响我们的收入    </p>
+<h3 id="业务高可用方案建设-1"><a href="#业务高可用方案建设-1" class="headerlink" title="业务高可用方案建设"></a>业务高可用方案建设</h3><ol>
+<li>业务高可用不像<code>Crash</code>，需要我们自己打点做数据采集。我们需要梳理项目主流程、核心路径、关键节点，并添加打点</li>
+<li>数据采集我们也可以采用<code>AOP</code>方式采集，减少手动打点的成本。</li>
+<li>数据上报之后，我们可以建立数据大盘，统计每个步骤的转化率。</li>
+<li>在数据之报之后，我们也可以建立报警策略，比如阈值报警、趋势报警(相比同期减少)、特定指标报警(比如支付失败)</li>
+<li>同时我们可以做一些异常监控的工作，比如<code>Catch</code>住的异常与异常逻辑的上报，这些异常虽然不会崩溃，但也是我们需要关注的</li>
+<li>针对一些难以解决的问题，我们可以针对特定用户采用全量日志回捞的方式来采集更多信息，</li>
+<li>在发现了异常之后，我们可以通过一些兜底策略来解决问题，比如支持通过配置中心配置功能开关是否打开，当发现某个新功能有问题时，我们可以直接隐藏该功能，或者通过配置路由的方式跳转到另一个方式</li>
+</ol>
+<h3 id="客户端容灾方案"><a href="#客户端容灾方案" class="headerlink" title="客户端容灾方案"></a>客户端容灾方案</h3><p>在性能或者业务异常发生了之后，我们该如何解决呢？传统的流程需要经过用户反馈，重新打包，渠道更新等多个步骤，可以看出其实比较麻烦，对用户的响应度也比较低<br>我们可以从以下角度来进行客户端的容灾方案建设</p>
+<ol>
+<li>对于新加的功能或者代码重构，支持通过配置中心配置开关，如果发生问题可以及时关闭</li>
+<li>同时如果我们的<code>App</code>所有的页面都是通过路由跳转的，可以通过动态配置路由的方式跳转到统一错误处理页面，或者跳转到临时h5页面</li>
+<li>通过热修复技术修复<code>BUG</code>，比如接入腾讯的<code>Tinker</code>或者美团的<code>Robust</code>等</li>
+<li>如果你的项目使用了<code>RN</code>或者<code>Weex</code>，可直接实现增量更新</li>
+<li>如果崩溃发生在刚启动<code>APP</code>时，这时候动态更新动态配置就都失效了，这个时候就需要用到安全模式。安全模式根据<code>Crash</code>信息自动恢复，多次启动失败重置应用为安装初始状态。如果是特别严重的<code>Bug</code>，也可以通过阻塞性热修复的方式来解决，即热修成功了才能进入<code>APP</code>。安全模式不仅可以用于<code>APP</code>，也可用于组件，如果某个组件多次报错，就可以进入兜底页面</li>
+</ol>
+<h2 id="稳定性优化常见面试题"><a href="#稳定性优化常见面试题" class="headerlink" title="稳定性优化常见面试题"></a>稳定性优化常见面试题</h2><p>下面介绍一下稳定性优化的模拟面试题</p>
+<h3 id="你们做了哪些稳定性方面的优化？"><a href="#你们做了哪些稳定性方面的优化？" class="headerlink" title="你们做了哪些稳定性方面的优化？"></a>你们做了哪些稳定性方面的优化？</h3><p>参考答案：</p>
+<p>随着项目的逐渐成熟，用户基数逐渐增多，<code>DAU</code>持续升高，我们遇到了很多稳定性方面的问题，对于我们技术同学遇到了很多的挑战，用户经常使用我们的<code>App</code>卡顿或者是功能不可用，因此我们就针对稳定性开启了专项的优化，我们主要优化了三项：</p>
+<ul>
+<li><code>Crash</code>专项优化</li>
+<li>性能稳定性优化</li>
+<li>业务稳定性优化</li>
+</ul>
+<p>通过这三方面的优化我们搭建了移动端的高可用平台。同时，也做了很多的措施来让<code>App</code>真正地实现了高可用。</p>
+<h3 id="性能稳定性是怎么做的？"><a href="#性能稳定性是怎么做的？" class="headerlink" title="性能稳定性是怎么做的？"></a>性能稳定性是怎么做的？</h3><p>参考答案：</p>
+<ul>
+<li>全面的性能优化：启动速度、内存优化、绘制优化</li>
+<li>线下发现问题、优化为主</li>
+<li>线上监控为主</li>
+<li><code>Crash</code>专项优化</li>
+</ul>
+<p>我们针对启动速度，内存、布局加载、卡顿、瘦身、流量、电量等多个方面做了多维的优化。</p>
+<p>我们的优化主要分为了两个层次，即线上和线下，针对于线下呢，我们侧重于发现问题，直接解决，将问题尽可能在上线之前解决为目的。而真正到了线上呢，我们最主要的目的就是为了监控，对于各个性能纬度的监控呢，可以让我们尽可能早地获取到异常情况的报警。</p>
+<p>同时呢，对于线上最严重的性能问题性问题：<code>Crash</code>，我们做了专项的优化，不仅优化了<code>Crash</code>的具体指标，而且也尽可能地获取了<code>Crash</code>发生时的详细信息，结合后端的聚合、报警等功能，便于我们快速地定位问题。</p>
+<h3 id="业务稳定性如何保障？"><a href="#业务稳定性如何保障？" class="headerlink" title="业务稳定性如何保障？"></a>业务稳定性如何保障？</h3><p>参考答案:</p>
+<ul>
+<li>数据采集 + 报警</li>
+<li>需要对项目的主流程与核心路径进行埋点监控，</li>
+<li>同时还需知道每一步发生了多少异常，这样，我们就知道了所有业务流程的转换率以及相应界面的转换率</li>
+<li>结合大盘，如果转换率低于某个值，进行报警</li>
+<li>异常监控 + 单点追查</li>
+<li>兜底策略，如天猫安全模式</li>
+</ul>
+<p>移动端业务高可用它侧重于用户功能完整可用，主要是为了解决一些线上一些异常情况导致用户他虽然没有崩溃，也没有性能问题，但是呢，只是单纯的功能不可用的情况，我们需要对项目的主流程、核心路径进行埋点监控，来计算每一步它真实的转换率是多少，同时呢，还需要知道在每一步到底发生了多少异常。这样我们就知道了所有业务流程的转换率以及相应界面的转换率，有了大盘的数据呢，我们就知道了，如果转换率或者是某些监控的成功率低于某个值，那很有可能就是出现了线上异常，结合了相应的报警功能，我们就不需要等用户来反馈了，这个就是业务稳定性保障的基础。</p>
+<p>同时呢，对于一些特殊情况，比如说，开发过程当中或代码中出现了一些<code>catch</code>代码块，捕获住了异常，让程序不崩溃，这其实是不合理的，程序虽然没有崩溃，当时程序的功能已经变得不可用，所以呢，这些被<code>catch</code>的异常我们也需要上报上来，这样我们才能知道用户到底出现了什么问题而导致的异常。此外，线上还有一些单点问题，比如说用户点击登录一直进不去，这种就属于单点问题，其实我们是无法找出其和其它问题的共性之处的，所以呢，我们就必须要找到它对应的详细信息。</p>
+<p>最后，如果发生了异常情况，我们还采取了一系列措施进行快速止损。</p>
+<h3 id="如果发生了异常情况，怎么快速止损？"><a href="#如果发生了异常情况，怎么快速止损？" class="headerlink" title="如果发生了异常情况，怎么快速止损？"></a>如果发生了异常情况，怎么快速止损？</h3><p>参考答案：</p>
+<ul>
+<li>功能开关</li>
+<li>统跳中心</li>
+<li>动态修复：热修复、资源包更新</li>
+<li>自主修复：安全模式</li>
+</ul>
+<p>首先，需要让<code>App</code>具备一些高级的能力，我们对于任何要上线的新功能，要加上一个功能的开关，通过配置中心下发的开关呢，来决定是否要显示新功能的入口。如果有异常情况，可以紧急关闭新功能的入口，那就可以让这个<code>App</code>处于可控的状态了。</p>
+<p>然后，我们需要给<code>App</code>设立路由跳转，所有的界面跳转都需要通过路由来分发，如果我们匹配到需要跳转到有<code>bug</code>的这样一个新功能时，那我们就不跳转了，或者是跳转到统一的异常正处理中的界面。如果这两种方式都不可以，那就可以考虑通过热修复的方式来动态修复，目前热修复的方案其实已经比较成熟了，我们完全可以低成本地在我们的项目中添加热修复的能力，当然，如果有些功能是由<code>RN</code>或<code>WeeX</code>来实现就更好了，那就可以通过更新资源包的方式来实现动态更新。而这些如果都不可以的话呢，那就可以考虑自己去给应用加上一个自主修复的能力，如果<code>App</code>启动多次的话，那就可以考虑清空所有的缓存数据，将<code>App</code>重置到安装的状态，到了最严重的等级呢，可以阻塞主线程，此时一定要等<code>App</code>热修复成功之后才允许用户进入。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了<code>Android</code>稳定性的正确认识，如何处理<code>Crash</code>，<code>Crash</code>的长效治理，业务高可用方案建设等内容，给大家介绍了一些稳定性优化的思路与方案。<br>不过大部分内容其实还是理论性的，具体的稳定性优化，<code>Crash</code>治理还是依赖于具体问题的分析与修复，所以本文名为<strong>从入门到了解</strong><br>后续应该还会给大家带来稳定性优化之<code>ANR</code>处理，<code>OOM</code>处理等内容，敬请期待~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6844903972587716621" target="_blank" rel="noopener">深入探索Android稳定性优化</a><br><a href="https://time.geekbang.org/column/article/70966" target="_blank" rel="noopener">Android开发高手课之崩溃优化</a><br><a href="https://coding.imooc.com/class/308.html" target="_blank" rel="noopener">国内Top团队大牛带你玩转Android性能分析与优化</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/04/compose-render-performance.html" rel="next" title="Compose 渲染性能到底怎么样?">
+                <i class="fa fa-chevron-left"></i> Compose 渲染性能到底怎么样?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/05/compose-general-performance.html" rel="prev" title="Jetpack Compose 中常见的性能问题">
+                Jetpack Compose 中常见的性能问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#稳定性优化的正确认识"><span class="nav-number">2.</span> <span class="nav-text">稳定性优化的正确认识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#稳定性优化的关键指标"><span class="nav-number">2.1.</span> <span class="nav-text">稳定性优化的关键指标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UV-Crash率与PV-Crash率"><span class="nav-number">2.1.1.</span> <span class="nav-text">UV Crash率与PV Crash率</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Crash率评价"><span class="nav-number">2.1.2.</span> <span class="nav-text">Crash率评价</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#稳定性优化的维度"><span class="nav-number">2.2.</span> <span class="nav-text">稳定性优化的维度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Crash处理的一般步骤"><span class="nav-number">3.</span> <span class="nav-text">Crash处理的一般步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#崩溃现场"><span class="nav-number">3.1.</span> <span class="nav-text">崩溃现场</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#崩溃信息"><span class="nav-number">3.1.1.</span> <span class="nav-text">崩溃信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#系统信息"><span class="nav-number">3.1.2.</span> <span class="nav-text">系统信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内存信息"><span class="nav-number">3.1.3.</span> <span class="nav-text">内存信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#资源信息"><span class="nav-number">3.1.4.</span> <span class="nav-text">资源信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用信息"><span class="nav-number">3.1.5.</span> <span class="nav-text">应用信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#崩溃分析"><span class="nav-number">3.2.</span> <span class="nav-text">崩溃分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第一步：确定重点"><span class="nav-number">3.2.1.</span> <span class="nav-text">第一步：确定重点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第二步：查找共性"><span class="nav-number">3.2.2.</span> <span class="nav-text">第二步：查找共性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第三步：尝试复现"><span class="nav-number">3.2.3.</span> <span class="nav-text">第三步：尝试复现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统崩溃解决"><span class="nav-number">3.3.</span> <span class="nav-text">系统崩溃解决</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Crash长效治理"><span class="nav-number">4.</span> <span class="nav-text">Crash长效治理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开发阶段"><span class="nav-number">4.1.</span> <span class="nav-text">开发阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试阶段"><span class="nav-number">4.2.</span> <span class="nav-text">测试阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#合码阶段"><span class="nav-number">4.3.</span> <span class="nav-text">合码阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布阶段"><span class="nav-number">4.4.</span> <span class="nav-text">发布阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运维阶段"><span class="nav-number">4.5.</span> <span class="nav-text">运维阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#业务高可用方案建设"><span class="nav-number">5.</span> <span class="nav-text">业务高可用方案建设</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#业务高可用方案建设-1"><span class="nav-number">5.1.</span> <span class="nav-text">业务高可用方案建设</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端容灾方案"><span class="nav-number">5.2.</span> <span class="nav-text">客户端容灾方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#稳定性优化常见面试题"><span class="nav-number">6.</span> <span class="nav-text">稳定性优化常见面试题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#你们做了哪些稳定性方面的优化？"><span class="nav-number">6.1.</span> <span class="nav-text">你们做了哪些稳定性方面的优化？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能稳定性是怎么做的？"><span class="nav-number">6.2.</span> <span class="nav-text">性能稳定性是怎么做的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#业务稳定性如何保障？"><span class="nav-number">6.3.</span> <span class="nav-text">业务稳定性如何保障？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如果发生了异常情况，怎么快速止损？"><span class="nav-number">6.4.</span> <span class="nav-text">如果发生了异常情况，怎么快速止损？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

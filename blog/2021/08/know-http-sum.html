@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机网络,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Http协议是我们开发中的必备知识，也是面试中的常客本文从几个问题出发梳理Http相关知识点，以便快速构建Http知识体系，如果对你有用，欢迎点赞~       本文主要包括以下内容      Http到底是什么？     Http协议为什么是无状态的? 什么是队头阻塞问题? GET,POST,PUT等方法有什么区别？ 为什么引入Https? 为什么引入Http2.0? 为什么引入Http3.">
+<meta name="keywords" content="计算机网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【知识点】Http协议8连问">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/08/know-http-sum.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Http协议是我们开发中的必备知识，也是面试中的常客本文从几个问题出发梳理Http相关知识点，以便快速构建Http知识体系，如果对你有用，欢迎点赞~       本文主要包括以下内容      Http到底是什么？     Http协议为什么是无状态的? 什么是队头阻塞问题? GET,POST,PUT等方法有什么区别？ 为什么引入Https? 为什么引入Http2.0? 为什么引入Http3.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p10.png">
+<meta property="og:image" content="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c244fcd0478b4cacaa0a147c24290a8a~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/02d2699f4cd84c849d61c3bfe64de16a~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://pic1.zhimg.com/80/v2-0d9d34d1a916a84e8780dd76e5654ee0_720w.jpg">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-c4a1ea4b9ac0045921360e11f68e6837_720w.jpg">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-e76adbd5dca9e3ade94f14b486692083_720w.jpg">
+<meta property="og:image" content="https://pic3.zhimg.com/80/v2-6e7f3f12f414b1e970467f50c0062c6e_720w.jpg">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.244Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【知识点】Http协议8连问">
+<meta name="twitter:description" content="前言Http协议是我们开发中的必备知识，也是面试中的常客本文从几个问题出发梳理Http相关知识点，以便快速构建Http知识体系，如果对你有用，欢迎点赞~       本文主要包括以下内容      Http到底是什么？     Http协议为什么是无状态的? 什么是队头阻塞问题? GET,POST,PUT等方法有什么区别？ 为什么引入Https? 为什么引入Http2.0? 为什么引入Http3.">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p10.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/08/know-http-sum.html">
+
+
+
+
+
+  <title>【知识点】Http协议8连问 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/08/know-http-sum.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【知识点】Http协议8连问</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-08T17:09:24+08:00">
+                2021-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Http</code>协议是我们开发中的必备知识，也是面试中的常客<br>本文从几个问题出发梳理<code>Http</code>相关知识点，以便快速构建<code>Http</code>知识体系，如果对你有用，欢迎点赞~      </p>
+<p>本文主要包括以下内容    </p>
+<ol>
+<li><code>Http</code>到底是什么？    </li>
+<li><code>Http</code>协议为什么是无状态的?</li>
+<li>什么是队头阻塞问题?</li>
+<li><code>GET</code>,<code>POST</code>,<code>PUT</code>等方法有什么区别？</li>
+<li>为什么引入<code>Https</code>?</li>
+<li>为什么引入<code>Http2.0</code>?</li>
+<li>为什么引入<code>Http3.0</code>?</li>
+<li>浏览器输入<code>url</code>后发生了什么?       </li>
+</ol>
+<p>本文目录如下所示<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/augest/p10.png" alt></p>
+<h2 id="1-Http到底是什么"><a href="#1-Http到底是什么" class="headerlink" title="1. Http到底是什么?"></a>1. <code>Http</code>到底是什么?</h2><p><code>Http</code>翻译过来就是超文本传输协议，它的主要作用就是在客户端与服务端之间进行通信<br>我们平常在浏览器查看网页时就用到了<code>Http</code>协议，根据浏览器地址栏中指定的<code>URL</code>，<code>Web</code>浏览器从<code>Web</code>服务器端获取文件资源（<code>resource</code>）等信息，从而显示出 <code>Web</code> 页面。        </p>
+<p><code>Http</code>协议主要具有以下特点    </p>
+<ul>
+<li>无连接：每一次请求都要连接一次，请求结束就会断掉，不会保持连接</li>
+<li>无状态：每一次请求都是独立的，请求结束不会记录连接的任何信息，减少了网络开销，这是优点也是缺点</li>
+<li>灵活：通过<code>http</code>协议中头部的<code>Content-Type</code>标记，可以传输任意数据类型的数据对象(文本、图片、视频等等)，非常灵活</li>
+<li>简单快速：发送请求访问某个资源时，只需传送请求方法和<code>URL</code>就可以了，使用简单，正由于<code>http</code>协议简单，使得<code>http</code>服务器的程序规模小，因而通信速度很快  </li>
+</ul>
+<p>当然<code>Http</code>协议也有一些缺点       </p>
+<ul>
+<li>无状态：请求不会记录任何连接信息，没有记忆，就无法区分多个请求发起者身份是不是同一个客户端的，意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大</li>
+<li>明文传输：<code>Http</code>报文使用明文传输，如果在通信的过程中存在中间人，可以轻易的获取请求的所有内容      </li>
+<li>队头阻塞：当开启长连接时，多个<code>Http</code>请求复用一个<code>TCP</code>连接，同一时刻只能处理一个请求，那么当前面的请求耗时过长时，其他请求就只能处于阻塞状态</li>
+</ul>
+<h2 id="2-Http协议为什么是无状态的"><a href="#2-Http协议为什么是无状态的" class="headerlink" title="2. Http协议为什么是无状态的?"></a>2. <code>Http</code>协议为什么是无状态的?</h2><p>上面我们介绍了<code>Http</code>协议是无状态的，即每次请求都是独立的，服务端中不保存客户端的状态<br>因此为了区分用户的身份，我们需要每次都在<code>Header</code>中携带身份信息(比如<code>Cookie</code>)，这样其实导致了每次连接传送的数据量变大了不少。        </p>
+<p><strong>那么为什么<code>Http</code>要这样设计呢？</strong>      </p>
+<ol>
+<li><code>http</code>最初设计成无状态的是因为只是用来浏览静态文件的，无状态协议已经足够，也没什么其他的负担。          </li>
+<li>随着<code>web</code>的发展，它需要变得有状态，但是不是就要修改<code>http</code>协议使之有状态呢？是不需要的。因为我们经常长时间逗留在某一个网页，然后才进入到另一个网页，如果在这两个页面之间维持状态，代价是很高的。     </li>
+<li>其次，老版本<code>http</code>是无状态的，但是现在对<code>http</code>提出了新的要求，按照软件领域的通常做法是，兼容历史版本，在<code>http</code>协议上再加上一层实现我们的目的。所以引入了<code>cookie</code>、<code>session</code>等机制来实现这种有状态的连接。      </li>
+<li>同时，保存用户状态是一个很复杂的过程，而<code>Http</code>协议为了更快地处理大量事务，确保协议的可伸缩性，故意把<code>HTTP</code>协议设计的比较简单。因此没有必要在<code>Http</code>协议中引入状态管理     </li>
+</ol>
+<h2 id="3-什么是队头阻塞问题"><a href="#3-什么是队头阻塞问题" class="headerlink" title="3. 什么是队头阻塞问题?"></a>3. 什么是队头阻塞问题?</h2><p><code>Http1.0</code>是无连接的，即每个请求/应答客户与服务器都要新建一个连接，完成之后立即断开连接<br>在<code>Http1.1</code>中引入了<code>Keep-Alive</code>支持长连接，即多个<code>Http</code>请求复用一个<code>TCP</code>连接,如下图所示：    </p>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c244fcd0478b4cacaa0a147c24290a8a~tplv-k3u1fbpfcp-watermark.awebp" alt><br>如上所示，使用长连接，可以减少<code>TCP</code>握手时间，提高请求速度<br>但是在长连接下同样<code>Http</code>协议同样会有队头阻塞问题，因为我们虽然可以复用<code>TCP</code>连接，但<code>Http</code>请求仍然是串行的       </p>
+<blockquote>
+<p>请求1 -&gt; 响应1 -&gt; 请求2 -&gt; 响应2 -&gt; 请求3 -&gt; 响应3</p>
+</blockquote>
+<p>如上所示，就是这样一个先进先出的串行队列，没有轻重缓急的优先级，只有入队的先后顺序，排在最前面的请求最先处理，就导致如果队首的请求耗时过长，后面的请求就只能处于阻塞状态，这就是队头阻塞问题<br>当然我们也可以通过一些方式缓解这个问题    </p>
+<ol>
+<li>一个域名允许分配多个长连接，就相当于增加了任务队列，不至于一个队列里的任务阻塞了其他全部任务。现在的浏览器标准中一个域名并发连接可以有<code>6~8</code>个(<code>Chrome</code>6个/<code>Firefox</code>8个)          </li>
+<li>一个域名最多可以并发<code>6~8</code>个,那我们可以使用多个二级域名，当我们访问服务端时，可以让不同的资源从不同的二域名中获取，而它们都指向同一台服务器，这样能够并发更多的长连接了，从而减少队头阻塞     </li>
+</ol>
+<h2 id="4-GET-POST-PUT等方法有什么区别？"><a href="#4-GET-POST-PUT等方法有什么区别？" class="headerlink" title="4. GET,POST,PUT等方法有什么区别？"></a>4. <code>GET</code>,<code>POST</code>,<code>PUT</code>等方法有什么区别？</h2><h3 id="4-1-GET与POST的区别"><a href="#4-1-GET与POST的区别" class="headerlink" title="4.1 GET与POST的区别"></a>4.1 <code>GET</code>与<code>POST</code>的区别</h3><ol>
+<li><code>GET</code> 用于获取信息，是无副作用的，是幂等的，且可缓存.          </li>
+<li><code>POST</code> 用于修改服务器上的数据，有副作用，非幂等，不可缓存          </li>
+</ol>
+<p>其实<code>GET</code>与<code>POST</code>的区别主要就是这些，网上有些文章说<code>GET</code>的<code>URL</code>长度有限制，<code>HTTP</code> 协议没有<code>Body</code> 和 <code>URL</code> 的长度限制，对 <code>URL</code> 限制的大多是浏览器和服务器的原因。<br>浏览器原因就不说了，服务器是因为处理长<code>URL</code>要消耗比较多的资源，为了性能和安全（防止恶意构造长<code>URL</code>来攻击）考虑，会给<code>URL</code>长度加限制。</p>
+<h3 id="4-2-PUT与POST的区别"><a href="#4-2-PUT与POST的区别" class="headerlink" title="4.2 PUT与POST的区别"></a>4.2 <code>PUT</code>与<code>POST</code>的区别</h3><p>有人说,<code>PUT</code>与<code>POST</code>的区别在于<code>POST</code>是用来创建数据的,<code>PUT</code>是用来更新数据的.<br>其实<code>PUT</code>与<code>POST</code>都能创建数据，它们的主要区别是<code>PUT</code>是幂等的，而<code>POST</code>不是幂等的<br>因此<code>PUT</code>能用于更新数据，也能用于创建数据，而<code>POST</code>只能用于创建数据     </p>
+<p>如果<code>POST</code>两条相同的数据，则会创建两条数据<br>而<code>PUT</code>两条相同的数据，则只会创建一条数据    </p>
+<h2 id="5-为什么引入Https"><a href="#5-为什么引入Https" class="headerlink" title="5. 为什么引入Https?"></a>5. 为什么引入<code>Https</code>?</h2><p>上面说到了<code>HTTP</code>是明文传输的，在安全方面主要有以下缺点     </p>
+<ol>
+<li><code>Http</code>通信使用明文（不加密），内容可能会被窃听        </li>
+<li>不验证通信方的身份，因此有可能遭遇伪装           </li>
+<li>无法证明报文的完整性，所以有可能已遭篡改       </li>
+</ol>
+<p>正因此才推出了<code>Https</code>协议来保证<code>Client</code>和<code>Server</code>交流的信息不能被其它第三方窃听及防止篡改与伪装            </p>
+<p><code>Https</code>通信的主要过程如图所示:<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/02d2699f4cd84c849d61c3bfe64de16a~tplv-k3u1fbpfcp-watermark.awebp" alt><br>主要做了以下几件事<br>1.客户端&amp;服务端通信，协商加密方式<br>2.客户端(<code>Client</code>)和服务端(<code>Server</code>)互相确认身份<br>3.双方安全地交换<code>https</code>通信使用的密钥（<code>Session Key</code>）     </p>
+<p><code>Https</code>加密的具体流程比较复杂，里面还涉及到证书链校验，中间人攻击等知识点<br>我之前总结过一篇文章，这里就不缀述了，有兴趣的同学可以了解下:<a href="https://juejin.cn/post/6880024440143347719" target="_blank" rel="noopener">Android程序员需要了解的https与中间人攻击</a></p>
+<h2 id="6-为什么引入Http2-0"><a href="#6-为什么引入Http2-0" class="headerlink" title="6. 为什么引入Http2.0?"></a>6. 为什么引入<code>Http2.0</code>?</h2><p>上面我们已经介绍了<code>Http</code>协议的主要缺点<br>1.请求 / 响应头部（<code>Header</code>）未经压缩就发送，首部信息越多延迟越大。<br>2.发送冗长的首部。每次互相发送相同的首部造成的浪费较多；<br>3.服务器是按请求的顺序响应的，如果服务器响应慢，会招致客户端一直请求不到数据，也就是队头阻塞；<br>4.没有请求优先级控制；<br>5.请求只能从客户端开始，服务器只能被动响应             </p>
+<p><code>Http2.0</code>正是为了解决以上问题才被引入的,相比<code>Http1.1</code>,<code>Http2.0</code>主要有以下改进     </p>
+<h3 id="6-1-头部压缩"><a href="#6-1-头部压缩" class="headerlink" title="6.1 头部压缩"></a>6.1 头部压缩</h3><p><code>HTTP/2</code> 会压缩头（<code>Header</code>）如果你同时发出多个请求，他们的头是一样的或是相似的，那么，协议会帮你消除重复的部分。           </p>
+<p>这就是所谓的<code>HPACK</code>算法：在客户端和服务器同时维护一张头信息表，所有字段都会存入这个表，生成一个索引号，以后就不发送同样字段了，只发送索引号，这样就提高速度了</p>
+<h3 id="6-2-多路复用"><a href="#6-2-多路复用" class="headerlink" title="6.2 多路复用"></a>6.2 多路复用</h3><h4 id="6-2-1-二进制分帧"><a href="#6-2-1-二进制分帧" class="headerlink" title="6.2.1 二进制分帧"></a>6.2.1 二进制分帧</h4><p><code>HTTP/2</code> 不再像<code>HTTP/1.1</code>里的纯文本形式的报文，而是全面采用了二进制格式，头信息和数据体都是二进制，并且统称为帧（<code>frame</code>）：头信息帧和数据帧。<br><img src="https://pic1.zhimg.com/80/v2-0d9d34d1a916a84e8780dd76e5654ee0_720w.jpg" alt><br>这样虽然对人不友好，但是对计算机非常友好，因为计算机只懂二进制，那么收到报文后，无需再将明文的报文转成二进制，而是直接解析二进制报文，这增加了数据传输的效率     </p>
+<h4 id="6-2-2-多路复用解决队头阻塞"><a href="#6-2-2-多路复用解决队头阻塞" class="headerlink" title="6.2.2 多路复用解决队头阻塞"></a>6.2.2 多路复用解决队头阻塞</h4><p>原来<code>Headers + Body</code>的报文格式如今被拆分成了一个个二进制的帧，用<code>Headers</code>帧存放头部字段，<code>Data</code>帧存放请求体数据。<br>分帧之后，服务器看到的不再是一个个完整的 <code>HTTP</code> 请求报文，而是一堆乱序的二进制帧。            </p>
+<p>通信双方都可以给对方发送二进制帧，这种二进制帧的双向传输的序列，也叫做流(<code>Stream</code>)。<br><code>HTTP/2</code> 用流(<code>Stream</code>)来在一个 <code>TCP</code> 连接上来进行多个数据帧的通信，这就是多路复用的概念。<br>这些二进制帧不存在先后关系，因此也就不会排队等待，也就没有了 <code>HTTP</code> 的队头阻塞问题。            </p>
+<p>举例来说，在一个 <code>TCP</code> 连接里，服务器收到了客户端 <code>A</code> 和 <code>B</code> 的两个请求，如果发现 <code>A</code> 处理过程非常耗时，于是就回应 <code>A</code> 请求已经处理好的部分，接着回应 <code>B</code> 请求，完成后，再回应 <code>A</code> 请求剩下的部分。<br><img src="https://pic4.zhimg.com/80/v2-c4a1ea4b9ac0045921360e11f68e6837_720w.jpg" alt></p>
+<h3 id="6-5-服务器推送"><a href="#6-5-服务器推送" class="headerlink" title="6.5 服务器推送"></a>6.5 服务器推送</h3><p><code>HTTP/2</code> 还在一定程度上改善了传统的<code>「请求 - 应答」</code>工作模式，服务不再是被动地响应，也可以主动向客户端发送消息。</p>
+<p>举例来说，在浏览器刚请求 <code>HTML</code> 的时候，就提前把可能会用到的 <code>JS</code>、<code>CSS</code> 文件等静态资源主动发给客户端，减少延时的等待，也就是服务器推送</p>
+<h2 id="7-为什么引入Http3-0"><a href="#7-为什么引入Http3-0" class="headerlink" title="7. 为什么引入Http3.0?"></a>7. 为什么引入<code>Http3.0</code>?</h2><p><code>Http2.0</code>还没学，怎么<code>Http3.0</code>又来了？<br>总得来说，这是因为<code>Http2.0</code>还存在一定的缺陷     </p>
+<p><code>HTTP/2</code> 主要的问题在于，多个 <code>HTTP</code> 请求在复用一个 <code>TCP</code> 连接，下层的 <code>TCP</code> 协议是不知道有多少个 <code>HTTP</code> 请求的。<br>所以一旦发生了丢包现象，就会触发 <code>TCP</code> 的重传机制，这样在一个 <code>TCP</code> 连接中的所有的 <code>HTTP</code> 请求都必须等待这个丢了的包被重传回来。    </p>
+<p><code>HTTP/2</code> 多请求复用一个<code>TCP</code>连接，一旦发生丢包，就会阻塞住所有的 <code>HTTP</code> 请求。<br>可以看出，这其实不是<code>Http</code>协议的问题，而是传输层协议的问题<br>所以 <code>HTTP/3</code> 把 <code>HTTP</code> 下层的 <code>TCP</code> 协议改成了 <code>UDP</code>！       </p>
+<p><img src="https://pic4.zhimg.com/80/v2-e76adbd5dca9e3ade94f14b486692083_720w.jpg" alt><br><code>UDP</code> 发生是不管顺序，也不管丢包的，所以不会出现 <code>HTTP/1.1</code> 的队头阻塞 和 <code>HTTP/2</code> 的一个丢包全部重传问题。<br>大家都知道 <code>UDP</code> 是不可靠传输的，但基于 <code>UDP</code> 的 <code>QUIC</code> 协议 可以实现类似 <code>TCP</code> 的可靠性传输。<br><code>QUIC</code> 是一个在 <code>UDP</code> 之上的伪 <code>TCP</code> + <code>TLS</code> + <code>HTTP/2</code> 的多路复用的协议,在这里就不详细介绍了，有兴趣的同学可参考：<a href="https://zhuanlan.zhihu.com/p/111716047" target="_blank" rel="noopener">QUIC协议连接过程介绍</a>    </p>
+<p>总得来说，<code>QUIC</code> 是新协议，对于很多网络设备，根本不知道什么是 <code>QUIC</code>，只会当做 <code>UDP</code>，这样会出现新的问题。<br>所以 <code>HTTP/3</code> 现在普及的进度非常的缓慢，大家只做简单了解即可。       </p>
+<h2 id="8-浏览器输入url后发生了什么？"><a href="#8-浏览器输入url后发生了什么？" class="headerlink" title="8. 浏览器输入url后发生了什么？"></a>8. 浏览器输入<code>url</code>后发生了什么？</h2><p>这个是面试中的常见问题了，我们在了解了上面的知识点后，再一起来看下这个问题<br>要回答这个问题，我们需要对<code>TCP/IP</code>协议族有一定的了解     </p>
+<h3 id="8-1-Tcp-IP协议族"><a href="#8-1-Tcp-IP协议族" class="headerlink" title="8.1 Tcp/IP协议族"></a>8.1 <code>Tcp/IP</code>协议族</h3><p><code>TCP/IP</code> 协议族里重要的一点就是分层。<br><code>TCP/IP</code> 协议族按层次分别分为以下 4 层：应用层、传输层、网络层和数据链路层。<br>把 <code>TCP/IP</code> 层次化是有好处的。比如，如果互联网只由一个协议统筹，某个地方需要改变设计时，就必须把所有部分整体替换掉。<br>而分层之后只需把变动的层替换掉即可。把各层之间的接口部分规划好之后，每个层次内部的设计就能够自由改动了。         </p>
+<p>值得一提的是，层次化之后，设计也变得相对简单了。<br>处于应用层上的应用可以只考虑分派给自己的任务，而不需要弄清对方在地球上哪个地方、对方的传输路线是怎样的、是否能确保传输送达等问题。      </p>
+<h4 id="8-1-1-应用层"><a href="#8-1-1-应用层" class="headerlink" title="8.1.1 应用层"></a>8.1.1 应用层</h4><p>应用层决定了向用户提供应用服务时通信的活动。<br><code>TCP/IP</code> 协议族内预存了各类通用的应用服务。比如，<code>FTP</code>（<code>File Transfer Protocol</code>,文件传输协议）和 <code>DNS</code>（<code>Domain Name System</code>，域名系统）服务就是其中两类。<br><code>HTTP</code> 协议也处于该层。</p>
+<h4 id="8-1-2-传输层"><a href="#8-1-2-传输层" class="headerlink" title="8.1.2 传输层"></a>8.1.2 传输层</h4><p>传输层对上层应用层，<strong>提供处于网络连接中的两台计算机之间的数据传输</strong>。<br>在传输层有两个性质不同的协议：<code>TCP</code>（<code>Transmission ControlProtocol</code>，传输控制协议）和 <code>UDP</code>（<code>User Data Protocol</code>，用户数据报协议）。</p>
+<h4 id="8-1-3-网络层"><a href="#8-1-3-网络层" class="headerlink" title="8.1.3 网络层"></a>8.1.3 网络层</h4><p>网络层用来处理在网络上流动的数据包。数据包是网络传输的最小数据单位。<br>该层规定了通过怎样的路径（所谓的传输路线）到达对方计算机，并把数据包传送给对方。<br>与对方计算机之间通过多台计算机或网络设备进行传输时，<strong>网络层所起的作用就是在众多的选项内选择一条传输路线</strong>。<br><code>IP</code>协议就在网络层</p>
+<h4 id="8-1-4-数据链路层"><a href="#8-1-4-数据链路层" class="headerlink" title="8.1.4 数据链路层"></a>8.1.4 数据链路层</h4><p><strong>用来处理连接网络的硬件部分。</strong><br>包括控制操作系统、硬件的设备驱动、<code>NIC</code>（<code>Network Interface Card</code>，网络适配器，即网卡），及光纤等物理可见部分（还包括连接器等一切传输媒介）。<br>硬件上的范畴均在链路层的作用范围之内。    </p>
+<h3 id="8-2-浏览器输入url后大致流程"><a href="#8-2-浏览器输入url后大致流程" class="headerlink" title="8.2 浏览器输入url后大致流程"></a>8.2 浏览器输入<code>url</code>后大致流程</h3><ol>
+<li>解析用户输入的<code>Url</code>       </li>
+<li>通过<code>DNS</code>协议根据域名查询<code>ip</code>地址         </li>
+<li>客户端发起请求       </li>
+<li>服务端接受请求并处理            </li>
+<li>客户端接受响应        </li>
+<li>浏览器渲染页面         </li>
+</ol>
+<p>这里我们主要关注客户端发起请求及服务端接受请求的过程，这里就用到了<code>TCP/IP</code>协议族<br>在发送数据时，每层都要对数据进行封装，在接收数据时，每层都要对数据进行解封，如下图所示：<br><img src="https://pic3.zhimg.com/80/v2-6e7f3f12f414b1e970467f50c0062c6e_720w.jpg" alt>          </p>
+<p>简单来说，就是从应用层发<code>http</code>请求，到传输层通过三次握手建立<code>tcp</code>连接，再到网络层的<code>ip</code>寻址，再经过数据链路层与物理层，最后到达服务端。<br>然后服务端经过相反的过程，在每一层将数据取出来即可。<br>关于浏览器输入<code>url</code>后的流程我们这里没有讲得很详细，想要了解更多细节的同学可参考：<a href="https://zhuanlan.zhihu.com/p/80551769" target="_blank" rel="noopener">在浏览器输入 URL 回车之后发生了什么（超详细版）</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要梳理了<code>Http</code>协议相关知识点，并回答了以下问题    </p>
+<ol>
+<li><code>Http</code>到底是什么？    </li>
+<li><code>Http</code>协议为什么是无状态的?</li>
+<li>什么是队头阻塞问题?</li>
+<li><code>GET</code>,<code>POST</code>,<code>PUT</code>等方法有什么区别？</li>
+<li>为什么引入<code>Https</code>?</li>
+<li>为什么引入<code>Http2.0</code>?</li>
+<li>为什么引入<code>Http3.0</code>?</li>
+<li>浏览器输入<code>url</code>后发生了什么?    </li>
+</ol>
+<p>如果对您有所帮助，欢迎点赞，谢谢~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6994629873985650696" target="_blank" rel="noopener">20分钟助你拿下HTTP和HTTPS，巩固你的HTTP知识体系</a><br><a href="https://www.byway.xyz/tips/http.html" target="_blank" rel="noopener">Http协议为什么是无状态的</a><br><a href="https://stackoverflow.com/questions/630453/what-is-the-difference-between-post-and-put-in-http" target="_blank" rel="noopener">What is the difference between POST and PUT in HTTP?</a><br><a href="https://zhuanlan.zhihu.com/p/111716047" target="_blank" rel="noopener">图解网络： HTTP 常见的面试题</a><br><a href="https://zhuanlan.zhihu.com/p/80551769" target="_blank" rel="noopener">在浏览器输入 URL 回车之后发生了什么（超详细版）</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/计算机网络/" rel="tag"># 计算机网络</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/08/desin-api-story.html" rel="next" title="【译】Google 是怎么设计一个 API 的,了解一下~">
+                <i class="fa fa-chevron-left"></i> 【译】Google 是怎么设计一个 API 的,了解一下~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/08/gradle-catalog-learn.html" rel="prev" title="【Gradle7.0】依赖统一管理的全新方式，了解一下~">
+                【Gradle7.0】依赖统一管理的全新方式，了解一下~ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Http到底是什么"><span class="nav-number">2.</span> <span class="nav-text">1. Http到底是什么?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Http协议为什么是无状态的"><span class="nav-number">3.</span> <span class="nav-text">2. Http协议为什么是无状态的?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-什么是队头阻塞问题"><span class="nav-number">4.</span> <span class="nav-text">3. 什么是队头阻塞问题?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-GET-POST-PUT等方法有什么区别？"><span class="nav-number">5.</span> <span class="nav-text">4. GET,POST,PUT等方法有什么区别？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-GET与POST的区别"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 GET与POST的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-PUT与POST的区别"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 PUT与POST的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-为什么引入Https"><span class="nav-number">6.</span> <span class="nav-text">5. 为什么引入Https?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-为什么引入Http2-0"><span class="nav-number">7.</span> <span class="nav-text">6. 为什么引入Http2.0?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-头部压缩"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 头部压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-多路复用"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 多路复用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-1-二进制分帧"><span class="nav-number">7.2.1.</span> <span class="nav-text">6.2.1 二进制分帧</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-2-多路复用解决队头阻塞"><span class="nav-number">7.2.2.</span> <span class="nav-text">6.2.2 多路复用解决队头阻塞</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-服务器推送"><span class="nav-number">7.3.</span> <span class="nav-text">6.5 服务器推送</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-为什么引入Http3-0"><span class="nav-number">8.</span> <span class="nav-text">7. 为什么引入Http3.0?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-浏览器输入url后发生了什么？"><span class="nav-number">9.</span> <span class="nav-text">8. 浏览器输入url后发生了什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-Tcp-IP协议族"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 Tcp/IP协议族</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#8-1-1-应用层"><span class="nav-number">9.1.1.</span> <span class="nav-text">8.1.1 应用层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-1-2-传输层"><span class="nav-number">9.1.2.</span> <span class="nav-text">8.1.2 传输层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-1-3-网络层"><span class="nav-number">9.1.3.</span> <span class="nav-text">8.1.3 网络层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-1-4-数据链路层"><span class="nav-number">9.1.4.</span> <span class="nav-text">8.1.4 数据链路层</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-浏览器输入url后大致流程"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 浏览器输入url后大致流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">10.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">10.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

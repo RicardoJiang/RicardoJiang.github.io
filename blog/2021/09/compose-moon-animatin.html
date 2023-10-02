@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="compose,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="我正在参加中秋创意投稿大赛，详情请看：中秋创意投稿大赛     效果图         人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。恰逢中秋佳节，我们今天就使用Compose来实现一下月相变化动画吧~感兴趣的同学可以点个Star : Compose 实现月亮阴晴圆缺动画       主要思路满天繁星为了实现月相动画，我们首先需要一个背景，因此我们需要一个好看的星空，最好还有闪烁">
+<meta name="keywords" content="compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【中秋征文】Compose 实现月亮阴晴圆缺动画">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/09/compose-moon-animatin.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="我正在参加中秋创意投稿大赛，详情请看：中秋创意投稿大赛     效果图         人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。恰逢中秋佳节，我们今天就使用Compose来实现一下月相变化动画吧~感兴趣的同学可以点个Star : Compose 实现月亮阴晴圆缺动画       主要思路满天繁星为了实现月相动画，我们首先需要一个背景，因此我们需要一个好看的星空，最好还有闪烁">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p4.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p5.jpeg">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p6.jpeg">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2ccb418c0dc8431fb449cb5ddd117bd5~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:image" content="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f872b4e4c2e6417bbd46c8547deb007a~tplv-k3u1fbpfcp-watermark.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.244Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【中秋征文】Compose 实现月亮阴晴圆缺动画">
+<meta name="twitter:description" content="我正在参加中秋创意投稿大赛，详情请看：中秋创意投稿大赛     效果图         人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。恰逢中秋佳节，我们今天就使用Compose来实现一下月相变化动画吧~感兴趣的同学可以点个Star : Compose 实现月亮阴晴圆缺动画       主要思路满天繁星为了实现月相动画，我们首先需要一个背景，因此我们需要一个好看的星空，最好还有闪烁">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p4.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/09/compose-moon-animatin.html">
+
+
+
+
+
+  <title>【中秋征文】Compose 实现月亮阴晴圆缺动画 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/09/compose-moon-animatin.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【中秋征文】Compose 实现月亮阴晴圆缺动画</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-12T19:01:26+08:00">
+                2021-09-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我正在参加中秋创意投稿大赛，详情请看：<a href="https://juejin.cn/post/7003154195826081800" target="_blank" rel="noopener">中秋创意投稿大赛</a>    </p>
+<h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h2><p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p4.gif" alt>       </p>
+<blockquote>
+<p>人有悲欢离合，月有阴晴圆缺，此事古难全。<br>但愿人长久，千里共婵娟。<br>恰逢中秋佳节，我们今天就使用<code>Compose</code>来实现一下月相变化动画吧~<br>感兴趣的同学可以点个<code>Star</code> : <a href="https://github.com/shenzhen2017/ComposeMoon" target="_blank" rel="noopener">Compose 实现月亮阴晴圆缺动画</a>     </p>
+</blockquote>
+<h2 id="主要思路"><a href="#主要思路" class="headerlink" title="主要思路"></a>主要思路</h2><h3 id="满天繁星"><a href="#满天繁星" class="headerlink" title="满天繁星"></a>满天繁星</h3><p>为了实现月相动画，我们首先需要一个背景，因此我们需要一个好看的星空，最好还有闪烁的效果<br>为为实现星空背景，我们需要做以下几件事       </p>
+<ol>
+<li>绘制背景       </li>
+<li>生成几十个星星，在背景上随机分布   </li>
+<li>通过<code>scale</code>与<code>alpha</code>动画，实现每个星星的闪烁效果    </li>
+</ol>
+<p>我们一起来看下代码<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">Stars</span><span class="params">(starNum: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    BoxWithConstraints(modifier = Modifier.fillMaxSize()) &#123;</span><br><span class="line">        <span class="keyword">val</span> list = remember &#123; mutableStateListOf&lt;Star&gt;() &#125;</span><br><span class="line">        LaunchedEffect(<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">0</span>..starNum) &#123;</span><br><span class="line">                delay(<span class="number">100L</span>)</span><br><span class="line">                <span class="comment">//添加星星，它们的位置在屏幕上随机</span></span><br><span class="line">                list.add(Star(maxWidth.value * density, maxHeight.value * density))</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        list.forEach &#123;</span><br><span class="line">            Star(it)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">Star</span><span class="params">(star: <span class="type">Star</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> progress: <span class="built_in">Float</span> <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="number">0f</span>) &#125;</span><br><span class="line">    <span class="keyword">val</span> infiniteTransition = rememberInfiniteTransition()</span><br><span class="line">    .... </span><br><span class="line">    star.updateStar(progress) <span class="comment">// 通过动画更新progress,从而更新star的属性值</span></span><br><span class="line">    Canvas(modifier = Modifier.wrapContentSize()) &#123;</span><br><span class="line">        scale(star.scale, Offset(star.x, star.y)) &#123; <span class="comment">// 缩放动画</span></span><br><span class="line">            drawCircle(</span><br><span class="line">                star.starColor,</span><br><span class="line">                star.radius,</span><br><span class="line">                center = Offset(star.x, star.y),</span><br><span class="line">                alpha = star.alpha <span class="comment">// alpha动画</span></span><br><span class="line">            )</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="月相变化"><a href="#月相变化" class="headerlink" title="月相变化"></a>月相变化</h3><p>月相，天文学术语。（<code>phase of the moon</code>）是天文学中对于地球上看到的月球被太阳照明部分的称呼。随着月亮每天在星空中自东向西移动一大段距离，它的形状也在不断地变化着，这就是月亮位相变化，叫做月相。<br>它的变化过程如下图所示<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p5.jpeg" alt><br>每个阶段都有各自的名字，如下图所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p6.jpeg" alt>     </p>
+<p>可以看出，月相变化过程还是有些复杂的，那我们怎么实现这个效果呢？       </p>
+<h4 id="思路分析"><a href="#思路分析" class="headerlink" title="思路分析"></a>思路分析</h4><p>为了实现月相变化,首先我们需要画一个圆，代表月亮，最终的满月其实就是这样，比较简单<br>有了满月，如何在它的基础上，画出其它的月相呢？我们可以通过图像混合模式来实现       </p>
+<p>图像混合模式定义的是，当两个图像合成时，图像最终的展示方式。在<code>Androd</code>中，有相应的<code>API</code>接口来支持图像混合模式，即<code>Xfermode</code>.<br>图像混合模式主要有以下16种,以下这张图片从一定程度上形象地说明了图像混合的作用，两个图形一圆一方通过一定的计算产生不同的组合效果，具体如下<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2ccb418c0dc8431fb449cb5ddd117bd5~tplv-k3u1fbpfcp-watermark.awebp" alt>      </p>
+<p>我们为了实现月相动画，主要需要使用以下两种混合模式    </p>
+<ul>
+<li><code>DST_OUT</code>:只在源图像和目标图像不相交的地方绘制【目标图像】，在相交的地方根据源图像的<code>alpha</code>进行过滤，源图像完全不透明则完全过滤，完全透明则不过滤    </li>
+<li><code>DST_OVER</code>:将目标图像放在源图像上方</li>
+</ul>
+<p>我们已经了解了图形混合模式，那么需要在满月上画什么才能实现其它效果呢?<br>我们可以通过在满月上放一个半圆<code>+</code>一个椭圆来实现<br><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f872b4e4c2e6417bbd46c8547deb007a~tplv-k3u1fbpfcp-watermark.awebp" alt>      </p>
+<ol>
+<li>如上所示，椭圆上水平的线叫长轴，竖直的线叫短轴      </li>
+<li>短轴不变，长轴半径从0到满月半径发生变化，再加上一个半圆，就可以实现不同的月相     </li>
+<li>比如为了画上蛾眉月，可以通过左半边画半圆，再加上一个椭圆，两都都使用<code>DST_OVER</code>混合模式来实现，就实现了它们两的并集，然后覆盖在下层满月上，就实现了上蛾眉月               </li>
+<li>为了画渐盈凸月,则同样就左半边以<code>DST_OVER</code>画半圆,再以<code>DST_OUT</code>画椭圆，就只剩下半圆与椭圆不相交的部分，再与下层的满月混合，就实现了渐盈凸月        </li>
+</ol>
+<p>这样说可能还是比较抽象，感兴趣的同学可下载源码详细了解下   </p>
+<h4 id="源码实现"><a href="#源码实现" class="headerlink" title="源码实现"></a>源码实现</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//月亮动画控件</span></span><br><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">Moon</span><span class="params">(modifier: <span class="type">Modifier</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> progress: <span class="built_in">Float</span> <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="number">0f</span>) &#125;</span><br><span class="line">    BoxWithConstraints(modifier = modifier) &#123;</span><br><span class="line">        Canvas(</span><br><span class="line">            modifier = Modifier</span><br><span class="line">                .size(canvasSize)</span><br><span class="line">                .align(Alignment.TopCenter)</span><br><span class="line">        ) &#123;</span><br><span class="line">            drawMoonCircle(<span class="keyword">this</span>, progress)</span><br><span class="line">            drawIntoCanvas &#123;</span><br><span class="line">                it.withSaveLayer(Rect(<span class="number">0f</span>, <span class="number">0f</span>, size.width, size.height), paint = Paint()) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (progress != <span class="number">1f</span>) &#123;</span><br><span class="line">                    	<span class="comment">//必须先画半圆，再画椭圆</span></span><br><span class="line">                        drawMoonArc(<span class="keyword">this</span>, it, paint, progress)</span><br><span class="line">                        drawMoonOval(<span class="keyword">this</span>, it, paint, progress)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1.首先画一个满月</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">drawMoonCircle</span><span class="params">(scope: <span class="type">DrawScope</span>, progress: <span class="type">Float</span>)</span></span> &#123;</span><br><span class="line">	<span class="comment">//....</span></span><br><span class="line">    drawCircle(Color(<span class="number">0xfff9dc60</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 画半圆</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">drawMoonArc</span><span class="params">(scope: <span class="type">DrawScope</span>, canvas: <span class="type">Canvas</span>, paint: <span class="type">Paint</span>, progress: <span class="type">Float</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> sweepAngle = <span class="keyword">when</span> &#123; <span class="comment">//从新月到满月在一边画半圆，从满月回到新月则在另一边画半圆</span></span><br><span class="line">        progress &lt;= <span class="number">0.5f</span> -&gt; <span class="number">180f</span></span><br><span class="line">        progress &lt;= <span class="number">1f</span> -&gt; <span class="number">180f</span></span><br><span class="line">        progress &lt;= <span class="number">1.5f</span> -&gt; -<span class="number">180f</span></span><br><span class="line">        <span class="keyword">else</span> -&gt; -<span class="number">180f</span></span><br><span class="line">    &#125;</span><br><span class="line">    paint.blendMode = BlendMode.DstOver <span class="comment">//半圆的混合模式始终是DstOver</span></span><br><span class="line">    scope.run &#123;</span><br><span class="line">        canvas.drawArc(Rect(<span class="number">0f</span>, <span class="number">0f</span>, size.width, size.height), <span class="number">90f</span>, sweepAngle, <span class="literal">false</span>, paint)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 画椭圆</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">drawMoonOval</span><span class="params">(scope: <span class="type">DrawScope</span>, canvas: <span class="type">Canvas</span>, paint: <span class="type">Paint</span>, progress: <span class="type">Float</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> blendMode = <span class="keyword">when</span> &#123; <span class="comment">//椭圆的混合模式会发生变化，这里需要注意下</span></span><br><span class="line">        progress &lt;= <span class="number">0.5f</span> -&gt; BlendMode.DstOver</span><br><span class="line">        progress &lt;= <span class="number">1f</span> -&gt; BlendMode.DstOut</span><br><span class="line">        progress &lt;= <span class="number">1.5f</span> -&gt; BlendMode.DstOut</span><br><span class="line">        <span class="keyword">else</span> -&gt; BlendMode.DstOver</span><br><span class="line">    &#125;</span><br><span class="line">    paint.blendMode = blendMode</span><br><span class="line">    scope.run &#123;</span><br><span class="line">        canvas.drawOval(</span><br><span class="line">            Rect(offset = topLeft, size = Size(horizontalAxis, verticalAxis)), <span class="comment">//椭圆的长轴会随着动画变化</span></span><br><span class="line">            paint = paint</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示:   </p>
+<ol>
+<li>主要就是3个步骤，画满月，再画半圆，再画椭圆    </li>
+<li>半圆的混合模式始终是<code>DstOver</code>,而椭圆的混合模式会发生变化，它们的颜色都是黑色。     </li>
+<li>可以看到半圆与椭圆新建了一个<code>Layer</code>，混合模式的变化，表示的就是最后剩下的是它们的并集，还是<code>Dst</code>不相交的部分，最后覆盖到满月上，所以必须先画半圆     </li>
+<li>随着动画的变化，椭圆的长轴会发生变化，这样就可以实现不同的月相    </li>
+</ol>
+<h3 id="诗歌打字机效果"><a href="#诗歌打字机效果" class="headerlink" title="诗歌打字机效果"></a>诗歌打字机效果</h3><p>上面其实已经做得差不多了，我们最后再添加一些诗歌，并为它们添加打字机效果<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">PoetryColumn</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    list: <span class="type">List</span>&lt;<span class="type">Char</span>&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">    offsetX: <span class="type">Float</span> = <span class="number">0</span>f,</span></span></span><br><span class="line"><span class="function"><span class="params">    offsetY: <span class="type">Float</span> = <span class="number">0</span>f</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> targetList = remember &#123; mutableStateListOf&lt;<span class="built_in">Char</span>&gt;() &#125;</span><br><span class="line">    LaunchedEffect(list) &#123;</span><br><span class="line">        targetList.clear()</span><br><span class="line">        list.forEach &#123;</span><br><span class="line">            delay(<span class="number">500</span>) <span class="comment">//通过在LaunchedEffect中delay实现动画效果</span></span><br><span class="line">            targetList.add(it)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//将 Jetpack Compose 环境的 Paint 对象转换为原生的 Paint 对象</span></span><br><span class="line">    <span class="keyword">val</span> textPaint = Paint().asFrameworkPaint().apply &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">    Canvas(modifier = Modifier.wrapContentSize()) &#123;</span><br><span class="line">        drawIntoCanvas &#123;</span><br><span class="line">            <span class="keyword">for</span> (i <span class="keyword">in</span> targetList.indices) &#123;</span><br><span class="line">                it.nativeCanvas.drawText(list[i].toString(), x, y, textPaint)</span><br><span class="line">                y += delta <span class="comment">// 更新文字y轴位置</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，代码比较简单   </p>
+<ol>
+<li>通过在<code>LaunchedEffect</code>中调用挂起函数，来实现动画效果    </li>
+<li>为了实现竖直方向的文字，我们需要使用<code>Paint</code>来绘制<code>Text</code>，而不能使用<code>Text</code>组件   </li>
+<li><code>Compose</code>目前还不支持直接绘制<code>Text</code>，所以我们需要调用<code>asFrameworkPaint</code>将其转化为原生的<code>Paint</code></li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过以上步骤，我们就通过<code>Compose</code>实现了月相阴晴圆缺+星空闪耀+诗歌打字机的动画效果<br>开发起来跟<code>Android</code>自定义绘制其实并没有多大差别，代码量因为<code>Compose</code>强大的<code>API</code>与声明式特点可能还有所减少<br>在我看来，<code>Compose</code>已经相当成熟了，而且将是<code>Android UI</code>的未来~     </p>
+<p>开源不易，如果项目对你有所帮助，欢迎点赞,<code>Star</code>,收藏~        </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/7006142194230755341" target="_blank" rel="noopener">蹭中秋热度来了~Android 自定义View——月有阴晴圆缺</a><br><a href="https://juejin.cn/post/7005355142413287438" target="_blank" rel="noopener">「寒草的中秋献礼🥮，实现30s前端创意动画」陪你看日落和月升｜与你赏星空和诗歌</a>    </p>
+<h3 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h3><p><a href="https://github.com/shenzhen2017/ComposeMoon" target="_blank" rel="noopener">Compose 实现月亮阴晴圆缺动画</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/compose/" rel="tag"># compose</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/09/compose-performance-summary.html" rel="next" title="相比 XML , Compose 性能到底怎么样？">
+                <i class="fa fa-chevron-left"></i> 相比 XML , Compose 性能到底怎么样？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/09/compose-measure-onece.html" rel="prev" title="为什么 Compose 没有布局嵌套问题?">
+                为什么 Compose 没有布局嵌套问题? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#效果图"><span class="nav-number">1.</span> <span class="nav-text">效果图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主要思路"><span class="nav-number">2.</span> <span class="nav-text">主要思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#满天繁星"><span class="nav-number">2.1.</span> <span class="nav-text">满天繁星</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#月相变化"><span class="nav-number">2.2.</span> <span class="nav-text">月相变化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#思路分析"><span class="nav-number">2.2.1.</span> <span class="nav-text">思路分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#源码实现"><span class="nav-number">2.2.2.</span> <span class="nav-text">源码实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#诗歌打字机效果"><span class="nav-number">2.3.</span> <span class="nav-text">诗歌打字机效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">3.1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目地址"><span class="nav-number">3.2.</span> <span class="nav-text">项目地址</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kotlin,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言编译运行是一个Android开发者每天都要做的工作，增量编译对于开发者也极其重要，高命中率的增量编译可以极大的提高开发者的开发效率与体验 之前写了一些文章介绍Kotlin增量编译的原理，以及Kotlin 1.7支持了跨模块增量编译         了解了这些基本原理之后，我们今天一起来看下Kotlin增量编译的源码，看看Kotlin增量编译到底是怎么实现的 前置知识Kotlin 快速编译背后的">
+<meta name="keywords" content="kotlin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kotlin 增量编译是怎么实现的？">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/08/kotlin-compile-analysis.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言编译运行是一个Android开发者每天都要做的工作，增量编译对于开发者也极其重要，高命中率的增量编译可以极大的提高开发者的开发效率与体验 之前写了一些文章介绍Kotlin增量编译的原理，以及Kotlin 1.7支持了跨模块增量编译         了解了这些基本原理之后，我们今天一起来看下Kotlin增量编译的源码，看看Kotlin增量编译到底是怎么实现的 前置知识Kotlin 快速编译背后的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/argust/p2.jpg">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a20c41dfc3f94bc5993d8a0e3d20d203~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.249Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kotlin 增量编译是怎么实现的？">
+<meta name="twitter:description" content="前言编译运行是一个Android开发者每天都要做的工作，增量编译对于开发者也极其重要，高命中率的增量编译可以极大的提高开发者的开发效率与体验 之前写了一些文章介绍Kotlin增量编译的原理，以及Kotlin 1.7支持了跨模块增量编译         了解了这些基本原理之后，我们今天一起来看下Kotlin增量编译的源码，看看Kotlin增量编译到底是怎么实现的 前置知识Kotlin 快速编译背后的">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/argust/p2.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/08/kotlin-compile-analysis.html">
+
+
+
+
+
+  <title>Kotlin 增量编译是怎么实现的？ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/08/kotlin-compile-analysis.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Kotlin 增量编译是怎么实现的？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-28T10:57:15+08:00">
+                2022-08-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>编译运行是一个<code>Android</code>开发者每天都要做的工作，增量编译对于开发者也极其重要，高命中率的增量编译可以极大的提高开发者的开发效率与体验</p>
+<p>之前写了一些文章介绍<code>Kotlin</code>增量编译的原理，以及<code>Kotlin 1.7</code>支持了跨模块增量编译        </p>
+<p>了解了这些基本原理之后，我们今天一起来看下<code>Kotlin</code>增量编译的源码，看看<code>Kotlin</code>增量编译到底是怎么实现的</p>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p><a href="https://juejin.cn/post/7118908219841314823" target="_blank" rel="noopener">Kotlin 快速编译背后的黑科技，了解一下~</a><br><a href="https://juejin.cn/post/7126698891692474375" target="_blank" rel="noopener">Kotlin 1.7 新特性：支持跨模块增量编译</a><br><a href="https://juejin.cn/post/7131889789787176974" target="_blank" rel="noopener">Transform 被废弃，TransformAction 了解一下~</a>   </p>
+<p>主要是<code>Kotlin</code>增量编译的原理介绍，以及因为在源码中使用了<code>TransformAction</code>，也需要了解一下<code>TransformAction</code>的基本使用</p>
+<h2 id="增量编译流程"><a href="#增量编译流程" class="headerlink" title="增量编译流程"></a>增量编译流程</h2><h3 id="第一步：编译入口"><a href="#第一步：编译入口" class="headerlink" title="第一步：编译入口"></a>第一步：编译入口</h3><p>如果我们要在项目中使用<code>Kotlin</code>，都必须要添加<code>org.jetbrains.kotlin.android</code>插件，这个插件是我们编译<code>Kotlin</code>的入口，它的代码在<code>kotlin-gradle-plugin</code>插件中</p>
+<p>这个插件的实现类就是<code>KotlinAndroidPluginWrapper</code>，可以看出<code>KotlinAndroidPluginWrapper</code>就是个包装，里面主要就是创建并配置<code>KotlinAndroidPlugin</code></p>
+<h3 id="第二步：配置KotlinAndroidPlugin"><a href="#第二步：配置KotlinAndroidPlugin" class="headerlink" title="第二步：配置KotlinAndroidPlugin"></a>第二步：配置<code>KotlinAndroidPlugin</code></h3><p><code>KotlinAndroidPlugin</code>是插件真正的入口，在这里完成<code>compileKotlin Task</code>相关的配置工作</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">KotlinAndroidPlugin</span></span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> registry: ToolingModelBuilderRegistry</span><br><span class="line">) : Plugin&lt;Project&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">apply</span><span class="params">(project: <span class="type">Project</span>)</span></span> &#123;</span><br><span class="line">        checkGradleCompatibility()</span><br><span class="line"></span><br><span class="line">        project.dynamicallyApplyWhenAndroidPluginIsApplied() </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">preprocessVariant</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        variantData: <span class="type">BaseVariant</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        compilation: <span class="type">KotlinJvmAndroidCompilation</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        project: <span class="type">Project</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        rootKotlinOptions: <span class="type">KotlinJvmOptionsImpl</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        tasksProvider: <span class="type">KotlinTasksProvider</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> configAction = KotlinCompileConfig(compilation)</span><br><span class="line">        configAction.configureTask &#123; task -&gt;</span><br><span class="line">            task.useModuleDetection.value(<span class="literal">true</span>).disallowChanges()</span><br><span class="line">            <span class="comment">// 将kotlin 编译结果存储在tmp/kotlin-classes/$variantDataName目录下，会作为java compiler的class-path输入</span></span><br><span class="line">            task.destinationDirectory.<span class="keyword">set</span>(project.layout.buildDirectory.dir(<span class="string">"tmp/kotlin-classes/<span class="variable">$variantDataName</span>"</span>))</span><br><span class="line">        &#125;</span><br><span class="line">        tasksProvider.registerKotlinJVMTask(project, compilation.compileKotlinTaskName, compilation.kotlinOptions, configAction)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>省略了一些代码，主要做了几件事：  </p>
+<ol>
+<li>检查<code>KGP</code>与<code>Gradle</code>的版本兼容，如果不兼容则抛出异常，中止构建</li>
+<li>如果在<code>project</code>中已经添加了<code>android</code>插件，则开始配置<code>kotlin-android</code>插件</li>
+<li>通过<code>KotlinCompileConfig</code>来配置<code>KotlinCompile Task</code>，设置<code>destinationDirectory</code>作为<code>Kotlin</code>编译结果存储目录，后续会作为<code>java compiler</code>的<code>classpath</code>输入</li>
+</ol>
+<h3 id="第三步：配置KotlinCompile的输入输出"><a href="#第三步：配置KotlinCompile的输入输出" class="headerlink" title="第三步：配置KotlinCompile的输入输出"></a>第三步：配置<code>KotlinCompile</code>的输入输出</h3><p>要实现增量编译，最重要的一点就是配置输入输出，当输入输出没有发生变化时，<code>Task</code>就可以被跳过，而<code>KotlinCompile</code>输入输出的配置，主要是在<code>KotlinCompileConfig</code>中完成的</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">configureTaskProvider &#123; taskProvider -&gt;</span><br><span class="line">	<span class="comment">// 是否开启classpathSnapthot</span></span><br><span class="line">    <span class="keyword">val</span> useClasspathSnapshot = propertiesProvider.useClasspathSnapshot</span><br><span class="line">    <span class="keyword">val</span> classpathConfiguration = <span class="keyword">if</span> (useClasspathSnapshot) &#123;</span><br><span class="line">    	<span class="comment">// 注册 Transform</span></span><br><span class="line">        registerTransformsOnce(project)</span><br><span class="line">        project.configurations.detachedConfiguration(</span><br><span class="line">            project.dependencies.create(objectFactory.fileCollection().from(project.provider &#123; taskProvider.<span class="keyword">get</span>().libraries &#125;))</span><br><span class="line">        )</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">    taskProvider.configure &#123; task -&gt;</span><br><span class="line">    	<span class="comment">// 配置输入属性</span></span><br><span class="line">        task.classpathSnapshotProperties.useClasspathSnapshot.value(useClasspathSnapshot).disallowChanges()</span><br><span class="line">        <span class="keyword">if</span> (useClasspathSnapshot) &#123;</span><br><span class="line">        	<span class="comment">// 通过TransformAction读取输入</span></span><br><span class="line">            <span class="keyword">val</span> classpathEntrySnapshotFiles = classpathConfiguration!!.incoming.artifactView &#123;</span><br><span class="line">                it.attributes.attribute(ARTIFACT_TYPE_ATTRIBUTE, CLASSPATH_ENTRY_SNAPSHOT_ARTIFACT_TYPE)</span><br><span class="line">            &#125;.files</span><br><span class="line">            task.classpathSnapshotProperties.classpathSnapshot.from(classpathEntrySnapshotFiles).disallowChanges()</span><br><span class="line">            task.classpathSnapshotProperties.classpathSnapshotDir.value(getClasspathSnapshotDir(task)).disallowChanges()</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            task.classpathSnapshotProperties.classpath.from(task.project.provider &#123; task.libraries &#125;).disallowChanges()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，主要做了这么几件事       </p>
+<ol>
+<li>判断是否开启了<code>classpathSnapthot</code>，这也是支持跨模块增量编译的开关，如果开启了就注册<code>Transform</code></li>
+<li>通过<code>TransformAction</code>获取输入，并配置给<code>Task</code>相应的属性</li>
+</ol>
+<p>下面我们着重来看下<code>TransformAction</code>在这里做了什么工作?</p>
+<h3 id="第四步：跨模块增量编译支持"><a href="#第四步：跨模块增量编译支持" class="headerlink" title="第四步：跨模块增量编译支持"></a>第四步：跨模块增量编译支持</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">registerTransformsOnce</span><span class="params">(project: <span class="type">Project</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> buildMetricsReporterService = BuildMetricsReporterService.registerIfAbsent(project)</span><br><span class="line">    project.dependencies.registerTransform(ClasspathEntrySnapshotTransform::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>) </span>&#123;</span><br><span class="line">        it.from.attribute(ARTIFACT_TYPE_ATTRIBUTE, JAR_ARTIFACT_TYPE)</span><br><span class="line">        it.to.attribute(ARTIFACT_TYPE_ATTRIBUTE, CLASSPATH_ENTRY_SNAPSHOT_ARTIFACT_TYPE)</span><br><span class="line">    &#125;</span><br><span class="line">    project.dependencies.registerTransform(ClasspathEntrySnapshotTransform::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>) </span>&#123;</span><br><span class="line">        it.from.attribute(ARTIFACT_TYPE_ATTRIBUTE, DIRECTORY_ARTIFACT_TYPE)</span><br><span class="line">        it.to.attribute(ARTIFACT_TYPE_ATTRIBUTE, CLASSPATH_ENTRY_SNAPSHOT_ARTIFACT_TYPE)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>了解了前置知识中的<code>TransformAction</code>，可以看出这就是注册了只变换<code>ArtifactType</code>的变换，主要涉及<code>JAR_ARTIFACT_TYPE</code>和<code>DIRECTORY_ARTIFACT_TYPE</code>转换为<code>CLASSPATH_ENTRY_SNAPSHOT_ARTIFACT_TYPE</code></p>
+<p>也就是说依赖的<code>jar</code>和类目录都会转换为<code>CLASSPATH_ENTRY_SNAPSHOT_ARTIFACT_TYPE</code>类型，也就可以获取我们依赖的所有<code>classpath</code>的<code>abi</code>了</p>
+<p>接下来我们看下<code>ClasspathEntrySnapshotTransform</code>的实现</p>
+<h4 id="ClasspathEntrySnapshotTransform实现"><a href="#ClasspathEntrySnapshotTransform实现" class="headerlink" title="ClasspathEntrySnapshotTransform实现"></a><code>ClasspathEntrySnapshotTransform</code>实现</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ClasspathEntrySnapshotTransform</span> : <span class="type">TransformAction</span>&lt;<span class="type">ClasspathEntrySnapshotTransform.Parameters</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@get:Classpath</span></span><br><span class="line">    <span class="meta">@get:InputArtifact</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">val</span> inputArtifact: Provider&lt;FileSystemLocation&gt;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">transform</span><span class="params">(outputs: <span class="type">TransformOutputs</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> classpathEntryInputDirOrJar = inputArtifact.<span class="keyword">get</span>().asFile</span><br><span class="line">        <span class="keyword">val</span> snapshotOutputFile = outputs.file(classpathEntryInputDirOrJar.name.replace(<span class="string">'.'</span>, <span class="string">'_'</span>) + <span class="string">"-snapshot.bin"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> granularity = getClassSnapshotGranularity(classpathEntryInputDirOrJar, parameters.gradleUserHomeDir.<span class="keyword">get</span>().asFile)</span><br><span class="line"></span><br><span class="line">		 <span class="keyword">val</span> snapshot = ClasspathEntrySnapshotter.snapshot(classpathEntryInputDirOrJar, granularity, metrics)</span><br><span class="line">         ClasspathEntrySnapshotExternalizer.saveToFile(snapshotOutputFile, snapshot)</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 如果是anroid.jar或者aar依赖，粒度为class, 否则为class_member_level </span></span><br><span class="line"><span class="comment">    /</span></span><br><span class="line"><span class="comment">    private fun getClassSnapshotGranularity(classpathEntryDirOrJar: File, gradleUserHomeDir: File): ClassSnapshotGranularity &#123;</span></span><br><span class="line"><span class="comment">        return if (</span></span><br><span class="line"><span class="comment">            classpathEntryDirOrJar.startsWith(gradleUserHomeDir) ||</span></span><br><span class="line"><span class="comment">            classpathEntryDirOrJar.name == "android.jar"</span></span><br><span class="line"><span class="comment">        ) CLASS_LEVEL</span></span><br><span class="line"><span class="comment">        else CLASS_MEMBER_LEVEL</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>关于自定义<code>TransformAction</code>，其实跟<code>Task</code>一样，也主要看3个部分，输入，输出，执行方法体</p>
+<ol>
+<li><code>ClasspathEntrySnapshotTransform</code>的输入就是模块依赖的<code>jar</code>或者文件目录</li>
+<li>输出则是以<code>-snapshot.bin</code>结尾的文件       </li>
+<li>方法体只做了一件事，通过<code>ClasspathEntrySnapshotter</code>计算出<code>claspath</code>的快照并保存，如果是<code>aar</code>依赖，计算的粒度为<code>class</code>，如果是项目内的类，计算的粒度是<code>class_member_level</code></li>
+</ol>
+<p><code>ClasspathEntrySnapshotter</code>内部是如何计算<code>classpath</code>快照的我们这就不看了，我们简单看下下面这样一个类计算的快照是怎样的</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">startTest</span><span class="params">(text: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        println(text)</span><br><span class="line">        test1(<span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">test1</span><span class="params">(index: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">        println(<span class="string">"here test126<span class="variable">$index</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/argust/p2.jpg" alt></p>
+<p><code>MyTest</code>类计算出来的快照如图所示，主要<code>classId</code>,<code>classAbiHash</code>,<code>classHeaderStrings</code>等内容</p>
+<p>可以看出<code>private</code>函数的声明也是<code>abi</code>的一部分，当<code>public</code>或者<code>private</code>的函数声明发生变化时，<code>classAbiHash</code>都会发生变化，而只修改函数体时，<code>snapshot</code>不会发生任何变化。</p>
+<h3 id="第五步：KotlinCompile-Task执行编译"><a href="#第五步：KotlinCompile-Task执行编译" class="headerlink" title="第五步：KotlinCompile Task执行编译"></a>第五步：<code>KotlinCompile Task</code>执行编译</h3><p>在配置完成之后，接下来我们就来看下<code>KotlinCompile</code>是怎么执行编译的</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">KotlinCompile</span> <span class="meta">@Inject</span> <span class="keyword">constructor</span></span>(</span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> kotlinOptions: KotlinJvmOptions,</span><br><span class="line">    workerExecutor: WorkerExecutor,</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> objectFactory: ObjectFactory</span><br><span class="line">) : AbstractKotlinCompile&lt;K2JVMCompilerArguments&gt;(objectFactory &#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// classpathSnapshot入参</span></span><br><span class="line">    <span class="meta">@get:Nested</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">val</span> classpathSnapshotProperties: ClasspathSnapshotProperties</span><br><span class="line"></span><br><span class="line">    <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ClasspathSnapshotProperties</span> </span>&#123;</span><br><span class="line">        <span class="meta">@get:Classpath</span></span><br><span class="line">        <span class="meta">@get:Incremental</span></span><br><span class="line">        <span class="meta">@get:Optional</span> <span class="comment">// Set if useClasspathSnapshot == true</span></span><br><span class="line">        <span class="keyword">abstract</span> <span class="keyword">val</span> classpathSnapshot: ConfigurableFileCollection</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 增量编译参数</span></span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">val</span> incrementalProps: List&lt;FileCollection&gt;</span><br><span class="line">        <span class="keyword">get</span>() = listOf(</span><br><span class="line">            sources,</span><br><span class="line">            javaSources,</span><br><span class="line">            classpathSnapshotProperties.classpathSnapshot</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">callCompilerAsync</span><span class="params">(inputChanges: <span class="type">InputChanges</span>)</span></span> &#123;</span><br><span class="line">    	<span class="comment">// 获取增量编译环境变量</span></span><br><span class="line">        <span class="keyword">val</span> icEnv = <span class="keyword">if</span> (isIncrementalCompilationEnabled()) &#123;</span><br><span class="line">            IncrementalCompilationEnvironment(</span><br><span class="line">                changedFiles = getChangedFiles(inputChanges, incrementalProps),</span><br><span class="line">                classpathChanges = getClasspathChanges(inputChanges),</span><br><span class="line">            )</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="literal">null</span></span><br><span class="line">        <span class="keyword">val</span> environment = GradleCompilerEnvironment(incrementalCompilationEnvironment = icEnv)</span><br><span class="line">        compilerRunner.runJvmCompilerAsync(</span><br><span class="line">            (kotlinSources + scriptSources).toList(),</span><br><span class="line">            commonSourceSet.toList(),</span><br><span class="line">            javaSources.files,</span><br><span class="line">            environment,</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查找改动了的input</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">fun</span> <span class="title">getChangedFiles</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        inputChanges: <span class="type">InputChanges</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        incrementalProps: <span class="type">List</span>&lt;<span class="type">FileCollection</span>&gt;</span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span> = <span class="keyword">if</span> (!inputChanges.isIncremental) &#123;</span><br><span class="line">        ChangedFiles.Unknown()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        incrementalProps</span><br><span class="line">            .fold(mutableListOf&lt;File&gt;() to mutableListOf&lt;File&gt;()) &#123; (modified, removed), prop -&gt;</span><br><span class="line">                inputChanges.getFileChanges(prop).forEach &#123;</span><br><span class="line">                    <span class="keyword">when</span> (it.changeType) &#123;</span><br><span class="line">                        ChangeType.ADDED, ChangeType.MODIFIED -&gt; modified.add(it.file)</span><br><span class="line">                        ChangeType.REMOVED -&gt; removed.add(it.file)</span><br><span class="line">                        <span class="keyword">else</span> -&gt; <span class="built_in">Unit</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                modified to removed</span><br><span class="line">            &#125;</span><br><span class="line">            .run &#123;</span><br><span class="line">                ChangedFiles.Known(first, second)</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查找改变了的classpath</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getClasspathChanges</span><span class="params">(inputChanges: <span class="type">InputChanges</span>)</span></span>: ClasspathChanges = <span class="keyword">when</span> &#123;</span><br><span class="line">        !classpathSnapshotProperties.useClasspathSnapshot.<span class="keyword">get</span>() -&gt; ClasspathSnapshotDisabled</span><br><span class="line">        <span class="keyword">else</span> -&gt; &#123;</span><br><span class="line">            <span class="keyword">when</span> &#123;</span><br><span class="line">                !inputChanges.isIncremental -&gt; NotAvailableForNonIncrementalRun(classpathSnapshotFiles)</span><br><span class="line">                inputChanges.getFileChanges(classpathSnapshotProperties.classpathSnapshot).none() -&gt; NoChanges(classpathSnapshotFiles)</span><br><span class="line">                !classpathSnapshotFiles.shrunkPreviousClasspathSnapshotFile.exists() -&gt; &#123;</span><br><span class="line">                    NotAvailableDueToMissingClasspathSnapshot(classpathSnapshotFiles)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> -&gt; ToBeComputedByIncrementalCompiler(classpathSnapshotFiles)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于<code>KotlinCompile</code>，我们也可以从入参，出参，<code>TaskAction</code>的角度来分析</p>
+<ol>
+<li><code>classpathSnapshotProperties</code>是个包装类型的输入，内部包括<code>@Classpath</code>类型的输入，使用<code>@Classpath</code>输入时，如果输入文件名发生变化而内容没有发生变化时，不会触发<code>Task</code>重新运行，这对<code>classpath</code>来说非常重要</li>
+<li><code>incrementalProps</code>是组件后的增量编译输入参数，包括<code>kotlin</code>输入，<code>java</code>输入，<code>classpath</code>输入等</li>
+<li><code>CompileKotlin</code>的<code>TaskAction</code>，它最后会执行到<code>callCompilerAsync</code>方法，在其中通过<code>getChangedFiles</code>与<code>getClasspathChanges</code>获取改变了的输入与<code>classpath</code></li>
+<li><code>getClasspathChanges</code>方法通过<code>inputChanges</code>获取一个已经改变与删除的文件的<code>Pair</code></li>
+<li><code>getClasspathChanges</code>则根据增量编译是否开启，是否有文件发生更改，历史<code>snapshotFile</code>是否存在，返回不同的<code>ClassPathChanges</code>密封类</li>
+</ol>
+<p>在增量编译参数拼装完成后，接下来就是跟着逻辑走，最后会走到<code>GradleKotlinCompilerWork</code> 的 <code>compileWithDaemmonOrFailbackImpl</code></p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a20c41dfc3f94bc5993d8a0e3d20d203~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp" alt></p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">compileWithDaemonOrFallbackImpl</span><span class="params">(messageCollector: <span class="type">MessageCollector</span>)</span></span>: ExitCode &#123;</span><br><span class="line">  <span class="keyword">val</span> executionStrategy = kotlinCompilerExecutionStrategy()</span><br><span class="line">  <span class="keyword">if</span> (executionStrategy == DAEMON_EXECUTION_STRATEGY) &#123;</span><br><span class="line">    <span class="keyword">val</span> daemonExitCode = compileWithDaemon(messageCollector)</span><br><span class="line">    <span class="keyword">if</span> (daemonExitCode != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> daemonExitCode</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">val</span> isGradleDaemonUsed = System.getProperty(<span class="string">"org.gradle.daemon"</span>)?.let(String::toBoolean)</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">if</span> (executionStrategy == IN_PROCESS_EXECUTION_STRATEGY || isGradleDaemonUsed == <span class="literal">false</span>) &#123;</span><br><span class="line">    compileInProcess(messageCollector)</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    compileOutOfProcess()</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，<code>kotlin</code>编译有三种策略，分别是     </p>
+<ol>
+<li>守护进程编译：<code>Kotlin</code>编译的默认模式，只有这种模式才支持增量编译，可以在多个<code>Gradle daemon</code>进程间共享</li>
+<li>进程内编译：<code>Gradle daemon</code>进程内编译</li>
+<li>进程外编译：每次编译都是在不同的进程</li>
+</ol>
+<p><code>compileWithDaemon</code> 会调用到 <code>Kotlin Compile</code> 里执行真正的编译逻辑：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> exitCode = <span class="keyword">try</span> &#123;</span><br><span class="line">  <span class="keyword">val</span> res = <span class="keyword">if</span> (isIncremental) &#123;</span><br><span class="line">    incrementalCompilationWithDaemon(daemon, sessionId, targetPlatform, bufferingMessageCollector)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    nonIncrementalCompilationWithDaemon(daemon, sessionId, targetPlatform, bufferingMessageCollector)</span><br><span class="line">  &#125;</span><br><span class="line">&#125; <span class="keyword">catch</span> (e: Throwable) &#123;</span><br><span class="line">    <span class="literal">null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到这里会执行 <code>org.jetbrains.kotlin.daemon.CompileServiceImpl</code> 的 <code>compile</code> 方法，这样就终于调到了<code>Kotlin</code>编译器内部</p>
+<h3 id="第六步：Kotlin-编译器计算出需重编译的文件"><a href="#第六步：Kotlin-编译器计算出需重编译的文件" class="headerlink" title="第六步：Kotlin 编译器计算出需重编译的文件"></a>第六步：<code>Kotlin</code> 编译器计算出需重编译的文件</h3><p>经过这么多步骤，终于走到<code>Kotlin</code>编译器内部了，下面我们来看下<code>Kotlin</code>编译器的增量编译逻辑</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">inline</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;ServicesFacadeT, JpsServicesFacadeT, CompilationResultsT&gt;</span> <span class="title">compileImpl</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="comment">//...</span></span><br><span class="line">	CompilerMode.INCREMENTAL_COMPILER -&gt; &#123;</span><br><span class="line">	    <span class="keyword">when</span> (targetPlatform) &#123;</span><br><span class="line">	        CompileService.TargetPlatform.JVM -&gt; withIC(k2PlatformArgs) &#123;</span><br><span class="line">	            doCompile(sessionId, daemonReporter, tracer = <span class="literal">null</span>) &#123; _, _ -&gt;</span><br><span class="line">	                execIncrementalCompiler(</span><br><span class="line">	                    k2PlatformArgs <span class="keyword">as</span> K2JVMCompilerArguments,</span><br><span class="line">	                    gradleIncrementalArgs,</span><br><span class="line">	                    <span class="comment">//...</span></span><br><span class="line">	                )</span><br><span class="line">	            &#125;</span><br><span class="line">        &#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上代码，会判断输入的编译参数，如果是增量编译并且是<code>JVM</code>平台的话，就会执行<code>execIncrementalCompiler</code>方法，最后会调用到<code>sourcesToCompile</code>方法</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">sourcesToCompile</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    caches: <span class="type">CacheManager</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    changedFiles: <span class="type">ChangedFiles</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    args: <span class="type">Args</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    messageCollector: <span class="type">MessageCollector</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    dependenciesAbiSnapshots: <span class="type">Map</span>&lt;<span class="type">String</span>, AbiSnapshot&gt;</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>: CompilationMode =</span><br><span class="line">    <span class="keyword">when</span> (changedFiles) &#123;</span><br><span class="line">        <span class="keyword">is</span> ChangedFiles.Known -&gt; calculateSourcesToCompile(caches, changedFiles, args, messageCollector, dependenciesAbiSnapshots)</span><br><span class="line">        <span class="keyword">is</span> ChangedFiles.Unknown -&gt; CompilationMode.Rebuild(BuildAttribute.UNKNOWN_CHANGES_IN_GRADLE_INPUTS)</span><br><span class="line">        <span class="keyword">is</span> ChangedFiles.Dependencies -&gt; error(<span class="string">"Unexpected ChangedFiles type (ChangedFiles.Dependencies)"</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">calculateSourcesToCompileImpl</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        caches: <span class="type">IncrementalJvmCachesManager</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        changedFiles: <span class="type">ChangedFiles</span>.<span class="type">Known</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        args: <span class="type">K2JVMCompilerArguments</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">        abiSnapshots: <span class="type">Map</span>&lt;<span class="type">String</span>, AbiSnapshot&gt; = HashMap()</span></span>,</span><br><span class="line">        withAbiSnapshot: <span class="built_in">Boolean</span></span><br><span class="line">    ): CompilationMode &#123;</span><br><span class="line">      	<span class="keyword">val</span> dirtyFiles = DirtyFilesContainer(caches, reporter, kotlinSourceFilesExtensions)</span><br><span class="line">      	<span class="comment">// 初始化dirtyFiles</span></span><br><span class="line">        initDirtyFiles(dirtyFiles, changedFiles)</span><br><span class="line"></span><br><span class="line">    	<span class="comment">// 计算变化的classpath</span></span><br><span class="line">        <span class="keyword">val</span> classpathChanges = <span class="keyword">when</span> (classpathChanges) &#123;</span><br><span class="line">            <span class="keyword">is</span> NoChanges -&gt; ChangesEither.Known(emptySet(), emptySet())</span><br><span class="line">            <span class="comment">//  classpathSnapshot可用时</span></span><br><span class="line">            <span class="keyword">is</span> ToBeComputedByIncrementalCompiler -&gt; reporter.measure(BuildTime.COMPUTE_CLASSPATH_CHANGES) &#123;</span><br><span class="line">                computeClasspathChanges(</span><br><span class="line">                    classpathChanges.classpathSnapshotFiles,</span><br><span class="line">                    caches.lookupCache,</span><br><span class="line">                    storeCurrentClasspathSnapshotForReuse,</span><br><span class="line">                    ClasspathSnapshotBuildReporter(reporter)</span><br><span class="line">                ).toChangesEither()</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">is</span> NotAvailableDueToMissingClasspathSnapshot -&gt; ChangesEither.Unknown(BuildAttribute.CLASSPATH_SNAPSHOT_NOT_FOUND)</span><br><span class="line">            <span class="keyword">is</span> NotAvailableForNonIncrementalRun -&gt; ChangesEither.Unknown(BuildAttribute.UNKNOWN_CHANGES_IN_GRADLE_INPUTS)</span><br><span class="line">            <span class="comment">// classpathSnapshot不可用时</span></span><br><span class="line">            <span class="keyword">is</span> ClasspathSnapshotDisabled -&gt; reporter.measure(BuildTime.IC_ANALYZE_CHANGES_IN_DEPENDENCIES) &#123;</span><br><span class="line">                <span class="keyword">val</span> lastBuildInfo = BuildInfo.read(lastBuildInfoFile)   </span><br><span class="line">                getClasspathChanges(</span><br><span class="line">                    args.classpathAsList, changedFiles, lastBuildInfo, modulesApiHistory, reporter, abiSnapshots, withAbiSnapshot,</span><br><span class="line">                    caches.platformCache, scopes</span><br><span class="line">                )</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">is</span> NotAvailableForJSCompiler -&gt; error(<span class="string">"Unexpected type for this code path: <span class="subst">$&#123;classpathChanges.javaClass.name&#125;</span>."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将结果添加到dirtyFiles</span></span><br><span class="line">        <span class="keyword">val</span> unused = <span class="keyword">when</span> (classpathChanges) &#123;</span><br><span class="line">            <span class="keyword">is</span> ChangesEither.Unknown -&gt; &#123;</span><br><span class="line">                <span class="keyword">return</span> CompilationMode.Rebuild(classpathChanges.reason)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">is</span> ChangesEither.Known -&gt; &#123;</span><br><span class="line">                dirtyFiles.addByDirtySymbols(classpathChanges.lookupSymbols)</span><br><span class="line">                dirtyClasspathChanges = classpathChanges.fqNames</span><br><span class="line">                dirtyFiles.addByDirtyClasses(classpathChanges.fqNames)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="keyword">return</span> CompilationMode.Incremental(dirtyFiles)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>calculateSourcesToCompileImpl</code>的目的就是计算<code>Kotlin</code>编译器应该重新编译哪些代码，主要分为以下几个步骤</p>
+<ol>
+<li>初始化<code>dirtyFiles</code>，并将<code>changedFiles</code>加入<code>dirtyFiles</code>，因为<code>changedFiles</code>需要重新编译</li>
+<li><code>classpathSnapshot</code>可用时，通过传入的<code>snapshot.bin</code>文件，与<code>Project</code>目录下的<code>shrunk-classpath-snapshot.bin</code>进行比较得出变化的<code>classpath</code>，以及受影响的类。在比较结束时，也会更新当前目录的<code>shrunk-classpath-snapshot.bin</code>，供下次比较使用</li>
+<li>当<code>classpathSnapshot</code>不可用时，通过<code>getClasspathChanges</code>方法来判断<code>classpath</code>变化，这里面实际上是通过<code>last-build.bin</code>与<code>build-history.bin</code>来判断的，同时每次编译完成也会更新<code>build-history.bin</code></li>
+<li>将受<code>classpath</code>变化影响的类也加入<code>dirtyFiles</code></li>
+<li>返回<code>dirtyFiles</code>供<code>Kotlin</code>编译器真正开始编译</li>
+</ol>
+<p>在这一步，<code>Kotlin</code>编译器利用输入的各种参数进行分析，将需要重新编译的文件加入<code>dirtyFiles</code>，供下一步使用</p>
+<h3 id="第七步：Kotlin编译器真正开始编译"><a href="#第七步：Kotlin编译器真正开始编译" class="headerlink" title="第七步：Kotlin编译器真正开始编译"></a>第七步：<code>Kotlin</code>编译器真正开始编译</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">compileImpl</span><span class="params">()</span></span>: ExitCode &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="keyword">var</span> compilationMode = sourcesToCompile(caches, changedFiles, args, messageCollector, classpathAbiSnapshot)</span><br><span class="line">    <span class="keyword">when</span> (compilationMode) &#123;</span><br><span class="line">        <span class="keyword">is</span> CompilationMode.Incremental -&gt; &#123;</span><br><span class="line">        	<span class="comment">// ...</span></span><br><span class="line">            compileIncrementally(args, caches, allSourceFiles, compilationMode, messageCollector, withAbiSnapshot)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">is</span> CompilationMode.Rebuild -&gt; rebuildReason = compilationMode.reason</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">open</span> <span class="function"><span class="keyword">fun</span> <span class="title">compileIncrementally</span><span class="params">()</span></span>: ExitCode &#123;</span><br><span class="line">   	<span class="keyword">while</span> (dirtySources.any() || runWithNoDirtyKotlinSources(caches)) &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="keyword">val</span> (sourcesToCompile, removedKotlinSources) = dirtySources.partition(File::exists)</span><br><span class="line">        <span class="comment">// 真正进行编译</span></span><br><span class="line">        <span class="keyword">val</span> compiledSources = runCompiler(</span><br><span class="line">            sourcesToCompile, args, caches, services, messageCollectorAdapter,</span><br><span class="line">            allKotlinSources, compilationMode <span class="keyword">is</span> CompilationMode.Incremental</span><br><span class="line">        )</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (exitCode == ExitCode.OK) &#123;</span><br><span class="line">        <span class="comment">// 写入`last-build.bin`</span></span><br><span class="line">        BuildInfo.write(currentBuildInfo, lastBuildInfoFile)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> dirtyData = DirtyData(buildDirtyLookupSymbols, buildDirtyFqNames)</span><br><span class="line">    <span class="comment">// 写入`build-history.bin`</span></span><br><span class="line">    processChangesAfterBuild(compilationMode, currentBuildInfo, dirtyData)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> exitCode</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码主要做了这么几件事：    </p>
+<ol>
+<li>通过<code>sourcesToCompile</code>计算出发生改变的文件后，如果可以增量编译，则进入到<code>compileIncrementally</code>     </li>
+<li>从<code>dirtySouces</code>中找出需要重新编译的文件，交给<code>runCompiler</code>方法进行真正的编译</li>
+<li>在编译结束之后，写入<code>last-build.bin</code>与<code>build-history.bin</code>文件，供下次编译时对比使用</li>
+</ol>
+<p>到这里，增量编译的流程也就基本完成了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文较为详细地介绍了<code>Kotin</code>是怎么一步步从编译入口到真正开始增量编译的，了解<code>Kotlin</code>增量编译原理可以帮助你定位为什么<code>Kotlin</code>增量编译有时会失效，也可以了解如何写出更容易命中增量编译的代码，希望对你有所帮助。</p>
+<p>关于<code>Kotlin</code>增量编译还有更多的细节，本文也只是介绍了主要的流程，感兴趣的同学可直接查看<code>KGP</code>和<code>Kotlin</code>编译器的源码</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/7087832824501239821" target="_blank" rel="noopener">深入研究Android编译流程-Kotlin是如何编译的</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kotlin/" rel="tag"># kotlin</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/07/kotlin-fast-compilation.html" rel="next" title="Kotlin 快速编译背后的黑科技，了解一下~">
+                <i class="fa fa-chevron-left"></i> Kotlin 快速编译背后的黑科技，了解一下~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/10/android-compile-speed.html" rel="prev" title="KAE 将被正式移除，如何无缝迁移？">
+                KAE 将被正式移除，如何无缝迁移？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前置知识"><span class="nav-number">2.</span> <span class="nav-text">前置知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增量编译流程"><span class="nav-number">3.</span> <span class="nav-text">增量编译流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一步：编译入口"><span class="nav-number">3.1.</span> <span class="nav-text">第一步：编译入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二步：配置KotlinAndroidPlugin"><span class="nav-number">3.2.</span> <span class="nav-text">第二步：配置KotlinAndroidPlugin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三步：配置KotlinCompile的输入输出"><span class="nav-number">3.3.</span> <span class="nav-text">第三步：配置KotlinCompile的输入输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四步：跨模块增量编译支持"><span class="nav-number">3.4.</span> <span class="nav-text">第四步：跨模块增量编译支持</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ClasspathEntrySnapshotTransform实现"><span class="nav-number">3.4.1.</span> <span class="nav-text">ClasspathEntrySnapshotTransform实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第五步：KotlinCompile-Task执行编译"><span class="nav-number">3.5.</span> <span class="nav-text">第五步：KotlinCompile Task执行编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第六步：Kotlin-编译器计算出需重编译的文件"><span class="nav-number">3.6.</span> <span class="nav-text">第六步：Kotlin 编译器计算出需重编译的文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第七步：Kotlin编译器真正开始编译"><span class="nav-number">3.7.</span> <span class="nav-text">第七步：Kotlin编译器真正开始编译</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

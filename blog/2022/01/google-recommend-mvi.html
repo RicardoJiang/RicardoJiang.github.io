@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言前段时间写了一些介绍MVI架构的文章，不过软件开发上没有最好的架构，只有最合适的架构，同时众所周知，Google推荐的是MVVM架构。相信很多人都会有疑问，我为什么不使用官方推荐的MVVM，而要用你说的这个什么MVI架构呢？不过我这几天查看Android的应用架构指南，发现谷歌推荐的最佳实践已经变成了单向数据流动 + 状态集中管理，这不就是MVI架构吗？看起来Google已经开始推荐使用MVI">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google 推荐使用 MVI 架构？卷起来了~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/01/google-recommend-mvi.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言前段时间写了一些介绍MVI架构的文章，不过软件开发上没有最好的架构，只有最合适的架构，同时众所周知，Google推荐的是MVVM架构。相信很多人都会有疑问，我为什么不使用官方推荐的MVVM，而要用你说的这个什么MVI架构呢？不过我这几天查看Android的应用架构指南，发现谷歌推荐的最佳实践已经变成了单向数据流动 + 状态集中管理，这不就是MVI架构吗？看起来Google已经开始推荐使用MVI">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-overview.png">
+<meta property="og:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-ui-overview.png">
+<meta property="og:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-ui-udf.png">
+<meta property="og:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-ui-udf-in-action.png">
+<meta property="og:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-domain-overview.png">
+<meta property="og:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-data-overview.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.246Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Google 推荐使用 MVI 架构？卷起来了~">
+<meta name="twitter:description" content="前言前段时间写了一些介绍MVI架构的文章，不过软件开发上没有最好的架构，只有最合适的架构，同时众所周知，Google推荐的是MVVM架构。相信很多人都会有疑问，我为什么不使用官方推荐的MVVM，而要用你说的这个什么MVI架构呢？不过我这几天查看Android的应用架构指南，发现谷歌推荐的最佳实践已经变成了单向数据流动 + 状态集中管理，这不就是MVI架构吗？看起来Google已经开始推荐使用MVI">
+<meta name="twitter:image" content="https://developer.android.com/topic/libraries/architecture/images/mad-arch-overview.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/01/google-recommend-mvi.html">
+
+
+
+
+
+  <title>Google 推荐使用 MVI 架构？卷起来了~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/01/google-recommend-mvi.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Google 推荐使用 MVI 架构？卷起来了~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-02T17:24:34+08:00">
+                2022-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间写了一些介绍<code>MVI</code>架构的文章，不过软件开发上没有最好的架构，只有最合适的架构，同时众所周知，<code>Google</code>推荐的是<code>MVVM</code>架构。相信很多人都会有疑问，我为什么不使用官方推荐的<code>MVVM</code>，而要用你说的这个什么<code>MVI</code>架构呢？<br>不过我这几天查看<code>Android</code>的<a href="https://developer.android.com/jetpack/guide" target="_blank" rel="noopener">应用架构指南</a>，发现谷歌推荐的最佳实践已经变成了<code>单向数据流动</code> + <code>状态集中管理</code>，这不就是<code>MVI</code>架构吗？<br>看起来<code>Google</code>已经开始推荐使用<code>MVI</code>架构了，大家也有必要开始了解一下<code>Android</code>应用架构指南的最新版本了~     </p>
+<p>本文主要基于<a href="https://developer.android.com/jetpack/guide" target="_blank" rel="noopener">Android应用架构指南</a>，感兴趣的也可以直接查看原文</p>
+<h2 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h2><h3 id="两个架构原则"><a href="#两个架构原则" class="headerlink" title="两个架构原则"></a>两个架构原则</h3><p><code>Android</code>的架构设计原则主要有两个     </p>
+<h4 id="分离关注点"><a href="#分离关注点" class="headerlink" title="分离关注点"></a>分离关注点</h4><p>要遵循的最重要的原则是分离关注点。一种常见的错误是在一个 <code>Activity</code> 或 <code>Fragment</code> 中编写所有代码。这些基于界面的类应仅包含处理界面和操作系统交互的逻辑。<br>总得来说，<code>Activity</code>或<code>Fragment</code>中的代码应该尽量精简，尽量将业务逻辑迁移到其它层</p>
+<h4 id="通过数据驱动界面"><a href="#通过数据驱动界面" class="headerlink" title="通过数据驱动界面"></a>通过数据驱动界面</h4><p>另一个重要原则是您应该通过数据驱动界面（最好是持久性模型）。数据模型独立于应用中的界面元素和其他组件。<br>这意味着它们与界面和应用组件的生命周期没有关联，但仍会在操作系统决定从内存中移除应用的进程时被销毁。<br>数据模型与界面元素，生命周期解耦，因此方便复用，同时便于测试，更加稳定可靠。      </p>
+<h3 id="推荐的应用架构"><a href="#推荐的应用架构" class="headerlink" title="推荐的应用架构"></a>推荐的应用架构</h3><p>基于上一部分提到的常见架构原则，每个应用应至少有两个层：        </p>
+<ul>
+<li>界面层 - 在屏幕上显示应用数据。</li>
+<li>数据层 - 提供所需要的应用数据。</li>
+</ul>
+<p>您可以额外添加一个名为“网域层”的架构层，以简化和复用使用界面层与数据层之间的交互<br><img src="https://developer.android.com/topic/libraries/architecture/images/mad-arch-overview.png" alt>     </p>
+<p>如上所示，各层之间的依赖关系是单向依赖的，网域层，数据层不依赖于界面层   </p>
+<h2 id="界面层"><a href="#界面层" class="headerlink" title="界面层"></a>界面层</h2><p>界面的作用是在屏幕上显示应用数据，并响应用户的点击。每当数据发生变化时，无论是因为用户互动（例如按了某个按钮），还是因为外部输入（例如网络响应），界面都应随之更新，以反映这些变化。<br>不过，从数据层获取的应用数据的格式通常不同于<code>UI</code>需要展示的数据的格式，因此我们需要将数据层数据转化为页面的状态<br>因此界面层一般分为两部分，即<code>UI</code>层与<code>State Holder</code>，<code>State Holder</code>的角色一般由<code>ViewModel</code>承担<br><img src="https://developer.android.com/topic/libraries/architecture/images/mad-arch-ui-overview.png" alt>    </p>
+<p>数据层的作用是存储和管理应用数据，以及提供对应用数据的访问权限，因此界面层必须执行以下步骤：       </p>
+<ol>
+<li>获取应用数据，并将其转换为<code>UI</code>可以轻松呈现的<code>UI State</code>。     </li>
+<li>订阅<code>UI State</code>，当页面状态发生改变时刷新<code>UI</code>       </li>
+<li>接收用户的输入事件，并根据相应的事件进行处理，从而刷新<code>UI State</code>   </li>
+<li>根据需要重复第 1-3 步。     </li>
+</ol>
+<p>主要是一个单向数据流动，如下图所示：<br><img src="https://developer.android.com/topic/libraries/architecture/images/mad-arch-ui-udf.png" alt>    </p>
+<p>因此界面层主要需要做以下工作：  </p>
+<ol>
+<li>如何定义<code>UI State</code>。</li>
+<li>如何使用单向数据流 (<code>UDF</code>)，作为提供和管理<code>UI State</code>的方式。</li>
+<li>如何暴露与更新<code>UI State</code></li>
+<li>如何订阅<code>UI State</code>    </li>
+</ol>
+<h3 id="如何定义UI-State"><a href="#如何定义UI-State" class="headerlink" title="如何定义UI State"></a>如何定义<code>UI State</code></h3><p>如果我们要实现一个新闻列表界面，我们该怎么定义<code>UI State</code>呢?我们将界面需要的所有状态都封装在一个<code>data class</code>中。<br>与之前的<code>MVVM</code>模式的主要区别之一也在这里，即之前通常是一个<code>State</code>对应一个<code>LiveData</code>，而<code>MVI</code>架构则强调对<code>UI State</code>的集中管理<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">NewsUiState</span></span>(</span><br><span class="line">    <span class="keyword">val</span> isSignedIn: <span class="built_in">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">    <span class="keyword">val</span> isPremium: <span class="built_in">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">    <span class="keyword">val</span> newsItems: List&lt;NewsItemUiState&gt; = listOf(),</span><br><span class="line">    <span class="keyword">val</span> userMessages: List&lt;Message&gt; = listOf()</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">NewsItemUiState</span></span>(</span><br><span class="line">    <span class="keyword">val</span> title: String,</span><br><span class="line">    <span class="keyword">val</span> body: String,</span><br><span class="line">    <span class="keyword">val</span> bookmarked: <span class="built_in">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">    ...</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>以上示例中的<code>UI State</code>定义是不可变的。这样的主要好处是，不可变对象可保证即时提供应用的状态。这样一来，<code>UI</code>便可专注于发挥单一作用：读取<code>UI State</code>并相应地更新其<code>UI</code>元素。因此，切勿直接在<code>UI</code>中修改<code>UI State</code>。违反这个原则会导致同一条信息有多个可信来源，从而导致数据不一致的问题。</p>
+<p>例如，如上中来自<code>UI State</code>的<code>NewsItemUiState</code>对象中的<code>bookmarked</code>标记在<code>Activity</code>类中已更新，那么该标记会与数据层展开竞争，从而产生多数据源的问题。     </p>
+<h4 id="UI-State集中管理的优缺点"><a href="#UI-State集中管理的优缺点" class="headerlink" title="UI State集中管理的优缺点"></a><code>UI State</code>集中管理的优缺点</h4><p>在<code>MVVM</code>中我们通常是多个数据流，即一个<code>State</code>对应一个<code>LiveData</code>，而<code>MVI</code>中则是单个数据流。两者各有什么优缺点？<br>单个数据流的优点主要在于方便，减少模板代码，添加一个状态只需要给<code>data class</code>添加一个属性即可，可以有效地降低<code>ViewModel</code>与<code>View</code>的通信成本<br>同时<code>UI State</code>集中管理可以轻松地实现类似<code>MediatorLiveData</code>的效果，比如可能只有在用户已登录并且是付费新闻服务订阅者时，您才需要显示书签按钮。您可以按如下方式定义<code>UI State</code>：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">NewsUiState</span></span>(</span><br><span class="line">    <span class="keyword">val</span> isSignedIn: <span class="built_in">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">    <span class="keyword">val</span> isPremium: <span class="built_in">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">    <span class="keyword">val</span> newsItems: List&lt;NewsItemUiState&gt; = listOf()</span><br><span class="line">)&#123;</span><br><span class="line">	<span class="keyword">val</span> canBookmarkNews: <span class="built_in">Boolean</span> <span class="keyword">get</span>() = isSignedIn &amp;&amp; isPremium</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，书签的可见性是其它两个属性的派生属性，其它两个属性发生变化时，<code>canBookmarkNews</code>也会自动变化，当我们需要实现书签的可见与隐藏逻辑，只需要订阅<code>canBookmarkNews</code>即可，这样可以轻松实现类似<code>MediatorLiveData</code>的效果，但是远比<code>MediatorLiveData</code>要简单    </p>
+<p>当然，<code>UI State</code>集中管理也会有一些问题：   </p>
+<ul>
+<li>不相关的数据类型：<code>UI</code>所需的某些状态可能是完全相互独立的。在此类情况下，将这些不同的状态捆绑在一起的代价可能会超过其优势，尤其是当其中某个状态的更新频率高于其他状态的更新频率时。</li>
+<li><code>UiState diffing</code>：<code>UiState</code> 对象中的字段越多，数据流就越有可能因为其中一个字段被更新而发出。由于视图没有 <code>diffing</code> 机制来了解连续发出的数据流是否相同，因此每次发出都会导致视图更新。当然，我们可以对 <code>LiveData</code> 或<code>Flow</code>使用 <code>distinctUntilChanged()</code> 等方法来实现局部刷新，从而解决这个问题  </li>
+</ul>
+<h3 id="使用单向数据流管理UI-State"><a href="#使用单向数据流管理UI-State" class="headerlink" title="使用单向数据流管理UI State"></a>使用单向数据流管理<code>UI State</code></h3><p>上文提到，为了保证<code>UI</code>中不能修改状态，<code>UI State</code>中的元素都是不可变的，那么如何更新<code>UI State</code>呢？<br>我们一般使用<code>ViewModel</code>作为<code>UI State</code>的容器，因此响应用户输入更新<code>UI State</code>主要分为以下几步：    </p>
+<ol>
+<li><code>ViewModel</code> 会存储并公开<code>UI State</code>。<code>UI State</code>是经过<code>ViewModel</code>转换的应用数据。</li>
+<li><code>UI</code>层会向<code>ViewModel</code>发送用户事件通知。        </li>
+<li><code>ViewModel</code>会处理用户操作并更新<code>UI State</code>。</li>
+<li>更新后的状态将反馈给<code>UI</code>以进行呈现。</li>
+<li>系统会对导致状态更改的所有事件重复上述操作。</li>
+</ol>
+<p>举个例子，如果用户需要给新闻列表加个书签，那么就需要将事件传递给<code>ViewModel</code>，然后<code>ViewModel</code>更新<code>UI State</code>(中间可能有数据层的更新)，<code>UI</code>层订阅<code>UI State</code>订响应刷新，从而完成页面刷新，如下图所示：<br><img src="https://developer.android.com/topic/libraries/architecture/images/mad-arch-ui-udf-in-action.png" alt>       </p>
+<h4 id="为什么使用单向数据流动？"><a href="#为什么使用单向数据流动？" class="headerlink" title="为什么使用单向数据流动？"></a>为什么使用单向数据流动？</h4><p>单向数据流动可以实现关注点分离原则，它可以将状态变化来源位置、转换位置以及最终使用位置进行分离。<br>这种分离可让<code>UI</code>只发挥其名称所表明的作用：通过观察<code>UI State</code>变化来显示页面信息，并将用户输入传递给<code>ViewModel</code>以实现状态刷新。     </p>
+<p>换句话说，单向数据流动有助于实现以下几点：         </p>
+<ol>
+<li>数据一致性。界面只有一个可信来源。</li>
+<li>可测试性。状态来源是独立的，因此可独立于界面进行测试。</li>
+<li>可维护性。状态的更改遵循明确定义的模式，即状态更改是用户事件及其数据拉取来源共同作用的结果。</li>
+</ol>
+<h2 id="暴露与更新UI-State"><a href="#暴露与更新UI-State" class="headerlink" title="暴露与更新UI State"></a>暴露与更新<code>UI State</code></h2><p>定义好<code>UI State</code>并确定如何管理相应状态后，下一步是将提供的状态发送给界面。我们可以使用<code>LiveData</code>或者<code>StateFlow</code>将<code>UI State</code>转化为数据流并暴露给<code>UI</code>层<br>为了保证不能在<code>UI</code>中修改状态，我们应该定义一个可变的<code>StateFlow</code>与一个不可变的<code>StateFlow</code>，如下所示：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsViewModel</span></span>(...) : ViewModel() &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _uiState = MutableStateFlow(NewsUiState())</span><br><span class="line">    <span class="keyword">val</span> uiState: StateFlow&lt;NewsUiState&gt; = _uiState.asStateFlow()</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样一来，<code>UI</code>层可以订阅状态，而<code>ViewModel</code>也可以修改状态,以需要执行异步操作的情况为例，可以使用<code>viewModelScope</code>启动协程，并且可以在操作完成时更新状态。     </p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsViewModel</span></span>(</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> repository: NewsRepository,</span><br><span class="line">    ...</span><br><span class="line">) : ViewModel() &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> _uiState = MutableStateFlow(NewsUiState())</span><br><span class="line">    <span class="keyword">val</span> uiState: StateFlow&lt;NewsUiState&gt; = _uiState.asStateFlow()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> fetchJob: Job? = <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">fetchArticles</span><span class="params">(category: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        fetchJob?.cancel()</span><br><span class="line">        fetchJob = viewModelScope.launch &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">val</span> newsItems = repository.newsItemsForCategory(category)</span><br><span class="line">                _uiState.update &#123;</span><br><span class="line">                    it.copy(newsItems = newsItems)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ioe: IOException) &#123;</span><br><span class="line">                <span class="comment">// Handle the error and notify the notify the UI when appropriate.</span></span><br><span class="line">                _uiState.update &#123;</span><br><span class="line">                    <span class="keyword">val</span> messages = getMessagesFromThrowable(ioe)</span><br><span class="line">                    it.copy(userMessages = messages)</span><br><span class="line">                 &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的示例中，<code>NewsViewModel</code> 类会尝试进行网络请求，然后更新<code>UI State</code>，然后<code>UI</code>层可以对其做出适当反应</p>
+<h3 id="订阅UI-State"><a href="#订阅UI-State" class="headerlink" title="订阅UI State"></a>订阅<code>UI State</code></h3><p>订阅<code>UI State</code>很简单，只需要在<code>UI</code>层观察并刷新<code>UI</code>即可<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        lifecycleScope.launch &#123;</span><br><span class="line">            repeatOnLifecycle(Lifecycle.State.STARTED) &#123;</span><br><span class="line">                viewModel.uiState.collect &#123;</span><br><span class="line">                    <span class="comment">// Update UI elements</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="UI-State实现局部刷新"><a href="#UI-State实现局部刷新" class="headerlink" title="UI State实现局部刷新"></a><code>UI State</code>实现局部刷新</h4><p>因为<code>MVI</code>架构下实现了<code>UI State</code>的集中管理，因此更新一个属性就会导致<code>UI State</code>的更新，那么在这种情况下怎么实现局部刷新呢？<br>我们可以利用<code>distinctUntilChanged</code>实现，<code>distinctUntilChanged</code>只有在值发生变化了之后才会回调刷新，相当于对属性做了一个防抖，因此我们可以实现局部刷新，使用方式如下所示<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewsActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onCreate</span><span class="params">(savedInstanceState: <span class="type">Bundle</span>?)</span></span> &#123;</span><br><span class="line">        lifecycleScope.launch &#123;</span><br><span class="line">            repeatOnLifecycle(Lifecycle.State.STARTED) &#123;</span><br><span class="line">                <span class="comment">// Bind the visibility of the progressBar to the state</span></span><br><span class="line">                <span class="comment">// of isFetchingArticles.</span></span><br><span class="line">                viewModel.uiState</span><br><span class="line">                    .map &#123; it.isFetchingArticles &#125;</span><br><span class="line">                    .distinctUntilChanged()</span><br><span class="line">                    .collect &#123; progressBar.isVisible = it &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当然我们也可以对其进行一定的封装，给<code>Flow</code>或者<code>LiveData</code>添加一个扩展函数，令其支持监听属性即可，使用方式如下所示<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> : <span class="type">AppCompatActivity</span></span>() &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">initViewModel</span><span class="params">()</span></span> &#123;</span><br><span class="line">        viewModel.viewStates.run &#123;</span><br><span class="line">            <span class="comment">//监听newsList</span></span><br><span class="line">            observeState(<span class="keyword">this</span><span class="symbol">@MainActivity</span>, MainViewState::newsList) &#123;</span><br><span class="line">                newsRvAdapter.submitList(it)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//监听网络状态</span></span><br><span class="line">            observeState(<span class="keyword">this</span><span class="symbol">@MainActivity</span>, MainViewState::fetchStatus) &#123;</span><br><span class="line">                <span class="comment">//..</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>关于<code>MVI</code>架构下支持属性监听，更加详细地内容可见：<a href="https://juejin.cn/post/7025222741322121223" target="_blank" rel="noopener">MVI 架构更佳实践：支持 LiveData 属性监听</a></p>
+<h2 id="网域层"><a href="#网域层" class="headerlink" title="网域层"></a>网域层</h2><p>网域层是位于界面层和数据层之间的可选层。<br><img src="https://developer.android.com/topic/libraries/architecture/images/mad-arch-domain-overview.png" alt><br>网域层负责封装复杂的业务逻辑，或者由多个<code>ViewModel</code>重复使用的简单业务逻辑。此层是可选的，因为并非所有应用都有这类需求。因此，您应仅在需要时使用该层。<br>网域层具有以下优势：   </p>
+<ol>
+<li>避免代码重复。</li>
+<li>改善使用网域层类的类的可读性。</li>
+<li>改善应用的可测试性。</li>
+<li>让您能够划分好职责，从而避免出现大型类。    </li>
+</ol>
+<p>我感觉对于常见的<code>APP</code>，网域层似乎并没有必要，对于<code>ViewModel</code>重复的逻辑，使用<code>util</code>来说一般就已足够<br>或许网域层适用于特别大型的项目吧，各位可根据自己的需求选用，关于网域层的详细信息可见：<a href="https://developer.android.com/jetpack/guide/domain-layer" target="_blank" rel="noopener">https://developer.android.com/jetpack/guide/domain-layer</a></p>
+<h2 id="数据层"><a href="#数据层" class="headerlink" title="数据层"></a>数据层</h2><p>数据层主要负责获取与处理数据的逻辑，数据层由多个<code>Repository</code>组成，其中每个<code>Repository</code>可包含零到多个<code>Data Source</code>。您应该为应用处理的每种不同类型的数据创建一个<code>Repository</code>类。例如，您可以为与电影相关的数据创建 <code>MoviesRepository</code> 类，或者为与付款相关的数据创建 <code>PaymentsRepository</code> 类。当然为了方便，针对只有一个数据源的<code>Repository</code>，也可以将数据源的代码也写在<code>Repository</code>，后续有多个数据源时再做拆分   </p>
+<p><img src="https://developer.android.com/topic/libraries/architecture/images/mad-arch-data-overview.png" alt><br>数据层跟之前的<code>MVVM</code>架构下的数据层并没用什么区别，这里就不多介绍了，关于数据层的详细信息可见：<a href="https://developer.android.com/jetpack/guide/data-layer" target="_blank" rel="noopener">https://developer.android.com/jetpack/guide/data-layer</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>相比老版的架构指南，新版主要是增加了网域层并修改了界面层，其中网域层是可选的，各位各根据自己的项目需求使用。<br>而界面层则从<code>MVVM</code>架构变成了<code>MVI</code>架构，强调了数据的<code>单向数据流动</code>与<code>状态的集中管理</code>。相比<code>MVVM</code>架构，<code>MVI</code>架构主要有以下优点    </p>
+<ol>
+<li>强调数据单向流动，很容易对状态变化进行跟踪和回溯，在数据一致性，可测试性，可维护性上都有一定优势    </li>
+<li>强调对<code>UI State</code>的集中管理，只需要订阅一个<code>ViewState</code>便可获取页面的所有状态，相对 <code>MVVM</code> 减少了不少模板代码    </li>
+<li>添加状态只需要添加一个属性，降低了<code>ViewModel</code>与<code>View</code>层的通信成本，将业务逻辑集中在<code>ViewModel</code>中，<code>View</code>层只需要订阅状态然后刷新即可     </li>
+</ol>
+<p>当然在软件开发中没有最好的架构，只有最合适的架构，各位可根据情况选用适合项目的架构，实际上在我看来<code>Google</code>在指南中推荐使用<code>MVI</code>而不再是<code>MVVM</code>，很可能是为了统一<code>Android</code>与<code>Compose</code>的架构。因为在<code>Compose</code>中并没有双向数据绑定，只有单向数据流动，因此<code>MVI</code>是最适合<code>Compose</code>的架构。       </p>
+<p>当然如果你的项目中没有使用<code>DataBinding</code>，或许也可以开始尝试一下使用<code>MVI</code>，不使用<code>DataBinding</code>的<code>MVVM</code>架构切换为<code>MVI</code>成本不高，切换起来也比较简单，在易用性，数据一致性，可测试性，可维护性等方面都有一定优势，后续也可以无缝切换到<code>Compose</code>。</p>
+<h3 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h3><p><a href="https://juejin.cn/post/7022624191723601928" target="_blank" rel="noopener">MVVM 进阶版：MVI 架构了解一下~</a><br><a href="https://juejin.cn/post/7025222741322121223" target="_blank" rel="noopener">MVI 架构更佳实践：支持 LiveData 属性监听</a><br><a href="https://juejin.cn/post/7027815347281477645" target="_blank" rel="noopener">MVI 架构封装：快速优雅地实现网络请求</a><br><a href="https://developer.android.com/jetpack/guide" target="_blank" rel="noopener">Android应用架构指南</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/11/2021-year-summary.html" rel="next" title="【2021年终总结】战胜拖延症的4种实用方法">
+                <i class="fa fa-chevron-left"></i> 【2021年终总结】战胜拖延症的4种实用方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/01/compose-write-spring.html" rel="prev" title="Compose 实现手写春联效果">
+                Compose 实现手写春联效果 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总体架构"><span class="nav-number">2.</span> <span class="nav-text">总体架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两个架构原则"><span class="nav-number">2.1.</span> <span class="nav-text">两个架构原则</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分离关注点"><span class="nav-number">2.1.1.</span> <span class="nav-text">分离关注点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过数据驱动界面"><span class="nav-number">2.1.2.</span> <span class="nav-text">通过数据驱动界面</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#推荐的应用架构"><span class="nav-number">2.2.</span> <span class="nav-text">推荐的应用架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#界面层"><span class="nav-number">3.</span> <span class="nav-text">界面层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何定义UI-State"><span class="nav-number">3.1.</span> <span class="nav-text">如何定义UI State</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UI-State集中管理的优缺点"><span class="nav-number">3.1.1.</span> <span class="nav-text">UI State集中管理的优缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用单向数据流管理UI-State"><span class="nav-number">3.2.</span> <span class="nav-text">使用单向数据流管理UI State</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么使用单向数据流动？"><span class="nav-number">3.2.1.</span> <span class="nav-text">为什么使用单向数据流动？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#暴露与更新UI-State"><span class="nav-number">4.</span> <span class="nav-text">暴露与更新UI State</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#订阅UI-State"><span class="nav-number">4.1.</span> <span class="nav-text">订阅UI State</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UI-State实现局部刷新"><span class="nav-number">4.1.1.</span> <span class="nav-text">UI State实现局部刷新</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网域层"><span class="nav-number">5.</span> <span class="nav-text">网域层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据层"><span class="nav-number">6.</span> <span class="nav-text">数据层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#更多"><span class="nav-number">7.1.</span> <span class="nav-text">更多</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

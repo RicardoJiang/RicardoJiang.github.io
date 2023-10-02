@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/06/elf-file-summary.html</loc>
+    
+    <lastmod>2023-10-02T05:34:14.741Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/05/compose-dynamic-island.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.250Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/about/index.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.250Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/categories/index.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.250Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/tags/index.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.250Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/08/kotlin-compile-analysis.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/10/android-compile-speed.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/11/now-in-android-learn.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/12/2022-sum-up.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/03/native-hook-start.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/03/android-stability-optimize.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/04/android-startup-optimize.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/04/android-jank-optimize.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2023/05/android-anr-monitor.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.249Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/05/compose-general-performance.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/06/android-jank-optimize.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/05/use-base-profile.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/06/gradle7-transform-learn.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/06/asm-method-record.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/06/how-apk-compile.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/07/ksp-version-butterknife.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/07/kotlin-fast-compilation.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/02/gradle-new-seven.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/02/kts-performance-evaluate.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/03/js-single-thread.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/04/vue-single-two.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/04/vue-chrome-rex.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/04/compose-render-performance.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/04/android-ui-render.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/05/android-crash-optimize.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.247Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/11/confuse-design-pattern.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.246Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/11/2021-year-summary.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.246Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/01/google-recommend-mvi.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.246Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/01/compose-write-spring.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.246Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2022/02/groovy-knowlege-sum.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.246Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/09/compose-summary-resource.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/09/compose-state-layout.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/10/compose-refresh-layout.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/10/okhttp-knowledge-sum.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/10/is-compose-view.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/10/mvvm-and-mvi.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/10/wan-android-compose.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/10/mvi-better-practice.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/11/mvi-network-architecture.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.245Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/08/know-http-sum.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/08/gradle-catalog-learn.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/08/open-source-douban.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/09/open-source-shimmer.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/09/compose-performance-summary.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/09/compose-moon-animatin.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/09/compose-measure-onece.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.244Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/06/coroutine-thread-expection.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/05/leakcanary-sum-up.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/07/need-replace-livedata.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/06/java-generic-questions.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/07/git-flow-compare.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/07/android-view-question.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/08/desin-api-story.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/05/glide-optimize-sum.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.243Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/03/mmkv-disadvange-sum.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/04/gradle-sum-up.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/04/android-ui-monitor.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/04/android-start-optimize.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/05/no-permission-float.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/05/memory-sum-up.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/05/dispatch-sum-up.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.242Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2020/12/translate-substituing-liveData.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2020/12/motionlayout-recyclerview-animation.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/01/kotlin-tips-sum.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/01/paging-source-learn.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/02/recyclerview-sum-up.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/02/sp-mmkv-learned.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/02/corountine-handle-exeception.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2021/03/paging-pain-points.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.241Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2017/03/hello-world.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.240Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2020/06/retrofit-design-patern.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.240Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://RicardoJiang.github.io/blog/2017/04/hexo-learn-start.html</loc>
+    
+    <lastmod>2023-10-02T05:09:49.240Z</lastmod>
+    
+  </url>
+  
+</urlset>

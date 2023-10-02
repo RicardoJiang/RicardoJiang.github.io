@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言打开Android架构组件页面,我们可以发现一些最新发布的jetpack组件，如Room，DataStore, Paging3,DataBinding 等都支持了FlowGoogle开发者账号最近也发布了几篇使用Flow的文章，比如：从 LiveData 迁移到 Kotlin 数据流看起来官方在大力推荐使用Flow取代LiveData，那么问题来了,有必要吗？我LiveData用得好好的，有必">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="官方推荐 Flow 取代 LiveData,有必要吗？">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/07/need-replace-livedata.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言打开Android架构组件页面,我们可以发现一些最新发布的jetpack组件，如Room，DataStore, Paging3,DataBinding 等都支持了FlowGoogle开发者账号最近也发布了几篇使用Flow的文章，比如：从 LiveData 迁移到 Kotlin 数据流看起来官方在大力推荐使用Flow取代LiveData，那么问题来了,有必要吗？我LiveData用得好好的，有必">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p10.jpg">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p9.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6d2e0e47e1bd479fa1e3f04aa06c74c3~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b5b31c118c7345a0add842aabed3c587~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/18816ce5cfdc411dbd642b2f66e0a406~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.243Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="官方推荐 Flow 取代 LiveData,有必要吗？">
+<meta name="twitter:description" content="前言打开Android架构组件页面,我们可以发现一些最新发布的jetpack组件，如Room，DataStore, Paging3,DataBinding 等都支持了FlowGoogle开发者账号最近也发布了几篇使用Flow的文章，比如：从 LiveData 迁移到 Kotlin 数据流看起来官方在大力推荐使用Flow取代LiveData，那么问题来了,有必要吗？我LiveData用得好好的，有必">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p10.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/07/need-replace-livedata.html">
+
+
+
+
+
+  <title>官方推荐 Flow 取代 LiveData,有必要吗？ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/07/need-replace-livedata.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">官方推荐 Flow 取代 LiveData,有必要吗？</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-05T08:17:24+08:00">
+                2021-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>打开<a href="https://developer.android.com/jetpack" target="_blank" rel="noopener">Android架构组件页面</a>,我们可以发现一些最新发布的<code>jetpack</code>组件，如<code>Room</code>，<code>DataStore</code>, <code>Paging3</code>,<code>DataBinding</code> 等都支持了<code>Flow</code><br><code>Google开发者</code>账号最近也发布了几篇使用<code>Flow</code>的文章，比如：<a href="https://juejin.cn/post/6979008878029570055" target="_blank" rel="noopener">从 LiveData 迁移到 Kotlin 数据流</a><br>看起来官方在大力推荐使用<code>Flow</code>取代<code>LiveData</code>，那么问题来了,有必要吗？<br>我<code>LiveData</code>用得好好的，有必要再学<code>Flow</code>吗?本文主要回答这个问题,具体包括以下内容<br>1.<code>LiveData</code>有什么不足?<br>2.<code>Flow</code>介绍以及为什么要有<code>Flow</code><br>3.<code>SharedFlow</code>与<code>StateFlow</code>的介绍与它们之间的区别      </p>
+<p>本文具体目录如下所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p10.jpg" alt></p>
+<h2 id="1-LiveData有什么不足"><a href="#1-LiveData有什么不足" class="headerlink" title="1. LiveData有什么不足?"></a>1. <code>LiveData</code>有什么不足?</h2><h3 id="1-1-为什么引入LiveData"><a href="#1-1-为什么引入LiveData" class="headerlink" title="1.1 为什么引入LiveData?"></a>1.1 为什么引入<code>LiveData</code>?</h3><p>要了解<code>LiveData</code>的不足，我们先了解下<code>LiveData</code>为什么被引入     </p>
+<blockquote>
+<p><code>LiveData</code> 的历史要追溯到 2017 年。彼时，观察者模式有效简化了开发，但诸如 <code>RxJava</code> 一类的库对新手而言有些太过复杂。为此，架构组件团队打造了 <code>LiveData</code>: 一个专用于 <code>Android</code> 的具备自主生命周期感知能力的可观察的数据存储器类。<code>LiveData</code> 被有意简化设计，这使得开发者很容易上手；而对于较为复杂的交互数据流场景，建议您使用 <code>RxJava</code>，这样两者结合的优势就发挥出来了</p>
+</blockquote>
+<p>可以看出,<code>LiveData</code>就是一个简单易用的，具备感知生命周期能力的观察者模式<br>它使用起来非常简单，这是它的优点，也是它的不足，因为它面对比较复杂的交互数据流场景时，处理起来比较麻烦        </p>
+<h3 id="1-2-LiveData的不足"><a href="#1-2-LiveData的不足" class="headerlink" title="1.2 LiveData的不足"></a>1.2 <code>LiveData</code>的不足</h3><p>我们上文说过<code>LiveData</code>结构简单，但是不够强大，它有以下不足<br>1.<code>LiveData</code>只能在主线程更新数据<br>2.<code>LiveData</code>的操作符不够强大,在处理复杂数据流时有些捉襟见肘    </p>
+<p>关于<code>LiveData</code>只能在主线程更新数据，有的同学可能要问，不是有<code>postValue</code>吗？其实<code>postValue</code>也是需要切换到到主线程的,如下图所示：<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p9.png" alt><br>这意味着当我们想要更新<code>LiveData</code>对象时，我们会经常更改线程（工作线程→主线程）,如果在修改<code>LiveData</code>后又要切换回到工作线程那就更麻烦了,同时<code>postValue</code>可能会有丢数据的问题。      </p>
+<h2 id="2-Flow介绍"><a href="#2-Flow介绍" class="headerlink" title="2. Flow介绍"></a>2. <code>Flow</code>介绍</h2><p><code>Flow</code> 就是 <code>Kotlin</code> 协程与响应式编程模型结合的产物，你会发现它与 <code>RxJava</code> 非常像，二者之间也有相互转换的 <code>API</code>，使用起来非常方便。     </p>
+<h3 id="2-1-为什么引入Flow"><a href="#2-1-为什么引入Flow" class="headerlink" title="2.1 为什么引入Flow"></a>2.1 为什么引入<code>Flow</code></h3><p>为什么引入<code>Flow</code>，我们可以从<code>Flow</code>解决了什么问题的角度切入    </p>
+<ol>
+<li><code>LiveData</code>不支持线程切换，所有数据转换都将在主线程上完成，有时需要频繁更改线程，面对复杂数据流时处理起来比较麻烦     </li>
+<li>而<code>RxJava</code>又有些过于麻烦了，有许多让人傻傻分不清的操作符，入门门槛较高，同时需要自己处理生命周期，在生命周期结束时取消订阅       </li>
+</ol>
+<p>可以看出，<code>Flow</code>是介于<code>LiveData</code>与<code>RxJava</code>之间的一个解决方案，它有以下特点   </p>
+<ul>
+<li><code>Flow</code> 支持线程切换、背压</li>
+<li><code>Flow</code> 入门的门槛很低，没有那么多傻傻分不清楚的操作符</li>
+<li>简单的数据转换与操作符，如 <code>map</code> 等等</li>
+<li>冷数据流，不消费则不生产数据,这一点与<code>LiveData</code>不同：<code>LiveData</code>的发送端并不依赖于接收端。 </li>
+<li>属于<code>kotlin</code>协程的一部分，可以很好的与协程基础设施结合    </li>
+</ul>
+<p>关于<code>Flow</code>的使用，比较简单，有兴趣的同学可参阅文档：<a href="http://www.kotlincn.net/docs/reference/coroutines/flow.html" target="_blank" rel="noopener">Flow文档</a></p>
+<h2 id="3-SharedFlow介绍"><a href="#3-SharedFlow介绍" class="headerlink" title="3. SharedFlow介绍"></a>3. <code>SharedFlow</code>介绍</h2><p>我们上面介绍过,<code>Flow 是冷流</code>，什么是冷流？         </p>
+<ul>
+<li>冷流 :只有<code>订阅者</code>订阅时，才开始执行发射数据流的代码。并且<code>冷流</code>和<code>订阅者</code>只能是一对一的关系，当有多个不同的<code>订阅者</code>时，消息是重新完整发送的。也就是说对<code>冷流</code>而言，有多个<code>订阅者</code>的时候，他们各自的事件是独立的。</li>
+<li>热流:无论有没有<code>订阅者</code>订阅，事件始终都会发生。当 <code>热流</code>有多个<code>订阅者</code>时，<code>热流</code>与<code>订阅者</code>们的关系是一对多的关系，可以与多个订阅者共享信息。</li>
+</ul>
+<h3 id="3-1-为什么引入SharedFlow"><a href="#3-1-为什么引入SharedFlow" class="headerlink" title="3.1 为什么引入SharedFlow"></a>3.1 为什么引入<code>SharedFlow</code></h3><p>上面其实已经说得很清楚了，<code>冷流</code>和<code>订阅者</code>只能是一对一的关系，当我们要实现一个流，多个<code>订阅者</code>的需求时(这在开发中是很常见的)，就需要<code>热流</code>了<br>从命名上也很容易理解，<code>SharedFlow</code>即共享的<code>Flow</code>，可以实现一对多关系,<code>SharedFlow</code>是一种热流  </p>
+<h3 id="3-2-SharedFlow的使用"><a href="#3-2-SharedFlow的使用" class="headerlink" title="3.2 SharedFlow的使用"></a>3.2 <code>SharedFlow</code>的使用</h3><p>我们来看看<code>SharedFlow</code>的构造函数<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">MutableSharedFlow</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    replay: <span class="type">Int</span> = <span class="number">0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    extraBufferCapacity: <span class="type">Int</span> = <span class="number">0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    onBufferOverflow: <span class="type">BufferOverflow</span> = BufferOverflow.SUSPEND</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>: MutableSharedFlow&lt;T&gt;</span><br></pre></td></tr></table></figure></p>
+<p>其主要有3个参数<br>1.<code>replay</code>表示当新的订阅者<code>Collect</code>时，发送几个已经发送过的数据给它，默认为0，即默认新订阅者不会获取以前的数据<br>2.<code>extraBufferCapacity</code>表示减去<code>replay</code>，<code>MutableSharedFlow</code>还缓存多少数据，默认为0<br>3.<code>onBufferOverflow</code>表示缓存策略，即缓冲区满了之后<code>Flow</code>如何处理，默认为挂起    </p>
+<p>简单使用如下：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ViewModel</span></span><br><span class="line"><span class="keyword">val</span> sharedFlow=MutableSharedFlow&lt;String&gt;()</span><br><span class="line"></span><br><span class="line">viewModelScope.launch&#123;</span><br><span class="line">      sharedFlow.emit(<span class="string">"Hello"</span>)</span><br><span class="line">      sharedFlow.emit(<span class="string">"SharedFlow"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Activity</span></span><br><span class="line">lifecycleScope.launch&#123;</span><br><span class="line">    viewMode.sharedFlow.collect &#123; </span><br><span class="line">       print(it)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-3-将冷流转化为SharedFlow"><a href="#3-3-将冷流转化为SharedFlow" class="headerlink" title="3.3 将冷流转化为SharedFlow"></a>3.3 将冷流转化为<code>SharedFlow</code></h3><p>普通<code>flow</code>可使用<code>shareIn</code>扩展方法，转化成<code>SharedFlow</code><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sharedFlow <span class="keyword">by</span> lazy &#123;</span><br><span class="line">    flow&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    &#125;.shareIn(viewModelScope, WhileSubscribed(<span class="number">500</span>), <span class="number">0</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>shareIn</code>主要也有三个参数：   </p>
+<blockquote>
+<p>@param <code>scope</code> 共享开始时所在的协程作用域范围<br>@param <code>started</code> 控制共享的开始和结束的策略<br>@param <code>replay</code> 状态流的重播个数      </p>
+</blockquote>
+<p><code>started</code> 接受以下的三个值:<br>1.<code>Lazily</code>: 当首个订阅者出现时开始，在<code>scope</code>指定的作用域被结束时终止。<br>2.<code>Eagerly</code>: 立即开始，而在<code>scope</code>指定的作用域被结束时终止。<br>3.<code>WhileSubscribed</code>: 这种情况有些复杂，后面会详细讲解      </p>
+<p>对于那些只执行一次的操作，您可以使用<code>Lazily</code>或者<code>Eagerly</code>。然而，如果您需要观察其他的流，就应该使用<code>WhileSubscribed</code>来实现细微但又重要的优化工作         </p>
+<h3 id="3-4-Whilesubscribed策略"><a href="#3-4-Whilesubscribed策略" class="headerlink" title="3.4 Whilesubscribed策略"></a>3.4 <code>Whilesubscribed</code>策略</h3><p><code>WhileSubscribed</code>策略会在没有收集器的情况下取消上游数据流,通过<code>shareIn</code>运算符创建的<code>SharedFlow</code>会把数据暴露给视图 (<code>View</code>)，同时也会观察来自其他层级或者是上游应用的数据流。<br>让这些流持续活跃可能会引起不必要的资源浪费，例如一直通过从数据库连接、硬件传感器中读取数据等等。当您的应用转而在后台运行时，您应当保持克制并中止这些协程。<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">fun</span> <span class="title">WhileSubscribed</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">   stopTimeoutMillis: <span class="type">Long</span> = <span class="number">0</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">   replayExpirationMillis: <span class="type">Long</span> = <span class="built_in">Long</span>.MAX_VALUE</span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>如上所示，它支持两个参数：    </p>
+<ul>
+<li>1.<code>stopTimeoutMillis</code> 控制一个以毫秒为单位的延迟值，指的是最后一个订阅者结束订阅与停止上游流的时间差。默认值是 0 (立即停止).这个值非常有用，因为您可能并不想因为视图有几秒钟不再监听就结束上游流。这种情况非常常见——比如当用户旋转设备时，原来的视图会先被销毁，然后数秒钟内重建。  </li>
+<li>2.<code>replayExpirationMillis</code>表示数据重播的过时时间，如果用户离开应用太久，此时您不想让用户看到陈旧的数据，你可以用到这个参数        </li>
+</ul>
+<h2 id="4-StateFlow介绍"><a href="#4-StateFlow介绍" class="headerlink" title="4. StateFlow介绍"></a>4. <code>StateFlow</code>介绍</h2><h3 id="4-1-为什么引入StateFlow"><a href="#4-1-为什么引入StateFlow" class="headerlink" title="4.1 为什么引入StateFlow"></a>4.1 为什么引入<code>StateFlow</code></h3><p>我们前面刚刚看了<code>SharedFlow</code>，为什么又冒出个<code>StateFlow</code>?<br><code>StateFlow</code> 是 <code>SharedFlow</code> 的一个比较特殊的变种，<code>StateFlow</code> 与 <code>LiveData</code> 是最接近的，因为:    </p>
+<ul>
+<li>1.它始终是有值的。</li>
+<li>2.它的值是唯一的。</li>
+<li>3.它允许被多个观察者共用 (因此是共享的数据流)。</li>
+<li>4.它永远只会把最新的值重现给订阅者，这与活跃观察者的数量是无关的。</li>
+</ul>
+<p>可以看出，<code>StateFlow</code>与<code>LiveData</code>是比较接近的，可以获取当前的值，可以想像之所以引入<code>StateFlow</code>就是为了替换<code>LiveData</code><br>总结如下：<br>1.<code>StateFlow</code>继承于<code>SharedFlow</code>,是<code>SharedFlow</code>的一个特殊变种<br>2.<code>StateFlow</code>与<code>LiveData</code>比较相近，相信之所以推出就是为了替换<code>LiveData</code>    </p>
+<h3 id="4-2-StateFlow的简单使用"><a href="#4-2-StateFlow的简单使用" class="headerlink" title="4.2 StateFlow的简单使用"></a>4.2 <code>StateFlow</code>的简单使用</h3><p>我们先来看看构造函数：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> <span class="title">MutableStateFlow</span><span class="params">(value: <span class="type">T</span>)</span></span>: MutableStateFlow&lt;T&gt; = StateFlowImpl(value ?: NULL)</span><br></pre></td></tr></table></figure></p>
+<p>1.<code>StateFlow</code>构造函数较为简单，只需要传入一个默认值<br>2.<code>StateFlow</code>本质上是一个<code>replay</code>为1，并且没有缓冲区的<code>SharedFlow</code>,因此第一次订阅时会先获得默认值<br>3.<code>StateFlow</code>仅在值已更新，并且值发生了变化时才会返回，即如果更新后的值没有变化，也没会回调<code>Collect</code>方法，这点与<code>LiveData</code>不同   </p>
+<p>与<code>SharedFlow</code>类似，我们也可以用<code>stateIn</code>将普通流转化成<code>StateFlow</code><br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> result: StateFlow&lt;Result&lt;UiState&gt;&gt; = someFlow</span><br><span class="line">    .stateIn(</span><br><span class="line">        scope = viewModelScope, </span><br><span class="line">        started = WhileSubscribed(<span class="number">5000</span>), </span><br><span class="line">        initialValue = Result.Loading</span><br><span class="line">    )</span><br></pre></td></tr></table></figure></p>
+<p>与<code>shareIn</code>类似，唯一不同的时需要传入一个默认值<br>同时之所以<code>WhileSubscribed</code>中传入了<code>5000</code>，是为了实现等待<code>5</code>秒后仍然没有订阅者存在就终止协程的功能，这个方法有以下功能     </p>
+<ul>
+<li>用户将您的应用转至后台运行，5 秒钟后所有来自其他层的数据更新会停止，这样可以节省电量。</li>
+<li>最新的数据仍然会被缓存，所以当用户切换回应用时，视图立即就可以得到数据进行渲染。</li>
+<li>订阅将被重启，新数据会填充进来，当数据可用时更新视图。</li>
+<li>在屏幕旋转时，因为重新订阅的时间在5s内，因此上游流不会中止   </li>
+</ul>
+<h3 id="4-3-在页面中观察StateFlow"><a href="#4-3-在页面中观察StateFlow" class="headerlink" title="4.3 在页面中观察StateFlow"></a>4.3 在页面中观察<code>StateFlow</code></h3><p>与<code>LiveData</code>类似，我们也需要经常在页面中观察<code>StateFlow</code><br>观察<code>StateFlow</code>需要在协程中，因此我们需要协程构建器，一般我们会使用下面几种      </p>
+<ol>
+<li><code>lifecycleScope.launch</code> : 立即启动协程，并且在本 <code>Activity</code>或<code>Fragment</code> 销毁时结束协程。     </li>
+<li><code>LaunchWhenStarted</code> 和 <code>LaunchWhenResumed</code>,它会在<code>lifecycleOwner</code>进入<code>X</code>状态之前一直等待，又在离开<code>X</code>状态时挂起协程     </li>
+</ol>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6d2e0e47e1bd479fa1e3f04aa06c74c3~tplv-k3u1fbpfcp-zoom-1.image" alt><br>如上图所示：<br>1.使用<code>launch</code>是不安全的，在应用在后台时也会接收数据更新，可能会导致应用崩溃<br>2.使用<code>launchWhenStarted</code>或<code>launchWhenResumed</code>会好一些，在后台时不会接收数据更新，但是，上游数据流会在应用后台运行期间保持活跃，因此可能浪费一定的资源       </p>
+<p>这么说来，我们使用<code>WhileSubscribed</code>进行的配置岂不是无效了吗？订阅者一直存在，只有页面关闭时才会取消订阅<br><strong>官方推荐<code>repeatOnLifecycle</code>来构建协程</strong><br>在某个特定的状态满足时启动协程，并且在生命周期所有者退出该状态时停止协程,如下图所示。<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b5b31c118c7345a0add842aabed3c587~tplv-k3u1fbpfcp-zoom-1.image" alt><br>比如在某个<code>Fragment</code>的代码中:<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">onCreateView(...) &#123;</span><br><span class="line">    viewLifecycleOwner.lifecycleScope.launch &#123;</span><br><span class="line">        viewLifecycleOwner.lifecycle.repeatOnLifecycle(STARTED) &#123;</span><br><span class="line">            myViewModel.myUiState.collect &#123; ... &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当这个<code>Fragment</code>处于<code>STARTED</code>状态时会开始收集流，并且在<code>RESUMED</code>状态时保持收集，最终在<code>Fragment</code>进入<code>STOPPED</code>状态时结束收集过程。<br>结合使用<code>repeatOnLifecycle API</code>和<code>WhileSubscribed</code>,可以帮助您的应用妥善利用设备资源的同时，发挥最佳性能    </p>
+<h3 id="4-4-页面中观察Flow的最佳方式"><a href="#4-4-页面中观察Flow的最佳方式" class="headerlink" title="4.4 页面中观察Flow的最佳方式"></a>4.4 页面中观察<code>Flow</code>的最佳方式</h3><p>通过<code>ViewModel</code>暴露数据，并在页面中获取的最佳方式是:       </p>
+<ul>
+<li>✔️ 使用带超时参数的 <code>WhileSubscribed</code> 策略暴露 <code>Flow</code>。<a href="https://gist.github.com/JoseAlcerreca/4eb0be817d8f94880dab279d1c27a4af" target="_blank" rel="noopener">示例 1</a></li>
+<li>✔️ 使用 <code>repeatOnLifecycle</code> 来收集数据更新。<a href="https://gist.github.com/JoseAlcerreca/6e2620b5615425a516635744ba59892e" target="_blank" rel="noopener">示例 2</a></li>
+</ul>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/18816ce5cfdc411dbd642b2f66e0a406~tplv-k3u1fbpfcp-zoom-1.image" alt><br>最佳实践如上图所示，如果采用其他方式，上游数据流会被一直保持活跃，导致资源浪费<br>当然，如果您并不需要使用到<code>Kotlin Flow</code>的强大功能，就用<code>LiveData</code>好了 :)       </p>
+<h2 id="5-StateFlow与SharedFlow有什么区别？"><a href="#5-StateFlow与SharedFlow有什么区别？" class="headerlink" title="5 StateFlow与SharedFlow有什么区别？"></a>5 <code>StateFlow</code>与<code>SharedFlow</code>有什么区别？</h2><p>从上文其实可以看出，<code>StateFlow</code>与<code>SharedFlow</code>其实是挺像的，让人有些傻傻分不清，有时候也挺难选择该用哪个的    </p>
+<p>我们总结一下，它们的区别如下:   </p>
+<ol>
+<li><code>SharedFlow</code>配置更为灵活，支持配置<code>replay</code>,缓冲区大小等，<code>StateFlow</code>是<code>SharedFlow</code>的特化版本，<code>replay</code>固定为1，缓冲区大小默认为0     </li>
+<li><code>StateFlow</code>与<code>LiveData</code>类似，支持通过<code>myFlow.value</code>获取当前状态，如果有这个需求，必须使用<code>StateFlow</code>      </li>
+<li><code>SharedFlow</code>支持发出和收集重复值，而<code>StateFlow</code>当<code>value</code>重复时，不会回调<code>collect</code>      </li>
+<li>对于新的订阅者，<code>StateFlow</code>只会重播当前最新值，<code>SharedFlow</code>可配置重播元素个数（默认为0，即不重播）   </li>
+</ol>
+<p>可以看出,<code>StateFlow</code>为我们做了一些默认的配置，在<code>SharedFlow</code>上添加了一些默认约束，这些配置可能并不符合我们的要求     </p>
+<ol>
+<li>它忽略重复的值，并且是不可配置的。这会带来一些问题，比如当往<code>List</code>中添加元素并更新时，<code>StateFlow</code>会认为是重复的值并忽略         </li>
+<li>它需要一个初始值，并且在开始订阅时会回调初始值，这有可能不是我们想要的     </li>
+<li>它默认是粘性的，新用户订阅会获得当前的最新值，而且是不可配置的,而<code>SharedFlow</code>可以修改<code>replay</code>       </li>
+</ol>
+<p><code>StateFlow</code>施加在<code>SharedFlow</code>上的约束可能不是最适合您，如果不需要访问<code>myFlow.value</code>，并且享受<code>SharedFlow</code>的灵活性，可以选择考虑使用<code>SharedFlow</code>    </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>简单往往意味着不够强大，而强大又常常意味着复杂,两者往往不能兼得，软件开发过程中常常面临这种取舍。<br><code>LiveData</code>的简单并不是它的缺点，而是它的特点。<code>StateFlow</code>与<code>SharedFlow</code>更加强大，但是学习成本也显著的更高.<br>我们应该根据自己的需求合理选择组件的使用       </p>
+<ol>
+<li>如果你的数据流比较简单，不需要进行线程切换与复杂的数据变换，<code>LiveData</code>对你来说相信已经足够了     </li>
+<li>如果你的数据流比较复杂，需要切换线程等操作，不需要发送重复值，需要获取<code>myFlow.value</code>，<code>StateFlow</code>对你来说是个好的选择     </li>
+<li>如果你的数据流比较复杂，同时不需要获取<code>myFlow.value</code>，需要配置新用户订阅重播无素的个数，或者需要发送重复的值，可以考虑使用<code>SharedFlow</code></li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://juejin.cn/post/6854573211930066951" target="_blank" rel="noopener">Google 推荐在 MVVM 架构中使用 Kotlin Flow</a><br><a href="https://alexzh.com/migrate-from-livedata-to-stateflow-and-sharedflow/" target="_blank" rel="noopener">Migrate from LiveData to StateFlow and SharedFlow</a><br><a href="https://juejin.cn/post/6979008878029570055" target="_blank" rel="noopener">从 LiveData 迁移到 Kotlin 数据流</a><br><a href="https://juejin.cn/post/6979793981928374308#heading-9" target="_blank" rel="noopener">关于kotlin中的Collections、Sequence、Channel和Flow (二)</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/06/java-generic-questions.html" rel="next" title="【知识点】Java泛型机制7连问">
+                <i class="fa fa-chevron-left"></i> 【知识点】Java泛型机制7连问
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/07/git-flow-compare.html" rel="prev" title="Git-flow作者称其不适用于持续交付?">
+                Git-flow作者称其不适用于持续交付? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-LiveData有什么不足"><span class="nav-number">2.</span> <span class="nav-text">1. LiveData有什么不足?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-为什么引入LiveData"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 为什么引入LiveData?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-LiveData的不足"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 LiveData的不足</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Flow介绍"><span class="nav-number">3.</span> <span class="nav-text">2. Flow介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-为什么引入Flow"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 为什么引入Flow</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SharedFlow介绍"><span class="nav-number">4.</span> <span class="nav-text">3. SharedFlow介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-为什么引入SharedFlow"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 为什么引入SharedFlow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-SharedFlow的使用"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 SharedFlow的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-将冷流转化为SharedFlow"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 将冷流转化为SharedFlow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Whilesubscribed策略"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 Whilesubscribed策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-StateFlow介绍"><span class="nav-number">5.</span> <span class="nav-text">4. StateFlow介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-为什么引入StateFlow"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 为什么引入StateFlow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-StateFlow的简单使用"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 StateFlow的简单使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-在页面中观察StateFlow"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 在页面中观察StateFlow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-页面中观察Flow的最佳方式"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 页面中观察Flow的最佳方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-StateFlow与SharedFlow有什么区别？"><span class="nav-number">6.</span> <span class="nav-text">5 StateFlow与SharedFlow有什么区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">7.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

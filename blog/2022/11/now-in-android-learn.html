@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言nowinandroid 项目是谷歌开源的示例项目，它遵循 Android 设计和开发的最佳实践，并旨在成为开发人员的有用参考 这个项目在架构演进，模块化方案，单元测试，Jetpack Compose，启动优化等多个方面都做了很好的示例，的确是一个值得学习的好项目 今天我们来学习一下 nowinandroid 项目的构建脚本，看一下都有哪些值得学习的地方 gradle.properties 中">
+<meta name="keywords" content="android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习一下 nowinandroid 的构建脚本">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2022/11/now-in-android-learn.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言nowinandroid 项目是谷歌开源的示例项目，它遵循 Android 设计和开发的最佳实践，并旨在成为开发人员的有用参考 这个项目在架构演进，模块化方案，单元测试，Jetpack Compose，启动优化等多个方面都做了很好的示例，的确是一个值得学习的好项目 今天我们来学习一下 nowinandroid 项目的构建脚本，看一下都有哪些值得学习的地方 gradle.properties 中">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p9.jpg">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.249Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="学习一下 nowinandroid 的构建脚本">
+<meta name="twitter:description" content="前言nowinandroid 项目是谷歌开源的示例项目，它遵循 Android 设计和开发的最佳实践，并旨在成为开发人员的有用参考 这个项目在架构演进，模块化方案，单元测试，Jetpack Compose，启动优化等多个方面都做了很好的示例，的确是一个值得学习的好项目 今天我们来学习一下 nowinandroid 项目的构建脚本，看一下都有哪些值得学习的地方 gradle.properties 中">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p9.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2022/11/now-in-android-learn.html">
+
+
+
+
+
+  <title>学习一下 nowinandroid 的构建脚本 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2022/11/now-in-android-learn.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">学习一下 nowinandroid 的构建脚本</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-27T14:42:09+08:00">
+                2022-11-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://github.com/android/nowinandroid" target="_blank" rel="noopener">nowinandroid</a> 项目是谷歌开源的示例项目，它遵循 Android 设计和开发的最佳实践，并旨在成为开发人员的有用参考</p>
+<p>这个项目在架构演进，模块化方案，单元测试，Jetpack Compose，启动优化等多个方面都做了很好的示例，的确是一个值得学习的好项目</p>
+<p>今天我们来学习一下 nowinandroid 项目的构建脚本，看一下都有哪些值得学习的地方</p>
+<h2 id="gradle-properties-中的配置"><a href="#gradle-properties-中的配置" class="headerlink" title="gradle.properties 中的配置"></a>gradle.properties 中的配置</h2><p>要看一个项目的构建脚本，我们首先看一下 gradle.properties</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Enable configuration caching between builds.</span></span><br><span class="line"><span class="attr">org.gradle.unsafe.configuration-cache</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">android.useAndroidX</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Non-transitive R classes is recommended and is faster/smaller</span></span><br><span class="line"><span class="attr">android.nonTransitiveRClass</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Disable build features that are enabled by default,</span></span><br><span class="line"><span class="comment"># https://developer.android.com/studio/releases/gradle-plugin#buildFeatures</span></span><br><span class="line"><span class="attr">android.defaults.buildfeatures.buildconfig</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">android.defaults.buildfeatures.aidl</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">android.defaults.buildfeatures.renderscript</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">android.defaults.buildfeatures.resvalues</span>=<span class="literal">false</span></span><br><span class="line"><span class="attr">android.defaults.buildfeatures.shaders</span>=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<p>可以看出，nowinandroid 项目主要做了以下几个配置</p>
+<ol>
+<li>开启配置阶段缓存</li>
+<li>开启 <code>androidX</code>，并且移除了 <code>Jetifier</code></li>
+<li>关闭 <code>R</code> 文件传递</li>
+<li>关闭 <code>build features</code></li>
+</ol>
+<p>前面3个配置之前都介绍过，我们来看一下关闭 <code>build features</code></p>
+<p> AGP 4.0.0 引入了一种新方法来控制您要启用和停用哪些构建功能，如<code>ViewBinding</code>，<code>BuildConfig</code>。</p>
+<p>我们可以在 gradle.properties 中全局开启或关闭某些功能，也可以在模块级 build.gradle 文件中为每个模块设置相应的选项，如下所示：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="comment">// The default value for each feature is shown below. You can change the value to</span></span><br><span class="line">    <span class="comment">// override the default behavior.</span></span><br><span class="line">    buildFeatures &#123;</span><br><span class="line">        <span class="comment">// Determines whether to generate a BuildConfig class.</span></span><br><span class="line">        buildConfig = <span class="keyword">true</span></span><br><span class="line">        <span class="comment">// Determines whether to support View Binding.</span></span><br><span class="line">        <span class="comment">// Note that the viewBinding.enabled property is now deprecated.</span></span><br><span class="line">        viewBinding = <span class="keyword">false</span></span><br><span class="line">        <span class="comment">// Determines whether to support Data Binding.</span></span><br><span class="line">        <span class="comment">// Note that the dataBinding.enabled property is now deprecated.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过停用不需要的构建可能，可以提升我们的构建性能，比如我们最熟悉的<code>BuildConfig</code>，每个模块都会生成这样一个类，但其实我们在绝大多数情况下是用不到的，因此其实可以将其默认关闭（在 AGP 8.0 中 BuildConfig 生成已经变成默认关闭了）</p>
+<h2 id="自动安装-git-hook"><a href="#自动安装-git-hook" class="headerlink" title="自动安装 git hook"></a>自动安装 git hook</h2><p>有时我们会添加一些 git hook，用于在代码提交或者 push 时做一些检查</p>
+<p>但使用 git hook 的一个问题在于，每次拉取新项目之后，都需要手动安装一下 git hook，这一点常常容易被忘记</p>
+<p>那么有没有什么办法可以自动安装 git hook 呢？nowinandroid 项目提供了一个示例</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// settings.gradle.kts</span></span><br><span class="line"></span><br><span class="line">val prePushHook = <span class="keyword">file</span>(<span class="string">".git/hooks/pre-push"</span>)</span><br><span class="line">val commitMsgHook = <span class="keyword">file</span>(<span class="string">".git/hooks/commit-msg"</span>)</span><br><span class="line">val hooksInstalled = commitMsgHook.<span class="keyword">exists</span>()</span><br><span class="line">    &amp;&amp; prePushHook.<span class="keyword">exists</span>()</span><br><span class="line">    &amp;&amp; prePushHook.readBytes().contentEquals(<span class="keyword">file</span>(<span class="string">"tools/pre-push"</span>).readBytes())</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (!hooksInstalled) &#123;</span><br><span class="line">    <span class="keyword">exec</span> &#123;</span><br><span class="line">        <span class="keyword">commandLine</span>(<span class="string">"tools/setup.sh"</span>)</span><br><span class="line">        workingDir = rootProject.projectDir</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实原理很简单，在<code>settings.gradle.kts</code>中添加以上代码，这样在 Gradle 同步时，就会自动判断 git hook 有没有被安装，如果没有被安装则自动安装</p>
+<h2 id="使用-includeBuild-而不是-buildSrc"><a href="#使用-includeBuild-而不是-buildSrc" class="headerlink" title="使用 includeBuild 而不是 buildSrc"></a>使用 includeBuild 而不是 buildSrc</h2><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">pluginManagement</span> &#123;</span><br><span class="line">    <span class="selector-tag">includeBuild</span>(<span class="string">"build-logic"</span>)</span><br><span class="line">    <span class="selector-tag">repositories</span> &#123;</span><br><span class="line">        <span class="selector-tag">google</span>()</span><br><span class="line">        <span class="selector-tag">mavenCentral</span>()</span><br><span class="line">        <span class="selector-tag">gradlePluginPortal</span>()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为了支持在不同的模块间共享构建逻辑，此前我们常常会添加一个 buildSrc 模块</p>
+<p>但是 buildSrc 模块的问题在于每次发生修改都会导致项目的绝大多数缓存失效，从而导致构建速度变得极慢</p>
+<p>因此官方现在更推荐我们使用 includeBuild，比如 nowinandroid 的构建逻辑就通过 includeBuild 放在了 <code>build-logic</code> 目录</p>
+<h2 id="如何复用-build-gradle-代码"><a href="#如何复用-build-gradle-代码" class="headerlink" title="如何复用 build.gradle 代码"></a>如何复用 build.gradle 代码</h2><p>其实我们项目中的各个模块的 build.gradle 中的代码，大部分是重复的，做的都是一些重复的配置，当要修改时就需要一个一个去修改了</p>
+<p>nowinandroid 通过抽取重复配置的方式大幅度的减少了 build.gradle 中的代码，如下所示</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">   <span class="built_in"> id</span>(<span class="string">"nowinandroid.android.feature"</span>)</span><br><span class="line">   <span class="built_in"> id</span>(<span class="string">"nowinandroid.android.library.compose"</span>)</span><br><span class="line">   <span class="built_in"> id</span>(<span class="string">"nowinandroid.android.library.jacoco"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">    <span class="type">namespace</span> = <span class="string">"com.google.samples.apps.nowinandroid.feature.author"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    implementation(libs.kotlinx.datetime)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是 nowinandroid 的一个 feature 模块，可以看出除了每个模块不同的<code>namespace</code>与各个模块的依赖之外，其他的内容都抽取到<code>nowinandroid.android.feature</code>等插件中去了，而这些插件的代码都存放在<code>build-logic</code> 目录中，通过 includeBuild 引入，大家可自行查看</p>
+<p>总得来说，通过这种方式可以大幅减少重复配置代码，当配置需要迁移时也更加方便</p>
+<h2 id="使用-Version-Catalog"><a href="#使用-Version-Catalog" class="headerlink" title="使用 Version Catalog"></a>使用 Version Catalog</h2><p>在 build.gradle 中添加依赖有以下几个痛点</p>
+<ol>
+<li>项目依赖统一管理，在单独文件中配置</li>
+<li>不同Module中的依赖版本号统一</li>
+<li>添加依赖时支持代码提示</li>
+</ol>
+<p>针对这几种需求，Gradle7.0 推出了一个新的特性，使用 Version Catalog 统一依赖版本，它支持以下特性：</p>
+<ul>
+<li>对所有 module 可见，可统一管理所有module的依赖</li>
+<li>支持声明依赖bundles,即总是一起使用的依赖可以组合在一起</li>
+<li>支持版本号与依赖名分离，可以在多个依赖间共享版本号</li>
+<li>支持在单独的libs.versions.toml文件中配置依赖</li>
+<li>支持代码提示(仅 kts)</li>
+</ul>
+<p><img src="https://raw.githubusercontents.com/RicardoJiang/resource/main/2022/november/p9.jpg" alt></p>
+<p>noinandroid 中目前已经全面启用了 Version Catalog，如上所示，统一依赖版本，支持代码提示，体验还是不错的</p>
+<p>关于 Version Catalog 的具体使用可以查看：<a href="https://juejin.cn/post/6997396071055900680" target="_blank" rel="noopener">【Gradle7.0】依赖统一管理的全新方式，了解一下~</a></p>
+<h2 id="代码格式检查"><a href="#代码格式检查" class="headerlink" title="代码格式检查"></a>代码格式检查</h2><p>nowinandroid 作为一个开源项目，不可避免地会有第三方贡献一些代码，因此也需要在代码合并前做一些格式检查，保证代码风格的统一</p>
+<p>nowinandroid 通过 spotless 来检查代码格式，主要是通过两种方式触发    </p>
+<ol>
+<li>通过上面提到的 git hook，在代码 push 时触发检查</li>
+<li>通过 github workflow，在代码 push 到 main 分支时触发检查</li>
+</ol>
+<p>上面两种方式都会调用以下命令</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./gradlew</span> spotlessCheck <span class="params">--init-script</span> gradle/init.gradle.kts <span class="params">--no-configuration-cache</span> <span class="params">--stacktrace</span></span><br></pre></td></tr></table></figure>
+<p>可以看出，这里主要是执行 spotlessCheck 任务，并且指定了 init-script，我们来看一下 init.gradle.kts 里面做了什么</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// init.gradle.kts</span></span><br><span class="line">rootProject &#123;</span><br><span class="line">    subprojects &#123;</span><br><span class="line">        apply&lt;com<span class="selector-class">.diffplug</span><span class="selector-class">.gradle</span><span class="selector-class">.spotless</span>.SpotlessPlugin&gt;()</span><br><span class="line">        extensions.configure&lt;com<span class="selector-class">.diffplug</span><span class="selector-class">.gradle</span><span class="selector-class">.spotless</span>.SpotlessExtension&gt; &#123;</span><br><span class="line">            kotlin &#123;</span><br><span class="line">                target(<span class="string">"**/*.kt"</span>)</span><br><span class="line">                targetExclude(<span class="string">"**/build/**/*.kt"</span>)</span><br><span class="line">                ktlint(ktlintVersion).userData(mapOf(<span class="string">"android"</span> to <span class="string">"true"</span>))</span><br><span class="line">                licenseHeaderFile(rootProject.file(<span class="string">"spotless/copyright.kt"</span>))</span><br><span class="line">            &#125;</span><br><span class="line">            format(<span class="string">"kts"</span>) &#123;</span><br><span class="line">                target(<span class="string">"**/*.kts"</span>)</span><br><span class="line">                targetExclude(<span class="string">"**/build/**/*.kts"</span>)</span><br><span class="line">                <span class="comment">// Look for the first line that doesn't have a block comment (assumed to be the license)</span></span><br><span class="line">                licenseHeaderFile(rootProject.file(<span class="string">"spotless/copyright.kts"</span>), <span class="string">"(^(?![\\/ ]\\*).*$)"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            format(<span class="string">"xml"</span>) &#123;</span><br><span class="line">                target(<span class="string">"**/*.xml"</span>)</span><br><span class="line">                targetExclude(<span class="string">"**/build/**/*.xml"</span>)</span><br><span class="line">                <span class="comment">// Look for the first XML tag that isn't a comment (&lt;!--) or the xml declaration (&lt;?xml)</span></span><br><span class="line">                licenseHeaderFile(rootProject.file(<span class="string">"spotless/copyright.xml"</span>), <span class="string">"(&lt;[^!?])"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，这里指定了对于 kotlin , kts , xml 等文件的格式要求，比如 kotlin 代码需要遵守 ktlint 规范，并且文件开头必须是 license 声明</p>
+<h2 id="自定义-lint-检查"><a href="#自定义-lint-检查" class="headerlink" title="自定义 lint 检查"></a>自定义 lint 检查</h2><p>除了代码风格的统一，nowinandroid 项目还自定义了一些 lint 检查，跟 spoltess 一样，也是通过 git hook 与 github workflow 两种方式触发，两种方式都会触发以下代码</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./gradlew</span> lintDemoDebug <span class="params">--stacktrace</span></span><br></pre></td></tr></table></figure>
+<p>nowinandroid 中有一个自定义的 lint 模块，自定义 lint 规则就定义在这里，如下所示：</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DesignSystemDetector</span> : <span class="type">Detector</span></span>(), Detector.UastScanner &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">createUastHandler</span><span class="params">(context: <span class="type">JavaContext</span>)</span></span>: UElementHandler &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">object</span> : UElementHandler() &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">visitCallExpression</span><span class="params">(node: <span class="type">UCallExpression</span>)</span></span> &#123;</span><br><span class="line">                <span class="keyword">val</span> name = node.methodName ?: <span class="keyword">return</span></span><br><span class="line">                <span class="keyword">val</span> preferredName = METHOD_NAMES[name] ?: <span class="keyword">return</span></span><br><span class="line">                reportIssue(context, node, name, preferredName)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">visitQualifiedReferenceExpression</span><span class="params">(node: <span class="type">UQualifiedReferenceExpression</span>)</span></span> &#123;</span><br><span class="line">                <span class="keyword">val</span> name = node.receiver.asRenderString()</span><br><span class="line">                <span class="keyword">val</span> preferredName = RECEIVER_NAMES[name] ?: <span class="keyword">return</span></span><br><span class="line">                reportIssue(context, node, name, preferredName)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="meta">@JvmField</span></span><br><span class="line">        <span class="keyword">val</span> ISSUE: Issue = Issue.create(</span><br><span class="line">            id = <span class="string">"DesignSystem"</span>,</span><br><span class="line">            briefDescription = <span class="string">"Design system"</span>,</span><br><span class="line">            explanation = <span class="string">"This check highlights calls in code that use Compose Material "</span> +</span><br><span class="line">                <span class="string">"composables instead of equivalents from the Now in Android design system "</span> +</span><br><span class="line">                <span class="string">"module."</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Unfortunately :lint is a Java module and thus can't depend on the :core-designsystem</span></span><br><span class="line">        <span class="comment">// Android module, so we can't use composable function references (eg. ::Button.name)</span></span><br><span class="line">        <span class="comment">// instead of hardcoded names.</span></span><br><span class="line">        <span class="keyword">val</span> METHOD_NAMES = mapOf(</span><br><span class="line">            <span class="string">"MaterialTheme"</span> to <span class="string">"NiaTheme"</span>,</span><br><span class="line">            <span class="string">"Button"</span> to <span class="string">"NiaFilledButton"</span>,</span><br><span class="line">            <span class="string">"OutlinedButton"</span> to <span class="string">"NiaOutlinedButton"</span>,</span><br><span class="line">            <span class="comment">// ...</span></span><br><span class="line">        )</span><br><span class="line">        <span class="keyword">val</span> RECEIVER_NAMES = mapOf(</span><br><span class="line">            <span class="string">"Icons"</span> to <span class="string">"NiaIcons"</span></span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">reportIssue</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            context: <span class="type">JavaContext</span>, node: <span class="type">UElement</span>, name: <span class="type">String</span>, preferredName: <span class="type">String</span></span></span></span><br><span class="line"><span class="function"><span class="params">        )</span></span> &#123;</span><br><span class="line">            context.report(</span><br><span class="line">                ISSUE, node, context.getLocation(node),</span><br><span class="line">                <span class="string">"Using <span class="variable">$name</span> instead of <span class="variable">$preferredName</span>"</span></span><br><span class="line">            )</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>总得来说，这个自定义规则是检查是否使用了 Compose 的默认 Material 组件而没有使用 nowinandroid 封装好的组件，如果检查不通过则会抛出异常，提醒开发者修改</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了 nowinandroid 项目构建脚本中的一系列小技巧，具体包括以下内容</p>
+<ol>
+<li>gradle.properties 中的配置</li>
+<li>自动安装 git hook</li>
+<li>使用 includeBuild 而不是 buildSrc</li>
+<li>如何复用 build.gradle 代码</li>
+<li>使用 Version Catalog</li>
+<li>代码格式检查</li>
+<li>自定义 lint 检查</li>
+</ol>
+<p>希望对你有所帮助~</p>
+<h3 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h3><p><a href="https://github.com/android/nowinandroid" target="_blank" rel="noopener">https://github.com/android/nowinandroid</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2022/10/android-compile-speed.html" rel="next" title="KAE 将被正式移除，如何无缝迁移？">
+                <i class="fa fa-chevron-left"></i> KAE 将被正式移除，如何无缝迁移？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2022/12/2022-sum-up.html" rel="prev" title="江同学的 2022 年终总结，请查收~">
+                江同学的 2022 年终总结，请查收~ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gradle-properties-中的配置"><span class="nav-number">2.</span> <span class="nav-text">gradle.properties 中的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动安装-git-hook"><span class="nav-number">3.</span> <span class="nav-text">自动安装 git hook</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-includeBuild-而不是-buildSrc"><span class="nav-number">4.</span> <span class="nav-text">使用 includeBuild 而不是 buildSrc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何复用-build-gradle-代码"><span class="nav-number">5.</span> <span class="nav-text">如何复用 build.gradle 代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Version-Catalog"><span class="nav-number">6.</span> <span class="nav-text">使用 Version Catalog</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码格式检查"><span class="nav-number">7.</span> <span class="nav-text">代码格式检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义-lint-检查"><span class="nav-number">8.</span> <span class="nav-text">自定义 lint 检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#项目地址"><span class="nav-number">9.1.</span> <span class="nav-text">项目地址</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

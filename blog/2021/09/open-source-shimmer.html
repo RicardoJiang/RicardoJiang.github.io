@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="compose,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言骨架屏是页面的一个空白版本，通常会在页面完全渲染之前，通过一些灰色的区块大致勾勒出轮廓，待数据加载完成后，再替换成真实的内容。骨架屏加载中效果，比起传统的加载中效果可以提供更多信息，用户体验更好，因此也变得越来越流行本文主要介绍如何使用Compose实现一个简单易用的骨架屏效果,有兴趣的同学可以点个Star：Compose版骨架屏 效果图首先看下最终的效果图 特性 简单易用，可复用页面UI,不">
+<meta name="keywords" content="compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【开源项目】简单易用的Compose版骨架屏,了解一下~">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/09/open-source-shimmer.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言骨架屏是页面的一个空白版本，通常会在页面完全渲染之前，通过一些灰色的区块大致勾勒出轮廓，待数据加载完成后，再替换成真实的内容。骨架屏加载中效果，比起传统的加载中效果可以提供更多信息，用户体验更好，因此也变得越来越流行本文主要介绍如何使用Compose实现一个简单易用的骨架屏效果,有兴趣的同学可以点个Star：Compose版骨架屏 效果图首先看下最终的效果图 特性 简单易用，可复用页面UI,不">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p1.gif">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p2.gif">
+<meta property="og:image" content="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/10/24/16dfbb120666a993~tplv-t2oaga2asx-watermark.awebp">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.244Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【开源项目】简单易用的Compose版骨架屏,了解一下~">
+<meta name="twitter:description" content="前言骨架屏是页面的一个空白版本，通常会在页面完全渲染之前，通过一些灰色的区块大致勾勒出轮廓，待数据加载完成后，再替换成真实的内容。骨架屏加载中效果，比起传统的加载中效果可以提供更多信息，用户体验更好，因此也变得越来越流行本文主要介绍如何使用Compose实现一个简单易用的骨架屏效果,有兴趣的同学可以点个Star：Compose版骨架屏 效果图首先看下最终的效果图 特性 简单易用，可复用页面UI,不">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p1.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/09/open-source-shimmer.html">
+
+
+
+
+
+  <title>【开源项目】简单易用的Compose版骨架屏,了解一下~ | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/09/open-source-shimmer.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【开源项目】简单易用的Compose版骨架屏,了解一下~</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-04T15:30:11+08:00">
+                2021-09-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>骨架屏是页面的一个空白版本，通常会在页面完全渲染之前，通过一些灰色的区块大致勾勒出轮廓，待数据加载完成后，再替换成真实的内容。骨架屏加载中效果，比起传统的加载中效果可以提供更多信息，用户体验更好，因此也变得越来越流行<br>本文主要介绍如何使用Compose实现一个简单易用的骨架屏效果,有兴趣的同学可以点个<code>Star</code>：<a href="https://github.com/shenzhen2017/ComposeShimmer" target="_blank" rel="noopener">Compose版骨架屏</a></p>
+<h2 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h2><p>首先看下最终的效果图<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p1.gif" alt><br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/september/p2.gif" alt></p>
+<h2 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h2><ol>
+<li>简单易用，可复用页面<code>UI</code>,不需要针对骨架屏定制<code>UI</code>        </li>
+<li>支持设置骨架屏是否显示，一般结合加载状态使用      </li>
+<li>支持设置骨架屏背景与高亮颜色    </li>
+<li>支持设置骨架屏高度部分宽度，渐变部分宽度       </li>
+<li>支持设置骨架屏动画的角度与方向</li>
+<li>支持设置骨架屏动画的时间与两次动画间隔</li>
+</ol>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="接入"><a href="#接入" class="headerlink" title="接入"></a>接入</h3><p>第 1 步:在工程的<code>build.gradle</code>中添加：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">allprojects &#123;</span><br><span class="line">	repositories &#123;</span><br><span class="line">		...</span><br><span class="line">		mavenCentral()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第2步：在应用的<code>build.gradle</code>中添加：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">        implementation <span class="string">'io.github.shenzhen2017:shimmer:1.0.0'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h3><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Composable</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">ShimmerSample</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> loading: <span class="built_in">Boolean</span> <span class="keyword">by</span> remember &#123;</span><br><span class="line">        mutableStateOf(<span class="literal">true</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    Column(</span><br><span class="line">        modifier = Modifier</span><br><span class="line">            .fillMaxWidth()</span><br><span class="line">            .shimmer(loading,config = ShimmerConfig())</span><br><span class="line">    ) &#123;</span><br><span class="line">        repeat(<span class="number">3</span>) &#123;</span><br><span class="line">            PlaceHolderItem()</span><br><span class="line">            Spacer(modifier = Modifier.height(<span class="number">10</span>.dp))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上所示:    </p>
+<ol>
+<li>只需要在<code>Column</code>的<code>Modifier</code>中加上<code>shimmer</code>，<code>Column</code>下的所有组件即可实现骨架屏效果    </li>
+<li>可通过<code>loading</code>参数，控制骨架屏效果是否显示    </li>
+<li>如果需要定制骨架屏动画效果，也可通过一些参数配置         </li>
+</ol>
+<p>具体主要有以下这些参数<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">ShimmerConfig</span></span>(</span><br><span class="line">    <span class="comment">// 未高亮部分颜色</span></span><br><span class="line">    <span class="keyword">val</span> contentColor: Color = Color.LightGray.copy(alpha = <span class="number">0.3f</span>),</span><br><span class="line">    <span class="comment">// 高亮部分颜色</span></span><br><span class="line">    <span class="keyword">val</span> higLightColor: Color = Color.LightGray.copy(alpha = <span class="number">0.9f</span>),</span><br><span class="line">    <span class="comment">// 渐变部分宽度</span></span><br><span class="line">    <span class="meta">@FloatRange(from = 0.0, to = 1.0)</span></span><br><span class="line">    <span class="keyword">val</span> dropOff: <span class="built_in">Float</span> = <span class="number">0.5f</span>,</span><br><span class="line">    <span class="comment">// 高亮部分宽度</span></span><br><span class="line">    <span class="meta">@FloatRange(from = 0.0, to = 1.0)</span></span><br><span class="line">    <span class="keyword">val</span> intensity: <span class="built_in">Float</span> = <span class="number">0.2f</span>,</span><br><span class="line">    <span class="comment">//骨架屏动画方向</span></span><br><span class="line">    <span class="keyword">val</span> direction: ShimmerDirection = ShimmerDirection.LeftToRight,</span><br><span class="line">    <span class="comment">//动画旋转角度</span></span><br><span class="line">    <span class="keyword">val</span> angle: <span class="built_in">Float</span> = <span class="number">20f</span>,</span><br><span class="line">    <span class="comment">//动画时长</span></span><br><span class="line">    <span class="keyword">val</span> duration: <span class="built_in">Float</span> = <span class="number">1000f</span>,</span><br><span class="line">    <span class="comment">//两次动画间隔</span></span><br><span class="line">    <span class="keyword">val</span> delay: <span class="built_in">Float</span> = <span class="number">200f</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<h2 id="主要原理"><a href="#主要原理" class="headerlink" title="主要原理"></a>主要原理</h2><h3 id="通过图像混合模式复用页面UI"><a href="#通过图像混合模式复用页面UI" class="headerlink" title="通过图像混合模式复用页面UI"></a>通过图像混合模式复用页面<code>UI</code></h3><p>如果我们要实现骨架屏效果，首先想到的是需要按照页面的结构再写一套<code>UI</code>，然后在加载中的时候，显示这套<code>UI</code>，否则隐藏<br>一般的加载中效果都是这样实现的，但这样会带来一个问题，不同的页面结构不同，那我们岂不是要一个页面就重写一套<code>UI</code>?这显然是不可接受的     </p>
+<p>我们可以想到，页面的结构其实我们已经写过一遍了，如果我们能复用我们写的页面结构不就好了吗？<br>我们可以通过图像混合模式来实现这一点      </p>
+<p>图像混合模式定义的是，当两个图像合成时，图像最终的展示方式。在<code>Androd</code>中，有相应的<code>API</code>接口来支持图像混合模式，即<code>Xfermode</code>.<br>图像混合模式主要有以下16种,以下这张图片从一定程度上形象地说明了图像混合的作用，两个图形一圆一方通过一定的计算产生不同的组合效果，具体如下<br><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/10/24/16dfbb120666a993~tplv-t2oaga2asx-watermark.awebp" alt><br>我们介绍几个常用的,其它的感兴趣的同学可自行查阅         </p>
+<ul>
+<li><code>SRC_IN</code>:只在源图像和目标图像相交的地方绘制【源图像】</li>
+<li><code>DST_IN</code>:只在源图像和目标图像相交的地方绘制【目标图像】，绘制效果受到源图像对应地方透明度影响</li>
+<li><code>SRC_OUT</code>:只在源图像和目标图像不相交的地方绘制【源图像】，相交的地方根据目标图像的对应地方的<code>alpha</code>进行过滤，目标图像完全不透明则完全过滤，完全透明则不过滤</li>
+<li><code>DST_OUT</code>:只在源图像和目标图像不相交的地方绘制【目标图像】，在相交的地方根据源图像的<code>alpha</code>进行过滤，源图像完全不透明则完全过滤，完全透明则不过滤</li>
+</ul>
+<p>如果我们把页面的<code>UI</code>结构作为目标图像，骨架屏效果作为源图像，然后使用<code>SRC_IN</code>混合模式<br>就可以实现只在页面的结构上显示骨架屏，在空白部分不显示，这样就可以避免重复写<code>UI</code>了     </p>
+<h3 id="通过平移实现动画效果"><a href="#通过平移实现动画效果" class="headerlink" title="通过平移实现动画效果"></a>通过平移实现动画效果</h3><p>上面我们已经实现了在页面结构上显示骨架屏，但是骨架屏效果还有一个动画效果<br>其实也很简单，给骨架屏设置一个渐变效果，然后做一个平移动画，然后看起来就是现在的骨架屏闪光动画了<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> Modifier.<span class="title">shimmer</span><span class="params">()</span></span>: Modifier = composed &#123;</span><br><span class="line">    <span class="keyword">var</span> progress: <span class="built_in">Float</span> <span class="keyword">by</span> remember &#123; mutableStateOf(<span class="number">0f</span>) &#125;</span><br><span class="line">    <span class="keyword">val</span> infiniteTransition = rememberInfiniteTransition()</span><br><span class="line">    progress = infiniteTransition.animateFloat().value  <span class="comment">// 动画效果，计算百分比</span></span><br><span class="line">    ShimmerModifier(visible = visible, progress = progress, config = config)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">internal</span> <span class="class"><span class="keyword">class</span> <span class="title">ShimmerModifier</span></span>(progress:<span class="built_in">Float</span>) : DrawModifier, LayoutModifier &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> paint = Paint().apply &#123;</span><br><span class="line">        blendMode = BlendMode.SrcIn <span class="comment">//设置混合模式</span></span><br><span class="line">        shader = LinearGradientShader(Offset(<span class="number">0f</span>, <span class="number">0f</span>),toOffset,colors,colorStops)<span class="comment">//设置渐变色</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> ContentDrawScope.<span class="title">draw</span><span class="params">()</span></span> &#123;</span><br><span class="line">        drawContent()</span><br><span class="line">        <span class="keyword">val</span> (dx, dy) = getOffset(progress) <span class="comment">//根据progress，设置平移的位置</span></span><br><span class="line">        paint.shader?.postTranslate(dx, dy) <span class="comment">// 平移操作</span></span><br><span class="line">        it.drawRect(Rect(<span class="number">0f</span>, <span class="number">0f</span>, size.width, size.height), paint = paint)<span class="comment">//绘制骨架屏效果</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，主要是几步：   </p>
+<ol>
+<li>启动动画，获得当前进度<code>progress</code>，并根据<code>progress</code>获得当前平移的位置    </li>
+<li>设置骨架屏的背景渐变颜色与混合模式    </li>
+<li>绘制骨架屏效果    </li>
+</ol>
+<h3 id="自定义骨架屏效果"><a href="#自定义骨架屏效果" class="headerlink" title="自定义骨架屏效果"></a>自定义骨架屏效果</h3><p>上面介绍了我们提供了一些参数，可以自定义骨架屏的效果，其它参数都比较好理解，主要是以下两个参数有点难理解         </p>
+<ol>
+<li><code>dropOff</code>：渐变部分宽度     </li>
+<li><code>intensity</code>: 高亮部分宽度    </li>
+</ol>
+<p>我们知道，可以通过<code>contentColor</code>自定义普通部分颜色,<code>higLightColor</code>自定义高亮部分颜色<br>但是这两种颜色是如何分布的呢？渐变的比例是怎样的呢？可以看下下面的代码：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> paint = Paint().apply &#123;</span><br><span class="line">    shader = LinearGradientShader(Offset(<span class="number">0f</span>, <span class="number">0f</span>),toOffset,colors,colorStops)<span class="comment">//设置渐变色</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> colors = listOf(</span><br><span class="line">    config.contentColor,</span><br><span class="line">    config.higLightColor,</span><br><span class="line">    config.higLightColor,</span><br><span class="line">    config.contentColor</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">val</span> colorStops: List&lt;<span class="built_in">Float</span>&gt; = listOf(</span><br><span class="line">    ((<span class="number">1f</span> - intensity - dropOff) / <span class="number">2f</span>).coerceIn(<span class="number">0f</span>, <span class="number">1f</span>),</span><br><span class="line">    ((<span class="number">1f</span> - intensity - <span class="number">0.001f</span>) / <span class="number">2f</span>).coerceIn(<span class="number">0f</span>, <span class="number">1f</span>),</span><br><span class="line">    ((<span class="number">1f</span> + intensity + <span class="number">0.001f</span>) / <span class="number">2f</span>).coerceIn(<span class="number">0f</span>, <span class="number">1f</span>),</span><br><span class="line">    ((<span class="number">1f</span> + intensity + dropOff) / <span class="number">2f</span>).coerceIn(<span class="number">0f</span>, <span class="number">1f</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>可以看出，我们的颜色渐变有以下特点：   </p>
+<ol>
+<li>渐变颜色分布为：<code>contentColor</code>-&gt;<code>higLightColor</code>-&gt;<code>higLightColor</code>-&gt;<code>contentColor</code>     </li>
+<li><code>LinearGradientShader</code>使用<code>colors</code>定义颜色,<code>colorStops</code>定义颜色渐变的分布,<code>colorStops</code>由<code>intensity</code>与<code>dropoff</code>计算得来              </li>
+<li><code>intensity</code>决定了高亮部分的宽度，即<code>intensity</code>越大，高亮部分越大      </li>
+<li><code>dropOff</code>决定了渐变部分的宽度，即<code>dropOff</code>越大，渐变部分越大          </li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="特别鸣谢"><a href="#特别鸣谢" class="headerlink" title="特别鸣谢"></a>特别鸣谢</h3><p>在实现<code>Compose</code>版本骨架屏的过程中，主要借鉴了以下开源框架的思想，有兴趣的同学也可以了解下<br><a href="https://github.com/facebook/shimmer-android" target="_blank" rel="noopener">Facebook开源的shimmer-android</a><br><a href="https://github.com/kazemihabib/compose-shimmer" target="_blank" rel="noopener">Habib Kazemi开源的compose-shimmer</a>       </p>
+<h3 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h3><p><a href="https://github.com/shenzhen2017/ComposeShimmer" target="_blank" rel="noopener">简单易用的Compose版骨架屏</a><br>开源不易，如果项目对你有所帮助，欢迎点赞,<code>Star</code>,收藏~</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/compose/" rel="tag"># compose</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/08/open-source-douban.html" rel="next" title="【开源项目】Compose仿豆瓣榜单客户端，了解一下~">
+                <i class="fa fa-chevron-left"></i> 【开源项目】Compose仿豆瓣榜单客户端，了解一下~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/09/compose-performance-summary.html" rel="prev" title="相比 XML , Compose 性能到底怎么样？">
+                相比 XML , Compose 性能到底怎么样？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#效果图"><span class="nav-number">2.</span> <span class="nav-text">效果图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特性"><span class="nav-number">3.</span> <span class="nav-text">特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">4.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#接入"><span class="nav-number">4.1.</span> <span class="nav-text">接入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单使用"><span class="nav-number">4.2.</span> <span class="nav-text">简单使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主要原理"><span class="nav-number">5.</span> <span class="nav-text">主要原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过图像混合模式复用页面UI"><span class="nav-number">5.1.</span> <span class="nav-text">通过图像混合模式复用页面UI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过平移实现动画效果"><span class="nav-number">5.2.</span> <span class="nav-text">通过平移实现动画效果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义骨架屏效果"><span class="nav-number">5.3.</span> <span class="nav-text">自定义骨架屏效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#特别鸣谢"><span class="nav-number">6.1.</span> <span class="nav-text">特别鸣谢</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目地址"><span class="nav-number">6.2.</span> <span class="nav-text">项目地址</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="github,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="前言Git-flow是由Vincent Driessen在2010年提出的一个Git分支模型,在这10年中，Git-flow在许多软件团队中变得非常流行，以至于人们开始将其视为某种标准。不过最近Vincent Driessen更新了他10年前那篇著名的A successful Git branching model，大意是Git-flow已不适用于当今持续交付的软件工程方式,推荐更简单的Githu">
+<meta name="keywords" content="github">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git-flow作者称其不适用于持续交付?">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/07/git-flow-compare.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="前言Git-flow是由Vincent Driessen在2010年提出的一个Git分支模型,在这10年中，Git-flow在许多软件团队中变得非常流行，以至于人们开始将其视为某种标准。不过最近Vincent Driessen更新了他10年前那篇著名的A successful Git branching model，大意是Git-flow已不适用于当今持续交付的软件工程方式,推荐更简单的Githu">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p5.png">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9b2a5994eafe41ec964b4792b8a9fc1a~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p6.png">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p7.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.243Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git-flow作者称其不适用于持续交付?">
+<meta name="twitter:description" content="前言Git-flow是由Vincent Driessen在2010年提出的一个Git分支模型,在这10年中，Git-flow在许多软件团队中变得非常流行，以至于人们开始将其视为某种标准。不过最近Vincent Driessen更新了他10年前那篇著名的A successful Git branching model，大意是Git-flow已不适用于当今持续交付的软件工程方式,推荐更简单的Githu">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/07/git-flow-compare.html">
+
+
+
+
+
+  <title>Git-flow作者称其不适用于持续交付? | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/07/git-flow-compare.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Git-flow作者称其不适用于持续交付?</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-12T08:53:24+08:00">
+                2021-07-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Git-flow</code>是由<code>Vincent Driessen</code>在2010年提出的一个<code>Git</code>分支模型,在这10年中，<code>Git-flow</code>在许多软件团队中变得非常流行，以至于人们开始将其视为某种标准。<br>不过最近<code>Vincent Driessen</code>更新了他10年前那篇著名的<a href="https://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="noopener">A successful Git branching model</a>，大意是<code>Git-flow</code>已不适用于当今持续交付的软件工程方式,推荐更简单的<code>Github flow</code>等模型</p>
+<p>连<code>Git-flow</code>作者都承认<code>Git-flow</code>不适合持续交付了，那我们更有必要好好研究一下了，以免掉坑里。<br>本文主要包括以下内容：<br>1.<code>Git-flow</code>介绍<br>2.为什么<code>Git-flow</code>不适用于持续交付？<br>3.<code>Github flow</code>介绍<br>4.<code>Gitlab flow</code>介绍        </p>
+<h2 id="1-Git-flow是什么"><a href="#1-Git-flow是什么" class="headerlink" title="1. Git-flow是什么?"></a>1. <code>Git-flow</code>是什么?</h2><p><code>Git-flow</code>是由<code>Vincent Driessen</code>在2010年提出的一个<code>Git</code>分支模型,其结构图如下所示，相信大家都看过<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p5.png" alt><br><code>Git-flow</code>主要包括以下分支</p>
+<ul>
+<li><code>master</code> 是长期分支，一般用于管理对外发布版本，每个<code>commit</code>对一个<code>tag</code>，也就是一个发布版本     </li>
+<li><code>develop</code> 是长期分支，一般用于作为日常开发汇总，即开发版的代码     </li>
+<li><code>feature</code> 是短期分支，一般用于一个新功能的开发  </li>
+<li><code>hotfix</code> 是短期分支 ，一般用于正式发布以后，出现<code>bug</code>，需要创建一个分支，进行<code>bug</code>修补。</li>
+<li><code>release</code> 是短期分支，一般用于发布正式版本之前（即合并到 <code>master</code> 分支之前），需要对预发布的版本进行测试。<code>release</code> 分支在经历测试之后，测试确认验收，将会被合并到 <code>develop</code> 和 <code>master</code></li>
+</ul>
+<h3 id="1-1-Git-flow工作流程"><a href="#1-1-Git-flow工作流程" class="headerlink" title="1.1 Git-flow工作流程"></a>1.1 <code>Git-flow</code>工作流程</h3><p>一般工作流程如下： </p>
+<ul>
+<li>1.日常在<code>develop</code>开发</li>
+<li>2.如果有比较大的功能或者其他需求，那么新开分支：<code>feature/xxx</code> 来做，并在这个分支上进行打包和提测。</li>
+<li>3.在封版日，将该版本上线的需求合并到<code>develop</code>，然后将开个新的分支<code>release/版本号</code>(如<code>release/1.0.1</code>),将<code>develop</code>合并至该分支。</li>
+<li>4.灰度阶段，在<code>releases/版本号</code> 分支上修复BUG，打包并发布,发布完成后反合入<code>master</code>与<code>develop</code>分支</li>
+<li>5.如果在全量发布后，发现有线上问题，那么在对应的<code>master</code>分支上新开分支<code>hotfix/{版本号}</code>来修复，并升级版本号，修复完成后，然后将<code>hotfix</code>合并到<code>master</code>，同时将合并到<code>develop</code></li>
+</ul>
+<h2 id="2-为什么Git-flow不适用于持续交付？"><a href="#2-为什么Git-flow不适用于持续交付？" class="headerlink" title="2. 为什么Git-flow不适用于持续交付？"></a>2. 为什么<code>Git-flow</code>不适用于持续交付？</h2><blockquote>
+<p>在这 10 年中，<code>Git</code> 本身已经席卷全球，并且使用 <code>Git</code> 开发的最受欢迎的软件类型正在更多地转向 <code>Web</code> 应用程序——至少在我的过滤器气泡中。 <code>Web</code> 应用程序通常是持续交付的，而不是回滚的，而且您不必支持同时 运行的多个版本的软件。</p>
+</blockquote>
+<p>如<code>Vincent Driessen</code>所述。<code>Git-flow</code>描述了<code>feature</code>分支、<code>release</code>分支、<code>master</code>或<code>develop</code>分支以及<code>hotfix</code>分支是如何相互关联的。<br>这种方法非常适用于用户下载的打包软件，例如库和桌面应用程序。</p>
+<p>然而，对于许多<code>Web</code>应用来说，<code>Git-flow</code>是矫枉过正的。有时，您的<code>develop</code>分支和<code>release</code>分支之间没有足够大的差异来区分值得。或者，您的<code>hotfix</code>分支和<code>feature</code>分支的工作流程可能相同。<br>在这种情况下，<code>Vincent Driessen</code>推荐<code>Github flow</code>分支模型</p>
+<p><code>Git-flow</code>的主要优点在于结构清晰，每个分支的任务划分的很清楚，而它的缺点自然就是有些复杂了<br><code>Git-flow</code>需要同时维护两个长期分支。大多数工具都将<code>master</code>当作默认分支，可是开发是在<code>develop</code>分支进行的，这导致经常要切换分支，非常烦人。<br>更大问题在于，这个模式是基于”版本发布”的，目标是一段时间以后产出一个新版本。但是，很多网站项目是”持续发布”，代码一有变动，就部署一次。这时，<code>master</code>分支和<code>develop</code>分支的差别不大，没必要维护两个长期分支</p>
+<h3 id="2-1-Git-fow何时值得额外的复杂性"><a href="#2-1-Git-fow何时值得额外的复杂性" class="headerlink" title="2.1 Git-fow何时值得额外的复杂性"></a>2.1 <code>Git-fow</code>何时值得额外的复杂性</h3><p>当然，是否使用<code>Git-flow</code>取决于你的业务复杂性，有时使用<code>Git-flow</code>是必须的，主要是当你需要同时维护多版本的时候,适合的是需要『多个版本并存』的场景<br>所谓『多版本并存』，就是说开发团队要同时维护多个有客户使用的版本，对于传统软件，比如我开发一个新的操作系统叫做<code>Doors</code>，先卖<code>v1</code>，卖出去1000万份，然后看在<code>v1</code>的基础上开发<code>v2</code>，但是客户会持续给<code>v1</code>提<code>bug</code>，这些<code>bug</code>既要在<code>v1</code>的后续补丁中<code>fix</code>，也要在<code>v2</code>中<code>fix</code>，等<code>v2</code>再卖出去2000万份开始开发<code>v3</code>的时候，<code>v1</code>依然有客户，我就必须要维持<code>v1</code>、<code>v2</code>、<code>v3</code>三个多版本都要支持。</p>
+<p>关于<code>Git-flow</code>同时支持多个版本，很多人可能会有疑问，因为<code>develop</code>只针对一个版本能持续交付<br>说实话我也感觉挺疑问的，后面查阅资料发现还有一个衍生的<code>support</code>分支，可以同时支持多个版本,在兴趣的同学可参考:<a href="https://mindsers.blog/post/several-versions-gitflow/" target="_blank" rel="noopener">https://mindsers.blog/post/several-versions-gitflow/</a></p>
+<h2 id="3-Github-flow介绍"><a href="#3-Github-flow介绍" class="headerlink" title="3.Github flow介绍"></a>3.<code>Github flow</code>介绍</h2><p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9b2a5994eafe41ec964b4792b8a9fc1a~tplv-k3u1fbpfcp-watermark.image" alt><br><code>Github flow</code>它只有一个长期分支，就是<code>master</code>，因此用起来非常简单。   </p>
+<ul>
+<li>第一步：根据需求，从<code>master</code>拉出新分支，不区分功能分支或补丁分支。</li>
+<li>第二步：新分支开发完成后，或者需要讨论的时候，就向<code>master</code>发起一个<code>pull request</code>（简称<code>PR</code>）。</li>
+<li>第三步：<code>Pull Request</code>既是一个通知，让别人注意到你的请求，又是一种对话机制，大家一起评审和讨论你的代码。对话过程中，你还可以不断提交代码</li>
+<li>第四步：布署流程：当项目负责人同意新功能可以发布，且代码也通过审核了。但是在代码合并之前还是要进行测试。所以要把<code>feature</code>分支的代码部署到测试环境进行测试</li>
+<li>第五步：你的<code>Pull Request</code>被接受，合并进<code>master</code>，重新部署到生产环境后，原来你拉出来的那个分支就被删除。</li>
+<li>第六步：修复正式环境<code>bug</code>流程：从<code>master</code>分支切一个<code>HotFix</code>分支，经过以上同样的流程发起<code>PR</code>合并即可</li>
+</ul>
+<h3 id="3-1-Github-flow的优点"><a href="#3-1-Github-flow的优点" class="headerlink" title="3.1 Github flow的优点"></a>3.1 <code>Github flow</code>的优点</h3><p><code>Github flow</code>的最大优点就是简单，对于”持续发布”的产品，可以说是最合适的流程。     </p>
+<h3 id="3-2-Github-flow的缺点"><a href="#3-2-Github-flow的缺点" class="headerlink" title="3.2 Github flow的缺点"></a>3.2 <code>Github flow</code>的缺点</h3><p>它的问题也在于它的假设：<code>master</code>分支的更新与产品的发布是一致的。也就是说，<code>master</code>分支的最新代码，默认就是当前的线上代码。<br>可是，有些时候并非如此，代码合并进入<code>master</code>分支，并不代表它就能立刻发布。比如，苹果商店的<code>APP</code>提交审核以后，等一段时间才能上架。这时，如果还有新的代码提交，<code>master</code>分支就会与刚发布的版本不一致。另一个例子是，有些公司有发布窗口，只有指定时间才能发布，这也会导致线上版本落后于<code>master</code>分支。<br>上面这种情况，只有<code>master</code>一个主分支就不够用了。通常，你不得不在<code>master</code>分支以外，另外新建一个<code>production</code>分支跟踪线上版本。   </p>
+<p>同时对于<code>Github flow</code>我还有个疑问，合并到<code>master</code>分支后即会部署到生产环境，但是在<code>merge</code>后的代码难道不会产生冲突吗？合并冲突难道不需要重新测试吗？如果评论区有了解的小伙伴可以解惑下</p>
+<p><code>Github flow</code>用起来比较简单，但是在很多公司的业务开发过程中一般都有开发、测试、预发布、生产几个环境，没有强有力的工具来支撑，我认为很难用这种简单的模式来实现管理。<br>看起来这种模式特别适合小团队，人少，需求少，比较容易通过这种方式管理分支。    </p>
+<h2 id="4-Gitlab-flow介绍"><a href="#4-Gitlab-flow介绍" class="headerlink" title="4.Gitlab flow介绍"></a>4.<code>Gitlab flow</code>介绍</h2><p><code>Gitlab flow</code> 是 <code>Git-flow</code>与<code>Github flow</code>的综合。它吸取了两者的优点，既有适应不同开发环境的弹性，又有单一主分支的简单和便利。它是<code>Gitlab.com</code>推荐的做法。<br><code>Gitlab flow</code>的最大原则叫做”上游优先”（<code>upsteam first</code>），即只存在一个主分支<code>master</code>，它是所有其他分支的”上游”。只有上游分支采纳的代码变化，才能应用到其他分支。<br><code>Gitlab flow</code>分为持续发布与版本发布两种情况，以适应不同的发布类型    </p>
+<h3 id="4-1-持续发布"><a href="#4-1-持续发布" class="headerlink" title="4.1 持续发布"></a>4.1 持续发布</h3><p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p6.png" alt><br>对于”持续发布”的项目，它建议在<code>master</code>分支以外，再建立不同的环境分支。<br>比如，”开发环境”的分支是<code>master</code>，”预发环境”的分支是<code>pre-production</code>，”生产环境”的分支是<code>production</code>。    </p>
+<p>开发分支是预发分支的”上游”，预发分支又是生产分支的”上游”。代码的变化，必须由”上游”向”下游”发展。比如，生产环境出现了<code>bug</code>，这时就要新建一个功能分支，先把它合并到<code>master</code>，确认没有问题，再<code>cherry-pick</code>到<code>pre-production</code>，这一步也没有问题，才进入<code>production</code>。</p>
+<p>只有紧急情况，才允许跳过上游，直接合并到下游分支。</p>
+<h3 id="4-2-版本发布"><a href="#4-2-版本发布" class="headerlink" title="4.2 版本发布"></a>4.2 版本发布</h3><p><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/july/p7.png" alt><br>对于”版本发布”的项目，建议的做法是每一个稳定版本，都要从<code>master</code>分支拉出一个分支，比如<code>2-3-stable</code>、<code>2-4-stable</code>等等。<br>以后，只有修补<code>bug</code>，才允许将代码合并到这些分支，并且此时要更新小版本号。     </p>
+<h3 id="4-3-Gitlab-flow开发流程"><a href="#4-3-Gitlab-flow开发流程" class="headerlink" title="4.3 Gitlab flow开发流程"></a>4.3 <code>Gitlab flow</code>开发流程</h3><p>对于<code>Android</code>开发，我们一般使用版本发布，因此我们使用<code>Gitlab flow</code>开发的工作流为     </p>
+<ul>
+<li>1.新的迭代开始，所有开发人员从主干<code>master</code>拉个人分支开发特性, 分支命名规范 <code>feature-name</code></li>
+<li>2.开发完成后，在迭代结束前，合入<code>master</code>分支</li>
+<li>3.<code>master</code>分支合并后，自动<code>cicd</code>到<code>dev</code>环境</li>
+<li>4.开发自测通过后，从<code>master</code>拉取要发布的分支，<code>release-$version</code>，将这个分支部署到测试环境进行测试</li>
+<li>5.测出的<code>bug</code>，通过从<code>release-$versio</code>拉出分支进行修复，修复完成后，再合入<code>release-$versio</code></li>
+<li>6.正式发布版本，如果上线后，又有<code>bug</code>，根据5的方式处理</li>
+<li>7.等发布版本稳定后，将<code>release-$versio</code>反合入主干<code>master</code>分支</li>
+</ul>
+<p>值得注意的是，按照<code>Github flow</code>规范，第5步如果测出<code>bug</code>,应该在<code>master</code>上修改，然后<code>cherry-pick</code>到<code>releases</code>上来，但是这样做太麻烦了，直接在<code>releases</code>分支上修复<code>bug</code>然后再反合入<code>master</code>分支应该是一个简单而且可以接受的做法</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>正如<code>Vincent Driessen</code>所说的,<strong>总而言之，请永远记住，灵丹妙药并不存在。考虑你自己的背景。不要讨厌。自己决定</strong>。      </p>
+<p><code>Git-flow</code>适用于大团队多版本并存迭代的开发流程<br><code>Github-flow</code>适用于中小型团队持续集成的开发流程<br><code>Gitlab-flow</code>适用范围则介于上面二者之间，支持持续发布与版本发布两种情况    </p>
+<p>总得来说，各种<code>Git</code>工作流自有其适合工作的场景,毕竟软件工程中没有银弹,读者可根据自己的项目情况对比选择使用，自己决定~      </p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.zhihu.com/question/379545619" target="_blank" rel="noopener">如何看待 Git flow 发明人称其不适用于持续交付？</a><br><a href="https://www.freshconsulting.com/insights/blog/git-development-workflows-git-flow-vs-github-flow/" target="_blank" rel="noopener">Git 开发工作流程：Git Flow 与 GitHub Flow</a><br><a href="http://www.ruanyifeng.com/blog/2015/12/git-workflow.html" target="_blank" rel="noopener">Git 工作流程</a><br><a href="https://www.cnblogs.com/xiaoqi/p/gitlab-flow.html" target="_blank" rel="noopener">高效团队的gitlab flow最佳实践</a></p>
+<h3 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h3><p>一些大厂的<code>Git</code>工作流，有兴趣的同学可以了解下<br><a href="https://developer.aliyun.com/article/573549" target="_blank" rel="noopener">在阿里，我们如何管理代码分支？</a><br><a href="https://juejin.cn/post/6875874533228838925" target="_blank" rel="noopener">字节研发设施下的 Git 工作流</a><br><a href="https://juejin.cn/post/6844903593015787534" target="_blank" rel="noopener">简介我的 Git Work Flow</a>         </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/github/" rel="tag"># github</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/07/need-replace-livedata.html" rel="next" title="官方推荐 Flow 取代 LiveData,有必要吗？">
+                <i class="fa fa-chevron-left"></i> 官方推荐 Flow 取代 LiveData,有必要吗？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/07/android-view-question.html" rel="prev" title="从 XML 到 View 显示在屏幕上，都发生了什么?">
+                从 XML 到 View 显示在屏幕上，都发生了什么? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Git-flow是什么"><span class="nav-number">2.</span> <span class="nav-text">1. Git-flow是什么?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Git-flow工作流程"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 Git-flow工作流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-为什么Git-flow不适用于持续交付？"><span class="nav-number">3.</span> <span class="nav-text">2. 为什么Git-flow不适用于持续交付？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Git-fow何时值得额外的复杂性"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 Git-fow何时值得额外的复杂性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Github-flow介绍"><span class="nav-number">4.</span> <span class="nav-text">3.Github flow介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Github-flow的优点"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 Github flow的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Github-flow的缺点"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 Github flow的缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Gitlab-flow介绍"><span class="nav-number">5.</span> <span class="nav-text">4.Gitlab flow介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-持续发布"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 持续发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-版本发布"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 版本发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Gitlab-flow开发流程"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 Gitlab flow开发流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">6.1.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#扩展阅读"><span class="nav-number">6.2.</span> <span class="nav-text">扩展阅读</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ricardo-谁谓河广" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="泛型机制是我们开发中的常用技巧，也是面试常见问题不过泛型机制这个知识点也比较繁杂又不成体系，学了容易忘本文从几个问题出发梳理Java泛型机制知识点，如果对你有用，欢迎点赞~        本文主要包括以下内容1.我们为什么需要泛型?2.什么是泛型擦除及泛型擦除带来的一些问题,如retrofit怎么获得擦除后的类型,Gson怎么获得擦除后的类型?3.什么是PECS原则      本文目录如下">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【知识点】Java泛型机制7连问">
+<meta property="og:url" content="http://RicardoJiang.github.io/blog/2021/06/java-generic-questions.html">
+<meta property="og:site_name" content="Ricardo-谁谓河广">
+<meta property="og:description" content="泛型机制是我们开发中的常用技巧，也是面试常见问题不过泛型机制这个知识点也比较繁杂又不成体系，学了容易忘本文从几个问题出发梳理Java泛型机制知识点，如果对你有用，欢迎点赞~        本文主要包括以下内容1.我们为什么需要泛型?2.什么是泛型擦除及泛型擦除带来的一些问题,如retrofit怎么获得擦除后的类型,Gson怎么获得擦除后的类型?3.什么是PECS原则      本文目录如下">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/june/p1.png">
+<meta property="og:updated_time" content="2023-10-02T05:09:49.243Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【知识点】Java泛型机制7连问">
+<meta name="twitter:description" content="泛型机制是我们开发中的常用技巧，也是面试常见问题不过泛型机制这个知识点也比较繁杂又不成体系，学了容易忘本文从几个问题出发梳理Java泛型机制知识点，如果对你有用，欢迎点赞~        本文主要包括以下内容1.我们为什么需要泛型?2.什么是泛型擦除及泛型擦除带来的一些问题,如retrofit怎么获得擦除后的类型,Gson怎么获得擦除后的类型?3.什么是PECS原则      本文目录如下">
+<meta name="twitter:image" content="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/june/p1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"hide","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://RicardoJiang.github.io/blog/2021/06/java-generic-questions.html">
+
+
+
+
+
+  <title>【知识点】Java泛型机制7连问 | Ricardo-谁谓河广</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ricardo-谁谓河广</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">谁谓河广</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://RicardoJiang.github.io/blog/2021/06/java-generic-questions.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ricardo.M.Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ricardo-谁谓河广">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【知识点】Java泛型机制7连问</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-27T20:16:46+08:00">
+                2021-06-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>泛型机制是我们开发中的常用技巧，也是面试常见问题<br>不过泛型机制这个知识点也比较繁杂又不成体系，学了容易忘<br>本文从几个问题出发梳理<code>Java</code>泛型机制知识点，如果对你有用，欢迎点赞~       </p>
+<p>本文主要包括以下内容<br>1.我们为什么需要泛型?<br>2.什么是泛型擦除及泛型擦除带来的一些问题,如<code>retrofit</code>怎么获得擦除后的类型,<code>Gson</code>怎么获得擦除后的类型?<br>3.什么是<code>PECS</code>原则     </p>
+<p>本文目录如下<br><img src="https://raw.githubusercontents.com/shenzhen2017/resource/main/2021/june/p1.png" alt>          </p>
+<h2 id="1-我们为什么需要泛型"><a href="#1-我们为什么需要泛型" class="headerlink" title="1.我们为什么需要泛型?"></a>1.我们为什么需要泛型?</h2><p>我们为什么需要泛型，即泛型有什么用?<br>首先举两个例子    </p>
+<h3 id="1-1-求和函数"><a href="#1-1-求和函数" class="headerlink" title="1.1 求和函数"></a>1.1 求和函数</h3><p>实际开发中，经常有数值类型求和的需求，例如实现<code>int</code>类型的加法, 有时候还需要实现<code>long</code>类型的求和 如果还需要<code>double</code>类型的求和，又需要重新在重载一个输入是<code>double</code>类型的<code>add</code>方法。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">addInt</span><span class="params">(<span class="keyword">int</span> x,<span class="keyword">int</span> y)</span></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> x+y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">addFloat</span><span class="params">(<span class="keyword">float</span> x,<span class="keyword">float</span> y)</span></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> x+y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果没有泛型，我们需要写不少重复代码     </p>
+<h3 id="1-2-List中添加元素"><a href="#1-2-List中添加元素" class="headerlink" title="1.2 List中添加元素"></a>1.2 <code>List</code>中添加元素</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">List list = <span class="keyword">new</span> ArrayList();</span><br><span class="line">list.add(<span class="string">"mark"</span>);</span><br><span class="line">list.add(<span class="string">"OK"</span>);</span><br><span class="line">list.add(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.size(); i++) &#123;</span><br><span class="line">        String name = list.get(i); <span class="comment">// 1</span></span><br><span class="line">        System.out.println(<span class="string">"name:"</span> + name);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>1.<code>list</code>默认是<code>Object</code>类型，因此可以存任意类型数据<br>2.但是当取出来时，我们并不知道取出元素的类型，就需要进行强制类型转换了，并且容易出错    </p>
+<h3 id="1-3-泛型机制的优点"><a href="#1-3-泛型机制的优点" class="headerlink" title="1.3 泛型机制的优点"></a>1.3 泛型机制的优点</h3><p>从上面的两个例子我们可以直观的得出泛型机制的优点<br>1.使用泛型可以编写模板代码来适应任意类型，减少重复代码<br>2.使用时不必对类型进行强制转换,方便且减少出错机会   </p>
+<h2 id="2-泛型擦除"><a href="#2-泛型擦除" class="headerlink" title="2.泛型擦除"></a>2.泛型擦除</h2><h3 id="2-1-什么是泛型擦除"><a href="#2-1-什么是泛型擦除" class="headerlink" title="2.1 什么是泛型擦除?"></a>2.1 什么是泛型擦除?</h3><p>大家都知道，<code>Java</code>的泛型是伪泛型，这是因为<code>Java</code>在编译期间，所有的泛型信息都会被擦掉，正确理解泛型概念的首要前提是理解类型擦除。<br><code>Java</code>的泛型基本上都是在编译器这个层次上实现的，在生成的字节码中是不包含泛型中的类型信息的，使用泛型的时候加上类型参数，在编译器编译的时候会去掉，这个过程就是泛型擦除。    </p>
+<p>举个例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        ArrayList&lt;String&gt; list1 = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">        list1.add(<span class="string">"abc"</span>);</span><br><span class="line"></span><br><span class="line">        ArrayList&lt;Integer&gt; list2 = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        list2.add(<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line">        System.out.println(list1.getClass() == list2.getClass());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上<code>list1.getClass==list2.getClass</code>返回<code>true</code>,说明泛型类型<code>String</code>和<code>Integer</code>都被擦除掉了，只剩下原始类型<br><code>Java</code>的泛型也可以被称作是伪泛型        </p>
+<ul>
+<li>真泛型：泛型中的类型是真实存在的。</li>
+<li>伪泛型：仅于编译时类型检查，在运行时擦除类型信息。</li>
+</ul>
+<p>看到这里我们可以自然地引出下一个问题，为什么<code>Java</code>中的泛型是伪泛型，为什么要这样实现？    </p>
+<h3 id="2-2-为什么需要泛型擦除"><a href="#2-2-为什么需要泛型擦除" class="headerlink" title="2.2 为什么需要泛型擦除?"></a>2.2 为什么需要泛型擦除?</h3><p>泛型擦除看起来有些反直觉，有些奇怪。为什么<code>Java</code>不能像<code>C#</code>一样实现真正的泛型呢?为什么<code>Java</code>的泛型要用”擦除”实现<br>单从技术来说，<code>Java</code>是完全<code>100%</code>能实现我们所说的<code>真泛型</code>，而之所以选择使用泛型擦除主要是从<code>API</code>兼容的角度考虑的<br>导致<code>Java 5</code>引入的泛型采用擦除式实现的根本原因是兼容性上的取舍，而不是“实现不了”的问题。     </p>
+<p>举个例子,<code>Java</code>到<code>1.4.2</code>都没有支持泛型，而到<code>Java 5</code>突然支持泛型了，要让以前编译的程序在新版本的<code>JRE</code>还能正常运行，就意味着以前没有的限制不能突然冒出来。<br>假如在没有泛型的<code>Java</code>里，我们有程序使用了<code>java.util.ArrayList</code>类，而且我们利用了它可以存异质元素的特性：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ArrayList things = <span class="keyword">new</span> ArrayList();</span><br><span class="line">things.add(Integer.valueof(<span class="number">42</span>));</span><br><span class="line">things.add(<span class="string">"Hello World"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>为了这段代码在<code>Java 5</code>引入泛型之后还必须要继续可以运行,有两种设计思路<br>1.需要泛型化的类型（主要是容器（<code>Collections</code>）类型），以前有的就保持不变，然后平行地加一套泛型化版本的新类型；<br>2.直接把已有的类型泛型化，让所有需要泛型化的已有类型都原地泛型化，不添加任何平行于已有类型的泛型版。     </p>
+<p><code>.NET</code>在<code>1.1 -&gt; 2.0</code>的时候选择了上面选项的1，而<code>Java</code>则选择了2。         </p>
+<p>从<code>Java</code>设计者的角度看，这个取舍很明白。<br><code>.NET</code>在<code>1.1 -&gt; 2.0</code>的时候，实际的应用代码量还很少（相对<code>Java</code>来说），而且整个体系都在微软的控制下，要做变更比较容易；<br>而<code>Java</code>在<code>1.4.2 -&gt; 5.0</code>的时候，Java已经有大量程序部署在生产环境中，已经有很多应用和库程序的代码。<br>如果这些代码在新版本的<code>Java</code>中，为了使用<code>Java</code>的新功能（例如泛型）而必须做大量源码层修改，那么新功能的普及速度就会大受影响。          </p>
+<h3 id="2-3-泛型擦除后retrofit是怎么获取类型的"><a href="#2-3-泛型擦除后retrofit是怎么获取类型的" class="headerlink" title="2.3 泛型擦除后retrofit是怎么获取类型的?"></a>2.3 泛型擦除后<code>retrofit</code>是怎么获取类型的?</h3><p><code>Retrofit</code>是如何传递泛型信息的？<br>上一段常见的网络接口请求代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span> </span>&#123;</span><br><span class="line">  <span class="meta">@GET</span>(<span class="string">"users/&#123;user&#125;/repos"</span>)</span><br><span class="line">  Call&lt;List&lt;Repo&gt;&gt; listRepos(<span class="meta">@Path</span>(<span class="string">"user"</span>) String user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>jad</code>查看反编译后的<code>class</code>文件：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> retrofit2.Call;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GitHubService</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Call <span class="title">listRepos</span><span class="params">(String s)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到<code>class</code>文件中已经将泛型信息给擦除了，那么<code>Retrofit</code>是如何拿到<code>Call&lt;List&gt;</code>的类型信息的?<br>我们看一下<code>retrofit</code>的源码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &lt;T&gt; <span class="function">ServiceMethod&lt;T&gt; <span class="title">parseAnnotations</span><span class="params">(Retrofit retrofit, Method method)</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  Type returnType = method.getGenericReturnType();</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Type <span class="title">getGenericReturnType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     <span class="comment">// 根据 Signature 信息 获取 泛型类型 </span></span><br><span class="line">    <span class="keyword">if</span> (getGenericSignature() != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> getGenericInfo().getReturnType();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; </span><br><span class="line">    	<span class="keyword">return</span> getReturnType();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出,<code>retrofit</code>是通过<code>getGenericReturnType</code>来获取类型信息的<br><code>jdk</code>的<code>Class</code> 、<code>Method</code> 、<code>Field</code> 类提供了一系列获取 泛型类型的相关方法。<br>以<code>Method</code>为例,<code>getGenericReturnType</code>获取带泛型信息的返回类型 、 <code>getGenericParameterTypes</code>获取带泛型信息的参数类型。     </p>
+<p>问：泛型的信息不是被擦除了吗？<br>答：是被擦除了， 但是某些（声明侧的泛型，接下来解释） 泛型信息会被<code>class</code>文件 以<code>Signature</code>的形式 保留在<code>Class</code>文件的<code>Constant pool</code>中。       </p>
+<p>通过<code>javap</code>命令 可以看到在<code>Constant pool</code>中<code>#5 Signature</code>记录了泛型的类型。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Constant pool:</span><br><span class="line">   #1 = Class              #16            //  com/example/diva/leet/GitHubService</span><br><span class="line">   #2 = Class              #17            //  java/lang/Object</span><br><span class="line">   #3 = Utf8               listRepos</span><br><span class="line">   #4 = Utf8               (Ljava/lang/String;)Lretrofit2/Call;</span><br><span class="line">   #5 = Utf8               Signature</span><br><span class="line">   #6 = Utf8               (Ljava/lang/String;)Lretrofit2/Call&lt;Ljava/util/List&lt;Lcom/example/diva/leet/Repo;&gt;;&gt;;</span><br><span class="line">   #7 = Utf8               RuntimeVisibleAnnotations</span><br><span class="line">   #8 = Utf8               Lretrofit2/http/GET;</span><br><span class="line">   #9 = Utf8               value</span><br><span class="line">  #10 = Utf8               users/&#123;user&#125;/repos</span><br><span class="line">  #11 = Utf8               RuntimeVisibleParameterAnnotations</span><br><span class="line">  #12 = Utf8               Lretrofit2/http/Path;</span><br><span class="line">  #13 = Utf8               user</span><br><span class="line">  #14 = Utf8               SourceFile</span><br><span class="line">  #15 = Utf8               GitHubService.java</span><br><span class="line">  #16 = Utf8               com/example/diva/leet/GitHubService</span><br><span class="line">  #17 = Utf8               java/lang/Object</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> retrofit2.Call&lt;java.util.List&lt;com.example.diva.leet.Repo&gt;&gt; listRepos(java.lang.String);</span><br><span class="line">    flags: ACC_PUBLIC, ACC_ABSTRACT</span><br><span class="line">    Signature: #6                           // (Ljava/lang/String;)Lretrofit2/Call&lt;Ljava/util/List&lt;Lcom/example/diva/leet/Repo;&gt;;&gt;;</span><br><span class="line">    RuntimeVisibleAnnotations:</span><br><span class="line">      0: #8(#9=s#10)</span><br><span class="line">    RuntimeVisibleParameterAnnotations:</span><br><span class="line">      parameter <span class="number">0</span>:</span><br><span class="line">        0: #12(#9=s#13)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这就是我们<code>retrofit</code>中能够获取泛型类型的原因    </p>
+<h3 id="2-4-Gson解析为什么要传入内部类"><a href="#2-4-Gson解析为什么要传入内部类" class="headerlink" title="2.4 Gson解析为什么要传入内部类"></a>2.4 <code>Gson</code>解析为什么要传入内部类</h3><p><code>Gson</code>是我们常用的<code>json</code>解析库,一般是这样使用的<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Gson 常用的情况</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span>  List&lt;String&gt; <span class="title">parse</span><span class="params">(String jsonStr)</span></span>&#123;</span><br><span class="line">       List&lt;String&gt; topNews =  <span class="keyword">new</span> Gson().fromJson(jsonStr, <span class="keyword">new</span> TypeToken&lt;List&lt;String&gt;&gt;() &#123;&#125;.getType());</span><br><span class="line">       <span class="keyword">return</span> topNews;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们这里可以提出两个问题<br>1.<code>Gson</code>是怎么获取泛型类型的，也是通过<code>Signature</code>吗?<br>2.为什么<code>Gson</code>解析要传入匿名内部类？这看起来有些奇怪    </p>
+<h3 id="2-4-1-那些泛型信息会被保留，哪些是真正的擦除了？"><a href="#2-4-1-那些泛型信息会被保留，哪些是真正的擦除了？" class="headerlink" title="2.4.1 那些泛型信息会被保留，哪些是真正的擦除了？"></a>2.4.1 那些泛型信息会被保留，哪些是真正的擦除了？</h3><p>上面我们说了，声明侧泛型会被记录在<code>Class</code>文件的<code>Constant pool</code>中,使用侧泛型则不会    </p>
+<p>声明侧泛型主要指以下内容<br>1.泛型类，或泛型接口的声明<br>2.带有泛型参数的方法<br>3.带有泛型参数的成员变量</p>
+<p>使用侧泛型<br>也就是方法的局部变量,方法调用时传入的变量。    </p>
+<p><code>Gson</code>解析时传入的参数属于使用侧泛型，因此不能通过<code>Signature</code>解析    </p>
+<h3 id="2-4-2-为什么Gson解析要传入匿名内部类"><a href="#2-4-2-为什么Gson解析要传入匿名内部类" class="headerlink" title="2.4.2 为什么Gson解析要传入匿名内部类"></a>2.4.2 为什么<code>Gson</code>解析要传入匿名内部类</h3><p>根据以上的总结，方法的局部变量的泛型是不会被保存的<br><code>Gson</code>是如何获取到<code>List&lt;String&gt;</code>的泛型信息<code>String</code>的呢？<br><code>Class</code>类提供了一个方法<code>public Type getGenericSuperclass()</code> ，可以获取到带泛型信息的父类<code>Type</code>。<br>也就是说<code>java</code>的<code>class</code>文件会保存继承的父类或者接口的泛型信息。          </p>
+<p>所以<code>Gson</code>使用了一个巧妙的方法来获取泛型类型：<br>1.创建一个泛型抽象类<code>TypeToken &lt;T&gt;</code> ，这个抽象类不存在抽象方法，因为匿名内部类必须继承自抽象类或者接口。所以才定义为抽象类。<br>2.创建一个 继承自<code>TypeToken</code>的匿名内部类， 并实例化泛型参数<code>TypeToken&lt;String&gt;</code><br>3.通过<code>class</code>类的<code>public Type getGenericSuperclass()</code>方法，获取带泛型信息的父类<code>Type</code>，也就是<code>TypeToken&lt;String&gt;</code>      </p>
+<p>总结：<code>Gson</code>利用子类会保存父类<code>class</code>的泛型参数信息的特点。 通过匿名内部类实现了泛型参数的传递。       </p>
+<h2 id="3-什么是PECS原则"><a href="#3-什么是PECS原则" class="headerlink" title="3.什么是PECS原则?"></a>3.什么是<code>PECS</code>原则?</h2><h3 id="3-1-PECS介绍"><a href="#3-1-PECS介绍" class="headerlink" title="3.1 PECS介绍"></a>3.1 <code>PECS</code>介绍</h3><p><code>PECS</code>的意思是<code>Producer Extend Consumer Super</code>，简单理解为如果是生产者则使用<code>Extend</code>，如果是消费者则使用<code>Super</code>，不过，这到底是啥意思呢？   </p>
+<p><code>PECS</code>是从集合的角度出发的<br>1.如果你只是从集合中取数据，那么它是个生产者，你应该用<code>extend</code><br>2.如果你只是往集合中加数据，那么它是个消费者，你应该用<code>super</code><br>3.如果你往集合中既存又取，那么你不应该用<code>extend</code>或者<code>super</code>     </p>
+<p>让我们通过一个典型的例子理解一下到底什么是<code>Producer</code>和<code>Consumer</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Collections</span> </span>&#123; </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">copy</span><span class="params">(List&lt;? <span class="keyword">super</span> T&gt; dest, List&lt;? extends T&gt; src)</span>   </span>&#123;  </span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;src.size(); i++) &#123; </span><br><span class="line">          dest.set(i, src.get(i)); </span><br><span class="line">      &#125;</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的例子中将<code>src</code>中的数据复制到<code>dest</code>中，这里<code>src</code>就是生产者，它「生产」数据，<code>dest</code>是消费者，它「消费」数据。             </p>
+<h3 id="3-2-为什么需要PECS"><a href="#3-2-为什么需要PECS" class="headerlink" title="3.2 为什么需要PECS"></a>3.2 为什么需要<code>PECS</code></h3><p><strong>使用<code>PECS</code>主要是为了实现集合的多态</strong><br>举个例子，现在有这样一个需求，将水果篮子中所有水果拿出来（即取出集合所有元素并进行操作）<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">getOutFruits</span><span class="params">(List&lt;Fruit&gt; basket)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (Fruit fruit : basket) &#123;</span><br><span class="line">        System.out.println(fruit);</span><br><span class="line">        <span class="comment">//...do something other</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">List&lt;Fruit&gt; fruitBasket = <span class="keyword">new</span> ArrayList&lt;Fruit&gt;();</span><br><span class="line">getOutFruits(fruitBasket);<span class="comment">//成功</span></span><br><span class="line"></span><br><span class="line">List&lt;Apple&gt; appleBasket = <span class="keyword">new</span> ArrayList&lt;Apple&gt;();</span><br><span class="line">getOutFruits(appleBasket);<span class="comment">//编译错误</span></span><br></pre></td></tr></table></figure></p>
+<p>如上所示:<br>1.将<code>List&lt;Apple&gt;</code>传递给<code>List&lt;Fruit&gt;</code>会编译错误。<br>2.因为虽然<code>Fruit</code>是<code>Apple</code>的父类，但是<code>List&lt;Apple&gt;</code>和<code>List&lt;Fruit&gt;</code>之间没有继承关系<br>3.因为这种限制，我们不能很好的完成取出水果篮子中的所有水果需求，总不能每个类型都写一遍一样的代码吧？    </p>
+<p>使用<code>extend</code>可以方便地解决这个问题<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**参数使用List&lt;? extends Fruit&gt;**/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">getOutFruits</span><span class="params">(List&lt;? extends Fruit&gt; basket)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (Fruit fruit : basket) &#123;</span><br><span class="line">        System.out.println(fruit);</span><br><span class="line">        <span class="comment">//...do something other</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    List&lt;Fruit&gt; fruitBasket = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    fruitBasket.add(<span class="keyword">new</span> Fruit());</span><br><span class="line">    getOutFruits(fruitBasket);</span><br><span class="line"></span><br><span class="line">    List&lt;Apple&gt; appleBasket = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    appleBasket.add(<span class="keyword">new</span> Apple());</span><br><span class="line">    getOutFruits(appleBasket);<span class="comment">//编译正确</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>List&lt;? extends Fruit&gt;</code>，同时兼容了<code>List&lt;Fruit&gt;</code>和<code>List&lt;Apple&gt;</code>，我们可以理解为<code>List&lt;? extends Fruit&gt;</code>现在是<code>List&lt;Fruit&gt;</code>和<code>List&lt;Apple&gt;</code>的超类型（父类型）<br>通过这种方式就实现了泛型集合的多态    </p>
+<h3 id="3-3-小结"><a href="#3-3-小结" class="headerlink" title="3.3 小结"></a>3.3 小结</h3><ul>
+<li>在<code>List&lt;? extends Fruit&gt;</code>的泛型集合中，对于元素的类型，编译器只能知道元素是继承自<code>Fruit</code>，具体是<code>Fruit</code>的哪个子类是无法知道的。 所以「向一个无法知道具体类型的泛型集合中插入元素是不能通过编译的」。但是由于知道元素是继承自<code>Fruit</code>，所以从这个泛型集合中取<code>Fruit</code>类型的元素是可以的。</li>
+<li>在<code>List&lt;? super Apple&gt;</code>的泛型集合中，元素的类型是<code>Apple</code>的父类，但无法知道是哪个具体的父类，因此「读取元素时无法确定以哪个父类进行读取」。 插入元素时可以插入<code>Apple</code>与<code>Apple</code>的子类，因为这个集合中的元素都是<code>Apple</code>的父类，子类型是可以赋值给父类型的。   </li>
+</ul>
+<p>有一个比较好记的口诀：<br>1.只读不可写时,使用<code>List&lt;? extends Fruit&gt;:Producer</code><br>2.只写不可读时,使用<code>List&lt;? super Apple&gt;:Consumer</code>     </p>
+<p>总得来说，<code>List&lt;Fruit&gt;</code>和<code>List&lt;Apple&gt;</code>之间没有任何继承关系。<code>API</code>的参数想要同时兼容2者，则只能使用<code>PECS</code>原则。这样做提升了<code>API</code>的灵活性，实现了泛型集合的多态<br>当然，为了提升了灵活性，自然牺牲了部分功能。鱼和熊掌不能兼得。     </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文梳理了<code>Java</code>泛型机制这个知识点，回答了如下几个问题<br>1.我们为什么需要泛型?<br>2.什么是泛型擦除?<br>3.为什么需要泛型擦除？<br>4.泛型擦除后<code>retrofit</code>怎么获得类型的?<br>5.<code>Gson</code>解析为什么要传入内部类<br>6.什么是<code>PECS</code>原则?<br>7.为什么需要<code>PECS</code>原则?    </p>
+<p>如果对您有所帮助，欢迎点赞，谢谢~</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.zhihu.com/question/28665443/answer/118148143" target="_blank" rel="noopener">Java 不能实现真正泛型的原因是什么？</a><br><a href="https://blog.csdn.net/wakewakewake/article/details/104836651" target="_blank" rel="noopener">java 的泛型擦除与 TypeToken</a><br><a href="https://elsef.com/2020/04/06/%E5%85%B3%E4%BA%8EPECS%E5%8E%9F%E5%88%99/" target="_blank" rel="noopener">关于PECS原则</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2021/06/coroutine-thread-expection.html" rel="next" title="【带着问题学】协程到底是怎么切换线程的？">
+                <i class="fa fa-chevron-left"></i> 【带着问题学】协程到底是怎么切换线程的？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2021/07/need-replace-livedata.html" rel="prev" title="官方推荐 Flow 取代 LiveData,有必要吗？">
+                官方推荐 Flow 取代 LiveData,有必要吗？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ricardo.M.Jiang</p>
+              <p class="site-description motion-element" itemprop="description">谁谓河广</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">74</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-我们为什么需要泛型"><span class="nav-number">1.</span> <span class="nav-text">1.我们为什么需要泛型?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-求和函数"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 求和函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-List中添加元素"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 List中添加元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-泛型机制的优点"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 泛型机制的优点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-泛型擦除"><span class="nav-number">2.</span> <span class="nav-text">2.泛型擦除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-什么是泛型擦除"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 什么是泛型擦除?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-为什么需要泛型擦除"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 为什么需要泛型擦除?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-泛型擦除后retrofit是怎么获取类型的"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 泛型擦除后retrofit是怎么获取类型的?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Gson解析为什么要传入内部类"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 Gson解析为什么要传入内部类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-1-那些泛型信息会被保留，哪些是真正的擦除了？"><span class="nav-number">2.5.</span> <span class="nav-text">2.4.1 那些泛型信息会被保留，哪些是真正的擦除了？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-2-为什么Gson解析要传入匿名内部类"><span class="nav-number">2.6.</span> <span class="nav-text">2.4.2 为什么Gson解析要传入匿名内部类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-什么是PECS原则"><span class="nav-number">3.</span> <span class="nav-text">3.什么是PECS原则?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-PECS介绍"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 PECS介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-为什么需要PECS"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 为什么需要PECS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-小结"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">4.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ricardo.M.Jiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
