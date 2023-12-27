@@ -4958,7 +4958,11 @@
 </ul>
 <p>同时在这里再次感谢霍丙乾，朱江，刘银龙三位讲师的大力支持，以及高金龙，关振智两位热心志愿者的鼎力帮助，期待与各位 Kotlin 开发者明年再相聚~</p>
 <p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/december/p19.png" alt></p>
-<h2 id="《Kotlin-技术月报》总结"><a href="#《Kotlin-技术月报》总结" class="headerlink" title="《Kotlin 技术月报》总结"></a>《Kotlin 技术月报》总结</h2>]]></content>
+<h2 id="《Kotlin-技术月报》总结与输出"><a href="#《Kotlin-技术月报》总结与输出" class="headerlink" title="《Kotlin 技术月报》总结与输出"></a>《Kotlin 技术月报》总结与输出</h2><p>我已经担任了一段时间的北京 Kotlin 用户组的组织者，但一直感觉对社区没有足够的输出，在参加 KotlinConf 和 Google I/O 的过程中，我发现他们都有大量的 Kotlin 技术分享，同时各地的 Kotlin 组织也举办了不少活动。因此为了帮助社区的小伙伴们更好地了解 Kotlin 相关的最新动态，我决定尝试使用月报的形式，整理展示最近一个月的 Kotlin 技术动态。</p>
+<p>月报的主要内容包括：整理展示最近一个月的最新技术动态，精选博客，精选视频，社区活动等，目前已经编写了 8 期，感兴趣的同学可查看：<a href="https://beijing-kug.github.io/news/" target="_blank" rel="noopener">https://beijing-kug.github.io/news/</a></p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/december/p20.png" alt></p>
+<p>同时在这里欢迎所有对 Kotlin 感兴趣的开发者加入用户组，在这里可以和其它成员一起讨论 Kotlin 语言的各项技术与最新特性，我们还会不定期举行分享会，进行与 Kotlin 相关的主题分享与讨论。如果你想要加入，可以关注微信公众号“程序员江同学”，点击技术讨论，加入技术交流群</p>
+<h2 id="《Android-性能优化手册》编写"><a href="#《Android-性能优化手册》编写" class="headerlink" title="《Android 性能优化手册》编写"></a>《Android 性能优化手册》编写</h2>]]></content>
       <tags>
         <tag>总结</tag>
       </tags>
