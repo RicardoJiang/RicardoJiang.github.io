@@ -4977,6 +4977,11 @@
 <li>针对启动速度、内存、卡顿、瘦身等常见优化方向，进行原理剖析并结合实战案例来解决</li>
 </ul>
 <p>对 Android 性能优化感兴趣的同学可查看：<a href="https://android-performance-optimization.github.io/" target="_blank" rel="noopener">Android 性能优化手册</a></p>
+<h2 id="Kotlin-中文开发者大会分享"><a href="#Kotlin-中文开发者大会分享" class="headerlink" title="Kotlin 中文开发者大会分享"></a>Kotlin 中文开发者大会分享</h2><p>众所周知，使用 Gson、Jackson 等框架反序列化 JSON 到 Kotlin 类时存在空安全问题和构造器默认值失效的问题，同时常用的 Gson, Moshi 等框架往往在功能上比较强大，全面，而在性能上却没有很明显的优势。为了实现更安全的 Gson 与更快的 Moshi，我们团队开发并开源了 Kudos 框架。</p>
+<p>Kudos 是 Kotlin utilities for deserializing objects 的缩写。它可以解决使用 Gson、Jackson 等框架反序列化 JSON 到 Kotlin 类时所存在的空安全问题和构造器默认值失效的问题，同时可以简化高性能的反序列化框架 JsonReader 的使用方式。<br>Kudos 已经在 Github 上开源，开源地址可见：<a href="https://github.com/kanyun-inc/Kudos" target="_blank" rel="noopener">https://github.com/kanyun-inc/Kudos</a></p>
+<p>同时我也在 2023 Kotlin 中文开发者大会上对 Kudos 框架的需求背景，使用方式，实现原理等内容做了分享，分享文字版可见：<a href="https://juejin.cn/post/7313242107681882138" target="_blank" rel="noopener">使用 KCP 打造更安全的 Gson 与更快的 Moshi</a></p>
+<p><img src="https://raw.gitmirror.com/RicardoJiang/resource/main/2023/december/p21.png" alt></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>相信大家都听过一句话，能教会别人才是真正的懂了，这句话背后的原理其实就是费曼学习法。当我们学习一个知识点时，并不是学过了就算学完了，一定要有一定的输出。在输出过程中，我们肯定也会遇到新的问题，然后继续学习、分享，循环这样一个过程，最终更全面的掌握知识，最终触类旁通，举一反三，通过输出的方式可以帮助我们更加深入的掌握知识点。这也是我一直在坚持输出的原因，希望在新的一年里可以跟大家多交流，共同进步~</p>
 ]]></content>
       <tags>
         <tag>总结</tag>
